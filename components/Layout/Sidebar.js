@@ -68,15 +68,20 @@ export default function Sidebar({
         <div className="m-1 flex items-center justify-between p-3 border border-secondary dark:border-gray-450 rounded-3xl ">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-4xl flex items-center justify-center">
-                  <img
-              src="/logo1.png"          // Place your logo in the public folder
+              <div className="w-10 h-10 ml-5 rounded-4xl flex items-center justify-center">
+                   <img
+              src="/logo3.gif"          // Place your logo in the public folder
               alt="CrowdFund Logo"
-              className="w-7 h-7 object-contain"
+              className="w-18 h-18 object-contain  dark:hidden"
+            />
+                 <img
+              src="/logo2.gif"
+              alt="CrowdFund Logo"
+              className="hidden w-18 h-18 object-contain dark:block"
             />
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-white">
-                CrowdFund Pro
+                CrowdFund 
               </span>
             </div>
           )}
