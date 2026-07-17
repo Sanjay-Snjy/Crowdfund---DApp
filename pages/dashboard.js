@@ -19,6 +19,14 @@ function Dashboard() {
   const { data: userContributions } = useUserContributions(address);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.style.colorScheme = "light";
+      window.localStorage.setItem("theme", "light");
+    }
+  }, []);
+
+  useEffect(() => {
     if (!isConnected) {
       router.push("/");
     }
@@ -45,12 +53,13 @@ function Dashboard() {
     <Layout>
       <div className="space-y-8">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-slate-500 to-slate-800 rounded-3xl p-8 text-white">
-          <div className="max-w-3xl">
+        
+        <div className="bg-gradient-to-r from-zinc-100 to-blue-300 rounded-3xl p-8 text-black">
+          <div className="max-w-4xl">
             <h1 className="text-3xl font-bold mb-4">
               Crowd Funding Marketplace! 👋
             </h1>
-            <p className="text-blue-100 text-lg mb-6">
+        <p className="bg-gradient-to-r from-blue-600 to-gray-800 bg-clip-text text-transparent mb-6">
               Discover amazing projects, support innovative ideas, or launch
               your own crowdfunding campaign.
             </p>

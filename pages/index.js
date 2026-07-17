@@ -260,9 +260,9 @@ export default function Home() {
       
       {/* Logo + Title */}
       <div className="flex items-center gap-2 min-w-0">
-        <div className="w-9 h-9 flex items-center justify-center ">
+        <div className="w-14 h-14 flex items-center justify-center ">
             <img
-              src="/logo1.png"          // Place your logo in the public folder
+              src="/logo2.gif"          // Place your logo in the public folder
               alt="CrowdFund Logo"
               className="w-full h-full object-contain"
             />

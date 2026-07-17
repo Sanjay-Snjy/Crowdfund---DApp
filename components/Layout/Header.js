@@ -9,15 +9,22 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    // Check for saved theme preference or default to light mode
-    const savedTheme = localStorage.getItem("theme");
+    const savedTheme = window.localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;
 
-    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
+    const isDashboardRoute = window.location.pathname === "/dashboard";
+    const shouldUseDark = isDashboardRoute
+      ? false
+      : savedTheme === "dark" || (!savedTheme && prefersDark);
+
+    setIsDark(shouldUseDark);
+    document.documentElement.classList.toggle("dark", shouldUseDark);
+    document.documentElement.style.colorScheme = shouldUseDark ? "dark" : "light";
+
+    if (!savedTheme || isDashboardRoute) {
+      window.localStorage.setItem("theme", shouldUseDark ? "dark" : "light");
     }
   }, []);
 
