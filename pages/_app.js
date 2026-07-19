@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import { useEffect, useState } from "react";
+import { ClerkProvider } from "@clerk/nextjs";
 import { WagmiConfig } from "wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -87,7 +88,7 @@ function MyApp({ Component, pageProps }) {
       </div>
     );
   }
-  return (
+  const appContent = (
     <div className="hydration-safe hydrated">
       <GlobalErrorBoundary>
         <QueryClientProvider client={queryClient}>
@@ -99,6 +100,22 @@ function MyApp({ Component, pageProps }) {
         </QueryClientProvider>
       </GlobalErrorBoundary>
     </div>
+  );
+
+  const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const hasValidClerkKey =
+    typeof clerkPublishableKey === "string" &&
+    clerkPublishableKey.trim().length > 0 &&
+    !clerkPublishableKey.includes("your_clerk_publishable_key_here");
+
+  if (!hasValidClerkKey) {
+    return appContent;
+  }
+
+  return (
+    <ClerkProvider publishableKey={clerkPublishableKey} afterSignOutUrl="/">
+      {appContent}
+    </ClerkProvider>
   );
 }
 

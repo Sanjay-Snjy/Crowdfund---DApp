@@ -1,14 +1,22 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useUser } from "@clerk/nextjs";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { FiMenu, FiSun, FiMoon, FiBell, FiSearch } from "react-icons/fi";
 
 export default function Header({ onMenuToggle, isCollapsed }) {
   const [isDark, setIsDark] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [walletUserName, setWalletUserName] = useState("");
+  const [linkedWalletAddress, setLinkedWalletAddress] = useState(null);
+  const [walletStatusMessage, setWalletStatusMessage] = useState("");
+  const [walletStatusError, setWalletStatusError] = useState("");
+  const [isLinkingWallet, setIsLinkingWallet] = useState(false);
   const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const router = useRouter();
+  const { user, isLoaded, isSignedIn } = useUser();
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
@@ -27,6 +35,148 @@ export default function Header({ onMenuToggle, isCollapsed }) {
       window.localStorage.setItem("theme", shouldUseDark ? "dark" : "light");
     }
   }, [router.pathname]);
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) {
+      setWalletUserName("");
+      setLinkedWalletAddress(null);
+      setWalletStatusMessage("");
+      setWalletStatusError("");
+      return;
+    }
+
+    const fallbackName =
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+      user.username ||
+      user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+      "Signed In";
+
+    setWalletUserName(fallbackName);
+  }, [isLoaded, isSignedIn, user]);
+
+  useEffect(() => {
+    const loadWalletLink = async () => {
+      if (!isLoaded || !isSignedIn || !user?.id) {
+        setLinkedWalletAddress(null);
+        setWalletStatusMessage("");
+        setWalletStatusError("");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/wallet-link?clerkUserId=${encodeURIComponent(user.id)}`
+        );
+        const data = await response.json();
+
+        if (data?.walletAddress) {
+          setLinkedWalletAddress(data.walletAddress);
+
+          if (!address || !isConnected) {
+            setWalletStatusMessage("Connect MetaMask to continue");
+            setWalletStatusError("");
+            return;
+          }
+
+          const connected = address.toLowerCase();
+          const linked = data.walletAddress.toLowerCase();
+          if (connected === linked) {
+            setWalletStatusMessage("Wallet verified");
+            setWalletStatusError("");
+          } else {
+            setWalletStatusMessage("Wallet mismatch");
+            setWalletStatusError(
+              `Linked wallet ${data.walletAddress.slice(0, 6)}...${data.walletAddress.slice(-4)} does not match the currently connected account.`
+            );
+          }
+        } else {
+          setLinkedWalletAddress(null);
+          if (isConnected && address) {
+            setWalletStatusMessage("Connect MetaMask and verify your wallet");
+            setWalletStatusError("");
+          } else {
+            setWalletStatusMessage("");
+            setWalletStatusError("");
+          }
+        }
+      } catch (error) {
+        console.error("Error loading wallet link state", error);
+      }
+    };
+
+    loadWalletLink();
+  }, [address, isConnected, isLoaded, isSignedIn, user?.id]);
+
+  const handleWalletLink = async () => {
+    if (!isLoaded || !isSignedIn || !user?.id || !address) {
+      setWalletStatusError("Please sign in and connect MetaMask first.");
+      return;
+    }
+
+    setIsLinkingWallet(true);
+    setWalletStatusError("");
+
+    try {
+      const initResponse = await fetch("/api/wallet-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "init",
+          clerkUserId: user.id,
+          walletAddress: address,
+          name:
+            user.fullName ||
+            [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+            user.username ||
+            user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+            "Signed In",
+          email: user.primaryEmailAddress?.emailAddress || "",
+        }),
+      });
+      const initData = await initResponse.json();
+
+      if (!initResponse.ok || !initData?.nonce) {
+        throw new Error(initData?.error || "Unable to start wallet verification.");
+      }
+
+      const signature = await signMessageAsync({
+        message: initData.nonce,
+      });
+
+      const verifyResponse = await fetch("/api/wallet-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "verify",
+          clerkUserId: user.id,
+          walletAddress: address,
+          nonce: initData.nonce,
+          signature,
+          name:
+            user.fullName ||
+            [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+            user.username ||
+            user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+            "Signed In",
+          email: user.primaryEmailAddress?.emailAddress || "",
+        }),
+      });
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyResponse.ok || !verifyData?.success) {
+        throw new Error(verifyData?.error || "Wallet verification failed.");
+      }
+
+      setLinkedWalletAddress(address);
+      setWalletStatusMessage("Wallet linked successfully");
+      setWalletStatusError("");
+    } catch (error) {
+      setWalletStatusError(error.message || "Wallet verification failed.");
+    } finally {
+      setIsLinkingWallet(false);
+    }
+  };
 
   const toggleTheme = () => {
     setIsDark((prev) => {
@@ -75,6 +225,18 @@ export default function Header({ onMenuToggle, isCollapsed }) {
 
         {/* Right Section */}
         <div className="flex items-center space-x-3">
+          {walletUserName && (
+            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-darkb/70 dark:text-gray-200">
+              {walletUserName}
+            </div>
+          )}
+
+          {isConnected && address && (
+            <div className="hidden md:flex items-center rounded-4xl border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
+              {address.slice(0, 6)}...{address.slice(-4)}
+            </div>
+          )}
+
           {/* Theme Toggle */}
           <buttona
             onClick={toggleTheme}
