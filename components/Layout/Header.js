@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { FiMenu, FiSun, FiMoon, FiBell, FiSearch } from "react-icons/fi";
@@ -7,36 +8,34 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   const [isDark, setIsDark] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { address, isConnected } = useAccount();
+  const router = useRouter();
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;
-
-    const isDashboardRoute = window.location.pathname === "/dashboard";
-    const shouldUseDark = isDashboardRoute
-      ? false
-      : savedTheme === "dark" || (!savedTheme && prefersDark);
+    const shouldUseDark = savedTheme
+      ? savedTheme === "dark"
+      : prefersDark;
 
     setIsDark(shouldUseDark);
     document.documentElement.classList.toggle("dark", shouldUseDark);
     document.documentElement.style.colorScheme = shouldUseDark ? "dark" : "light";
 
-    if (!savedTheme || isDashboardRoute) {
+    if (!savedTheme) {
       window.localStorage.setItem("theme", shouldUseDark ? "dark" : "light");
     }
-  }, []);
+  }, [router.pathname]);
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
+    setIsDark((prev) => {
+      const nextIsDark = !prev;
+      document.documentElement.classList.toggle("dark", nextIsDark);
+      document.documentElement.style.colorScheme = nextIsDark ? "dark" : "light";
+      localStorage.setItem("theme", nextIsDark ? "dark" : "light");
+      return nextIsDark;
+    });
   };
 
   return (

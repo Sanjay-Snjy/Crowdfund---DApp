@@ -19,14 +19,6 @@ function Dashboard() {
   const { data: userContributions } = useUserContributions(address);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.style.colorScheme = "light";
-      window.localStorage.setItem("theme", "light");
-    }
-  }, []);
-
-  useEffect(() => {
     if (!isConnected) {
       router.push("/");
     }

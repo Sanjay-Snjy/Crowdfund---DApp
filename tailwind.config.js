@@ -82,8 +82,8 @@ module.exports = {
           800: "#1f2937",
           900: "#111827",
         },
-        darkc: "#0a0e12",
-        darkb: "#1b1f24",
+        darkc: "#0d1318",
+        darkb: "#181d23",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui"],
