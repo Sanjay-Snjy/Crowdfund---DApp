@@ -24,6 +24,14 @@ function Dashboard() {
     }
   }, [isConnected, router]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
+      document.documentElement.style.colorScheme = "light";
+    }
+  }, []);
+
   if (!isConnected) {
     return (
       <Layout>

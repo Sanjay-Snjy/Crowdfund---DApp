@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useAccount, useContractRead } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
@@ -26,6 +27,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showConnectedPopup, setShowConnectedPopup] = useState(false);
   const [shouldBlinkDashboard, setShouldBlinkDashboard] = useState(false);
+  const hasValidClerkKey =
+    typeof process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "string" &&
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim().length > 0 &&
+    !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("your_clerk_publishable_key_here");
 
   // Fetch campaign counter
   const { data: campaignCount } = useContractRead({
@@ -162,6 +167,18 @@ export default function Home() {
     };
   }, []);
 
+  const applyLightTheme = () => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("theme", "light");
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = "light";
+  };
+
+  const handleGoToDashboard = () => {
+    applyLightTheme();
+    router.push("/dashboard");
+  };
+
   const [mousePosition, setMousePosition] = useState({
     x: 0,
     y: 0,
@@ -281,7 +298,7 @@ export default function Home() {
         </span>
       </div>
 
-      {/* Wallet Button */}
+      {/* Auth / Wallet Actions */}
       <div
         className={`
           px-3 sm:px-4
@@ -293,22 +310,53 @@ export default function Home() {
           relative
         `}
       >
-        <ConnectButton.Custom>
-          {({ openConnectModal, mounted, account }) => {
-            if (!mounted) return null;
+        {hasValidClerkKey ? (
+          <>
+            <SignedOut>
+              <div className="flex items-center gap-2">
+                <SignInButton mode="modal">
+                  <button className="font-medium text-black text-sm whitespace-nowrap rounded-3xl border border-gray-200 bg-white px-3 py-2">
+                    Login
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl bg-blue-600 px-3 py-2">
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
 
-            return (
-              <button
-                onClick={openConnectModal}
-                className="font-medium text-black text-sm  whitespace-nowrap sm:bg-white"
-              >
-                {account
-                  ? "Wallet Connected"
-                  : "Connect Wallet"}
-              </button>
-            );
-          }}
-        </ConnectButton.Custom>
+            <SignedIn>
+              <div className="flex items-center gap-2">
+                <UserButton afterSignOutUrl="/" />
+                <ConnectButton.Custom>
+                  {({ openConnectModal, mounted, account }) => {
+                    if (!mounted) return null;
+
+                    return (
+                      <button
+                        onClick={openConnectModal}
+                        className="font-medium text-black text-sm whitespace-nowrap sm:bg-white"
+                      >
+                        {account ? "Wallet Connected" : "Connect Wallet"}
+                      </button>
+                    );
+                  }}
+                </ConnectButton.Custom>
+              </div>
+            </SignedIn>
+          </>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.open("https://dashboard.clerk.com/last-active?path=api-keys", "_blank", "noopener,noreferrer")}
+              className="font-medium text-black text-sm whitespace-nowrap rounded-3xl border border-gray-200 bg-white px-3 py-2 shadow-sm hover:bg-gray-50"
+            >
+              Configure Clerk
+            </button>
+          </div>
+        )}
       </div>
 
     </div>
@@ -329,27 +377,73 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        {isConnected ? (
-          <button
-            onClick={() => router.push("/dashboard")}
-            className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
-          >
-            Go to Dashboard
-            <FiArrowRight className="ml-2 w-5 h-5" />
-          </button>
-        ) : (
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-blue-400">
-            <ConnectButton.Custom>
-              {({ openConnectModal }) => (
+        {hasValidClerkKey ? (
+          <>
+            <SignedOut>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <SignInButton mode="modal">
+                  <button className="bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors">
+                    Login
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="bg-blue-600 text-white px-8 py-4 rounded-4xl font-medium hover:bg-blue-700 transition-colors border border-blue-400">
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+
+            <SignedIn>
+              {isConnected ? (
                 <button
-                  onClick={openConnectModal}
-                  className="text-white font-medium"
+                  onClick={handleGoToDashboard}
+                  className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
                 >
-                  Connect Wallet to Start
+                  Go to Dashboard
+                  <FiArrowRight className="ml-2 w-5 h-5" />
                 </button>
+              ) : (
+                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-blue-400">
+                  <ConnectButton.Custom>
+                    {({ openConnectModal }) => (
+                      <button
+                        onClick={openConnectModal}
+                        className="text-white font-medium"
+                      >
+                        Connect Wallet to Start
+                      </button>
+                    )}
+                  </ConnectButton.Custom>
+                </div>
               )}
-            </ConnectButton.Custom>
-          </div>
+            </SignedIn>
+          </>
+        ) : (
+          <>
+            {isConnected ? (
+              <button
+                onClick={handleGoToDashboard}
+                className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
+              >
+                Go to Dashboard
+                <FiArrowRight className="ml-2 w-5 h-5" />
+              </button>
+            ) : (
+              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-blue-400">
+                <ConnectButton.Custom>
+                  {({ openConnectModal }) => (
+                    <button
+                      onClick={openConnectModal}
+                      className="text-white font-medium"
+                    >
+                      Connect Wallet to Start
+                    </button>
+                  )}
+                </ConnectButton.Custom>
+              </div>
+            )}
+          </>
         )}
 
         <button
