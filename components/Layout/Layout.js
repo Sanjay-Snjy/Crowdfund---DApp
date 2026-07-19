@@ -5,12 +5,28 @@ import Header from "./Header";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    const savedState = window.localStorage.getItem("sidebarCollapsed");
+    return savedState === null ? false : JSON.parse(savedState);
+  });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isDark, setIsDark] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const toggleSidebarCollapse = () => setSidebarCollapsed(!sidebarCollapsed);
+  const toggleSidebarCollapse = () => {
+    setSidebarCollapsed((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "sidebarCollapsed",
+        JSON.stringify(sidebarCollapsed)
+      );
+    }
+  }, [sidebarCollapsed]);
 
   // Check dark mode and update on theme change
   useEffect(() => {
