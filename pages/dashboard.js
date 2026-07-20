@@ -54,7 +54,7 @@ function Dashboard() {
       <div className="space-y-8">
         {/* Welcome Section */}
         
-        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner1.gif')] opacity-100 bg-cover bg-center bg-no-repeat">
+        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner01.gif')] opacity-100 bg-cover bg-center bg-no-repeat">
           <div className="max-w-4xl">
             <h1 className="text-3xl font-bold mb-4">
               Crowd Funding Marketplace! 👋
