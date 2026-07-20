@@ -150,7 +150,7 @@ export default function CampaignCard({ campaign, className = "" }) {
 
         {/* Action Button */}
         <Link href={`/campaign/${campaign.id}`}>
-          <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-2xl   transition-all duration-200 transform hover:scale-105">
+          <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl   transition-all duration-200 transform hover:scale-105">
             View Details
           </button>
         </Link>

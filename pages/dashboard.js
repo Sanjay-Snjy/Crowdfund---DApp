@@ -54,12 +54,12 @@ function Dashboard() {
       <div className="space-y-8">
         {/* Welcome Section */}
         
-        <div className="bg-gradient-to-r from-zinc-100 to-blue-300 rounded-3xl p-8 text-black">
+        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner1.gif')] opacity-100 bg-cover bg-center bg-no-repeat">
           <div className="max-w-4xl">
             <h1 className="text-3xl font-bold mb-4">
               Crowd Funding Marketplace! 👋
             </h1>
-        <p className="bg-gradient-to-r from-blue-600 to-gray-800 bg-clip-text text-transparent mb-6">
+        <p className="text-black  mb-6">
               Discover amazing projects, support innovative ideas, or launch
               your own crowdfunding campaign.
             </p>
@@ -214,7 +214,7 @@ function Dashboard() {
           </h3>
           <div className="space-y-4">
             {/* Sample activity items - you can populate this with real data */}
-            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl">
+            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-3xl">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <div className="flex-1">
                 <p className="text-sm text-gray-900 dark:text-white">
