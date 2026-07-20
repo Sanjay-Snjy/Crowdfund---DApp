@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { useAccount, useContractRead } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
@@ -19,6 +19,7 @@ import { CROWDFUNDING_ABI } from "../constants/abi";
 export default function Home() {
   const router = useRouter();
   const { isConnected } = useAccount();
+  const { user, isLoaded } = useUser();
   const [stats, setStats] = useState({
     campaignsLaunched: 0,
     fundsRaised: 0,
@@ -27,6 +28,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showConnectedPopup, setShowConnectedPopup] = useState(false);
   const [shouldBlinkDashboard, setShouldBlinkDashboard] = useState(false);
+  const [greetingIndex, setGreetingIndex] = useState(0);
+  const [isGreetingVisible, setIsGreetingVisible] = useState(true);
+  const greetingPhrases = [
+    "Hello",
+    "Ready to Fund",
+    "Support Great Ideas",
+    "Discover New Campaigns",
+    "Let's Build Together",
+  ];
   const hasValidClerkKey =
     typeof process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "string" &&
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim().length > 0 &&
@@ -184,6 +194,39 @@ export default function Home() {
     y: 0,
   });
 
+  useEffect(() => {
+    if (!isLoaded || !user) {
+      setIsGreetingVisible(true);
+      return;
+    }
+
+    let hideTimer;
+    let advanceTimer;
+
+    setIsGreetingVisible(true);
+
+    hideTimer = window.setTimeout(() => {
+      setIsGreetingVisible(false);
+    }, 2200);
+
+    advanceTimer = window.setTimeout(() => {
+      setGreetingIndex((prevIndex) => (prevIndex + 1) % greetingPhrases.length);
+      setIsGreetingVisible(true);
+    }, 2600);
+
+    return () => {
+      if (hideTimer) {
+        window.clearTimeout(hideTimer);
+      }
+      if (advanceTimer) {
+        window.clearTimeout(advanceTimer);
+      }
+    };
+  }, [greetingIndex, isLoaded, user]);
+
+  const displayName = user?.firstName || user?.username || user?.fullName || "there";
+  const displayGreeting = greetingIndex === 0 ? `Hello, ${displayName}!` : `${greetingPhrases[greetingIndex]}!`;
+
   return (
 <div
   onMouseMove={(e) => {
@@ -301,11 +344,11 @@ export default function Home() {
       {/* Auth / Wallet Actions */}
       <div
         className={`
-          px-3 sm:px-4
-          py-2
+          px-1 sm:px-4
+          py-1
           rounded-3xl
           shadow-lg
-          bg-white
+          bg-white/0
           flex-shrink-0
           relative
         `}
@@ -313,14 +356,14 @@ export default function Home() {
         {hasValidClerkKey ? (
           <>
             <SignedOut>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-white">
                 <SignInButton mode="modal">
-                  <button className="font-medium text-black text-sm whitespace-nowrap rounded-3xl border border-gray-200 bg-white px-3 py-2">
-                    Login
+                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl  px-3 py-2">
+                    Login 
                   </button>
-                </SignInButton>
+                </SignInButton> / 
                 <SignUpButton mode="modal">
-                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl bg-blue-600 px-3 py-2">
+                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl  px-3 py-2">
                     Sign Up
                   </button>
                 </SignUpButton>
@@ -337,7 +380,7 @@ export default function Home() {
                     return (
                       <button
                         onClick={openConnectModal}
-                        className="font-medium text-black text-sm whitespace-nowrap sm:bg-white"
+                        className="font-medium text-white text-sm whitespace-nowrap "
                       >
                         {account ? "Wallet Connected" : "Connect Wallet"}
                       </button>
@@ -364,10 +407,21 @@ export default function Home() {
 </header>
 
       {/* Hero Section */}
-  <section className="relative overflow-hidden mt-48 ">
+  <section className="relative overflow-hidden mt-40">
   {/* Content */}
-  <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-0 mb-12">
+  <div className="relative z-10 max-w-7xl pt-[60px] mx-auto px-4 sm:px-6 lg:px-8 mt-0 mb-12">
     <div className="text-center">
+      {isLoaded && user && (
+        <div className="absolute -mt-[60px] ml-[520px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
+          <p
+            className={`mx-auto  max-w-[20rem] break-words text-center text-lg font-semibold leading-tight text-cyan-100 transition-all duration-500 ease-out sm:max-w-[32rem] sm:text-xl ${
+              isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+            }`}
+          >
+            {displayGreeting}
+          </p>
+        </div>
+      )}
       <h1 className="text-2xl md:text-5xl font-bold text-white mb-6">
       Trusted Crowdfunding Platform!
         <span className="mt-3 block text-4xl text-blue-200">Decentralized Funding</span>
