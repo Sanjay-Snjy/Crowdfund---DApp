@@ -41,12 +41,7 @@ export const NETWORK_CONFIGS = {
 };
 
 export const SIDEBAR_ITEMS = [
-  {
-    id: "home",
-    label: "Home",
-    icon: "FiHome",
-    path: "/",
-  },
+  
   {
     id: "dashboard",
     label: "Dashboard",
@@ -56,7 +51,7 @@ export const SIDEBAR_ITEMS = [
   {
     id: "campaigns",
     label: "All Campaigns",
-    icon: "FiGrid",
+    icon: "FiList",
     path: "/campaigns",
   },
   {

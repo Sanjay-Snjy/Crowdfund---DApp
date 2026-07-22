@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import {
   FiHome,
   FiGrid,
+  FiList,
   FiPlus,
   FiUser,
   FiHeart,
@@ -18,6 +19,7 @@ import { SIDEBAR_ITEMS } from "../../constants";
 const iconMap = {
   FiHome,
   FiGrid,
+  FiList,
   FiPlus,
   FiUser,
   FiHeart,

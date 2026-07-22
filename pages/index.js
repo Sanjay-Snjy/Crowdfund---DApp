@@ -509,12 +509,12 @@ export default function Home() {
             <SignedOut>
               <div className="flex flex-col sm:flex-row gap-3">
                 <SignInButton mode="modal">
-                  <button className="bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors">
+                  <button className="bg-white text-cyan-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors">
                     Login
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="bg-blue-600 text-white px-8 py-4 rounded-4xl font-medium hover:bg-blue-700 transition-colors border border-blue-400">
+                  <button className="bg-cyan-600/40 text-white px-8 py-4 rounded-4xl font-medium hover:bg-cyan-700 transition-colors border border-cyan-400">
                     Sign Up
                   </button>
                 </SignUpButton>
@@ -573,12 +573,21 @@ export default function Home() {
           </>
         )}
 
-        <button
-          onClick={() => router.push("/campaigns")}
-          className="bg-transparent  backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
-        >
-          Explore Campaigns
-        </button>
+        <SignedIn>
+          <button
+            onClick={() => router.push("/campaigns")}
+            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
+          >
+            Explore Campaigns
+          </button>
+        </SignedIn>
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors">
+              Explore Campaigns
+            </button>
+          </SignInButton>
+        </SignedOut>
       </div>
     </div>
 </div>
@@ -598,13 +607,23 @@ export default function Home() {
                 Discover the latest ideas gaining traction
               </h2>
             </div>
-            <button
-              onClick={() => router.push("/campaigns")}
-              className=" inline-flex items-center justify-center rounded-full border border-cyan-300/30 bg-transparent backdrop-blur-sm px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
-            >
-              Explore all campaigns
-              <FiArrowRight className="ml-2 h-4 w-4" />
-            </button>
+            <SignedIn>
+              <button
+                onClick={() => router.push("/campaigns")}
+                className="inline-flex items-center justify-center rounded-full border border-cyan-300/30 bg-transparent backdrop-blur-sm px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+              >
+                Explore all campaigns
+                <FiArrowRight className="ml-2 h-4 w-4" />
+              </button>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="inline-flex items-center justify-center rounded-full border border-cyan-300/30 bg-transparent backdrop-blur-sm px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15">
+                  Explore all campaigns
+                  <FiArrowRight className="ml-2 h-4 w-4" />
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
 
           {recentCampaignsLoading ? (
