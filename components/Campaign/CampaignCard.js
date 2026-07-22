@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { FiUser, FiClock, FiTarget, FiTrendingUp } from "react-icons/fi";
 import {
   formatEther,
@@ -155,11 +156,30 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           </>
         )}
 
-        <Link href={`/campaign/${campaign.id}`}>
-          <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl   transition-all duration-200 transform hover:scale-105">
-            View Details
-          </button>
-        </Link>
+        {isLandingCard ? (
+          <>
+            <SignedIn>
+              <Link href={`/campaign/${campaign.id}`}>
+                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+                  View Details
+                </button>
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+                  View Details
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </>
+        ) : (
+          <Link href={`/campaign/${campaign.id}`}>
+            <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+              View Details
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

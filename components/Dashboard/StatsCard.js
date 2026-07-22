@@ -9,7 +9,14 @@ export function StatsCard({
   color = "blue",
 }) {
   const colorClasses = {
-   
+    blue: "from-blue-500/20 to-blue-500/20",
+    green: "from-emerald-500 to-teal-500",
+    purple: "from-violet-500 to-fuchsia-500",
+    orange: "from-orange-400 to-amber-500",
+    pink: "from-fuchsia-500 to-pink-500",
+    indigo: "from-indigo-500 to-sky-500",
+    red: "from-rose-500 to-pink-600",
+    teal: "from-teal-500 to-cyan-500",
   };
 
   return (

@@ -54,12 +54,12 @@ function Dashboard() {
       <div className="space-y-8">
         {/* Welcome Section */}
         
-        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner01.gif')] opacity-100 bg-cover bg-center bg-no-repeat">
-          <div className="max-w-4xl">
+        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner2.gif')] opacity-100 bg-[length:100%_100%]  bg-cover bg-center bg-no-repeat">
+          <div className="max-w-xl">
             <h1 className="text-3xl font-bold mb-4">
               Crowd Funding Marketplace! 👋
             </h1>
-        <p className="text-black  mb-6">
+        <p className="text-white  mb-6">
               Discover amazing projects, support innovative ideas, or launch
               your own crowdfunding campaign.
             </p>
@@ -80,15 +80,12 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Statistics */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Platform Statistics
-          </h2>
-          <DashboardStats />
-        </div>
+      
 
         {/* Quick Stats for User */}
+         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            My Statistics
+          </h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-[#e6e6e6]/60 dark:bg-darkb rounded-2xl backdrop-blur-md border border-secondary p-6">
             <div className="flex items-center justify-between">
@@ -100,8 +97,8 @@ function Dashboard() {
                   {userCampaigns?.length || 0}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gray-300 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiTarget className="w-6 h-6 text-black dark:text-white" />
+              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
+                <FiTarget className="w-6 h-6 text-blue-900 dark:text-white" />
               </div>
             </div>
           </div>
@@ -116,8 +113,8 @@ function Dashboard() {
                   {userContributions?.length || 0}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gray-300 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiUsers className="w-6 h-6 text-black dark:text-white" />
+              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
+                <FiUsers className="w-6 h-6 text-blue-900 dark:text-white" />
               </div>
             </div>
           </div>
@@ -132,8 +129,8 @@ function Dashboard() {
                   {activeCampaigns?.length || 0}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gray-300 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiActivity className="w-6 h-6 text-black dark:text-white" />
+              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
+                <FiActivity className="w-6 h-6 text-blue-900 dark:text-white" />
               </div>
             </div>
           </div>
@@ -148,13 +145,19 @@ function Dashboard() {
                   85%
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gray-300 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiTrendingUp className="w-6 h-6 text-black dark:text-white" />
+              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
+                <FiTrendingUp className="w-6 h-6 text-blue-900 dark:text-white" />
               </div>
             </div>
           </div>
         </div>
-
+  {/* Statistics */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Platform Statistics
+          </h2>
+          <DashboardStats />
+        </div>
         {/* Recent Active Campaigns */}
         <div>
           <div className="flex items-center justify-between mb-6">

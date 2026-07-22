@@ -74,6 +74,18 @@ contract CrowdfundingMarketplace is ReentrancyGuard, Ownable, Pausable {
         uint256 amount;
         uint256 timestamp;
     }
+
+    struct Milestone {
+        string title;
+        string description;
+        uint256 amount;
+        bool completed;
+        bool voteRequested;
+        bool fundsReleased;
+        uint256 approvals;
+        uint256 rejections;
+        uint256 createdAt;
+    }
     
     // State variables
     uint256 public constant CAMPAIGN_CREATION_FEE = 0 ether;
@@ -83,6 +95,9 @@ contract CrowdfundingMarketplace is ReentrancyGuard, Ownable, Pausable {
     mapping(uint256 => Campaign) public campaigns;
     mapping(uint256 => mapping(address => uint256)) public contributions;
     mapping(uint256 => Contribution[]) public campaignContributions;
+    mapping(uint256 => Milestone[]) public campaignMilestones;
+    mapping(uint256 => mapping(uint256 => mapping(address => bool))) public milestoneVoted;
+    mapping(uint256 => uint256) public releasedAmount;
     mapping(address => uint256[]) public userCampaigns;
     mapping(address => uint256[]) public userContributions;
     
