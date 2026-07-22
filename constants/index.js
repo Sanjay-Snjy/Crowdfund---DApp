@@ -60,12 +60,7 @@ export const SIDEBAR_ITEMS = [
     icon: "FiPlus",
     path: "/create-campaign",
   },
-  {
-    id: "my-campaigns",
-    label: "My Campaigns",
-    icon: "FiUser",
-    path: "/my-campaigns",
-  },
+ 
   {
     id: "contributions",
     label: "My Contributions",

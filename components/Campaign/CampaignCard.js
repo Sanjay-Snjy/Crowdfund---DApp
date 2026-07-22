@@ -38,7 +38,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
 
   return (
     <div
-      className={`bg-[#e6e6e6]/40 backdrop-blur-sm border border-secondary dark:bg-darkb rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group ${className}`}
+      className={`bg-slate-50 backdrop-blur-sm border border-secondary dark:bg-darkb rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group ${className}`}
     >
       {/* Image */}
       <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600 overflow-hidden">
