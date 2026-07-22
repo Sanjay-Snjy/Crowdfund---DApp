@@ -33,19 +33,18 @@ export default function CreateCampaignPage() {
 
   return (
     <Layout>
-      <main className="max-w-6xl mx-auto px-4 py-10 lg:py-14">
-        <section className="text-center mb-10">
+      <main className="max-w-8xl mx-auto px-0 py-0 lg:py-0">
+        <section className="ml-[25px] text-left mb-10">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-600 dark:text-blue-300">
             Launch a campaign
           </p>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+          <h1 className="mt-4 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Create your campaign with confidence
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-gray-600 dark:text-gray-300 text-base sm:text-lg">
+          <p className="mt-4 max-w-2xl  text-gray-600 dark:text-gray-300 text sm:text-md">
             Share your story, set your goal, and invite supporters to back your mission.
           </p>
         </section>
-
         <CreateCampaignForm />
       </main>
     </Layout>

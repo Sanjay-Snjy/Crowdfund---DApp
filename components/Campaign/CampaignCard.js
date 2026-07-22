@@ -10,7 +10,7 @@ import {
 } from "../../utils/helpers";
 import { getFromIPFS } from "../../utils/ipfs";
 
-export default function CampaignCard({ campaign, className = "", isLandingCard = false }) {
+export default function CampaignCard({ campaign, className = "", isLandingCard = false, viewMode = "grid" }) {
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,61 +38,54 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
 
   return (
     <div
-      className={`bg-slate-50 backdrop-blur-sm border border-secondary dark:bg-darkb rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group ${className}`}
+      className={`bg-white border border-slate-200 shadow-lg shadow-slate-200/40 rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-slate-950 dark:border-slate-800 dark:shadow-none ${
+        viewMode === "list"
+          ? "flex flex-col gap-6 md:flex-row md:items-center"
+          : ""
+      } ${className}`}
     >
-      {/* Image */}
-      <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600 overflow-hidden">
+      <div className={`relative overflow-hidden ${viewMode === "list" ? "md:w-1/3" : ""}`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-slate-700 to-slate-950 opacity-20" />
         {metadata?.image ? (
           <img
             src={metadata.image}
             alt={campaign.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="h-56 w-full object-cover transition-transform duration-500 ease-out hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-white text-6xl font-bold opacity-20">
-              {campaign.title?.charAt(0) || "C"}
-            </div>
+          <div className="flex h-56 items-center justify-center bg-slate-100 text-6xl font-bold text-slate-300 dark:bg-slate-900 dark:text-slate-600">
+            {campaign.title?.charAt(0) || "C"}
           </div>
         )}
 
-        {/* Status Badge */}
         {!isLandingCard && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute inset-x-0 top-4 flex items-center justify-between px-4">
             <span
-              className={`
-            px-2 py-1 text-xs font-medium rounded-full
-            ${
-              campaign.active
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            }
-          `}
+              className={`rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm ${
+                campaign.active
+                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                  : "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
+              }`}
             >
               {campaign.active ? "Active" : "Inactive"}
             </span>
-          </div>
-        )}
-
-        {/* Time Left Badge */}
-        {!isLandingCard && !timeLeft.expired && (
-          <div className="absolute top-3 left-3">
-            <span className="px-2 py-1 text-xs font-medium bg-black bg-opacity-50 text-white rounded-full backdrop-blur-sm">
-              <FiClock className="inline w-3 h-3 mr-1" />
-              {timeLeft.text}
-            </span>
+            {!timeLeft.expired && (
+              <span className="rounded-full bg-slate-900/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                <FiClock className="inline h-3 w-3 mr-1" />
+                {timeLeft.text}
+              </span>
+            )}
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-6">
+      <div className={`p-6 ${viewMode === "list" ? "md:w-2/3" : ""}`}>
         <div className="mb-4">
-          <h3 className={`text-lg font-bold mb-2 line-clamp-2 ${isLandingCard ? "text-white" : "text-gray-900 dark:text-white"}`}>
+          <h3 className={`text-xl font-semibold tracking-tight ${isLandingCard ? "text-white" : "text-slate-950 dark:text-white"}`}>
             {campaign.title}
           </h3>
           {!isLandingCard && (
-            <p className={`text-sm line-clamp-2 ${isLandingCard ? "text-slate-700" : "text-gray-600 dark:text-gray-400"}`}>
+            <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400 line-clamp-3">
               {campaign.description}
             </p>
           )}
@@ -100,57 +93,47 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
 
         {!isLandingCard && (
           <>
-            {/* Creator */}
-            <div className={`flex items-center mb-4 text-sm ${isLandingCard ? "text-slate-500" : "text-gray-500 dark:text-gray-400"}`}>
-              <FiUser className="w-4 h-4 mr-2" />
-              <span>by {formatAddress(campaign.creator)}</span>
+            <div className="mb-5 text-sm text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2">
+                <FiUser className="h-4 w-4" />
+                <span>by {formatAddress(campaign.creator)}</span>
+              </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Progress
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {progress.toFixed(1)}%
-                </span>
+            <div className="mb-5 rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
+              <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-3">
+                <span>Funding progress</span>
+                <span>{Math.min(progress, 100).toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                 <div
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-violet-500 transition-all duration-500"
                   style={{ width: `${Math.min(progress, 100)}%` }}
                 />
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs mb-1">
-                  <FiTrendingUp className="w-3 h-3 mr-1" />
-                  Raised
-                </div>
-                <div className={`font-bold ${isLandingCard ? "text-slate-900" : "text-gray-900 dark:text-white"}`}>
+            <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
+                <p className="text-slate-500 dark:text-slate-400">Raised</p>
+                <p className="mt-2 text-lg font-semibold text-slate-950 dark:text-white">
                   {parseFloat(raisedAmount).toFixed(2)} ETH
-                </div>
+                </p>
               </div>
-              <div>
-                <div className={`flex items-center text-xs mb-1 ${isLandingCard ? "text-slate-500" : "text-gray-500 dark:text-gray-400"}`}>
-                  <FiTarget className="w-3 h-3 mr-1" />
-                  Target
-                </div>
-                <div className={`font-bold ${isLandingCard ? "text-slate-900" : "text-gray-900 dark:text-white"}`}>
+              <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
+                <p className="text-slate-500 dark:text-slate-400">Target</p>
+                <p className="mt-2 text-lg font-semibold text-slate-950 dark:text-white">
                   {parseFloat(targetAmount).toFixed(2)} ETH
-                </div>
+                </p>
               </div>
             </div>
 
-            {/* Contributors Count */}
-            <div className={`flex items-center justify-between text-sm mb-4 ${isLandingCard ? "text-slate-500" : "text-gray-500 dark:text-gray-400"}`}>
+            <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-6">
               <span>{campaign.contributorsCount || 0} contributors</span>
               {timeLeft.expired && (
-                <span className="text-red-500 font-medium">Expired</span>
+                <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-700 dark:bg-rose-900 dark:text-rose-200">
+                  Expired
+                </span>
               )}
             </div>
           </>
@@ -160,14 +143,14 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           <>
             <SignedIn>
               <Link href={`/campaign/${campaign.id}`}>
-                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+                <button className="w-full rounded-3xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.01]">
                   View Details
                 </button>
               </Link>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+                <button className="w-full rounded-3xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.01]">
                   View Details
                 </button>
               </SignInButton>
@@ -175,7 +158,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           </>
         ) : (
           <Link href={`/campaign/${campaign.id}`}>
-            <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-3xl transition-all duration-200 transform hover:scale-105">
+            <button className="w-full rounded-3xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.01]">
               View Details
             </button>
           </Link>
