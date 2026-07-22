@@ -1,6 +1,8 @@
+import { useState, useEffect, useMemo } from "react";
 import {
   useAccount,
   useContractRead,
+  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
@@ -160,6 +162,214 @@ export const useContract = () => {
       isLoading,
       isSuccess,
       error,
+    };
+  };
+
+  const useAddMilestone = () => {
+    const { write, writeAsync, isLoading, isSuccess, error } = useContractWrite({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "addCampaignMilestone",
+      onSuccess() {
+        toast.success("Milestone added successfully!");
+      },
+      onError(err) {
+        console.error("Milestone add error:", err);
+        toast.error(err?.message || "Failed to add milestone");
+      },
+    });
+
+    return {
+      addMilestone: write,
+      addMilestoneAsync: writeAsync,
+      isLoading,
+      isSuccess,
+      error,
+    };
+  };
+
+  const useRequestMilestoneVote = () => {
+    const { write, writeAsync, isLoading, isSuccess, error } = useContractWrite({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "requestMilestoneVote",
+      onSuccess() {
+        toast.success("Milestone vote requested successfully!");
+      },
+      onError(err) {
+        console.error("Milestone vote request error:", err);
+        toast.error(err?.message || "Failed to request milestone vote");
+      },
+    });
+
+    return {
+      requestMilestoneVote: write,
+      requestMilestoneVoteAsync: writeAsync,
+      isLoading,
+      isSuccess,
+      error,
+    };
+  };
+
+  const useVoteOnMilestone = () => {
+    const { write, writeAsync, isLoading, isSuccess, error } = useContractWrite({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "voteOnMilestone",
+      onSuccess() {
+        toast.success("Vote submitted successfully!");
+      },
+      onError(err) {
+        console.error("Vote on milestone error:", err);
+        toast.error(err?.message || "Failed to submit vote");
+      },
+    });
+
+    return {
+      voteOnMilestone: write,
+      voteOnMilestoneAsync: writeAsync,
+      isLoading,
+      isSuccess,
+      error,
+    };
+  };
+
+  const useReleaseMilestoneFunds = () => {
+    const { write, writeAsync, isLoading, isSuccess, error } = useContractWrite({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "releaseMilestoneFunds",
+      onSuccess() {
+        toast.success("Milestone funds released successfully!");
+      },
+      onError(err) {
+        console.error("Release milestone funds error:", err);
+        toast.error(err?.message || "Failed to release milestone funds");
+      },
+    });
+
+    return {
+      releaseMilestoneFunds: write,
+      releaseMilestoneFundsAsync: writeAsync,
+      isLoading,
+      isSuccess,
+      error,
+    };
+  };
+
+  const useMilestoneCount = (campaignId) => {
+    return useContractRead({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "getMilestoneCount",
+      args: campaignId ? [campaignId] : undefined,
+      enabled: Boolean(campaignId && CONTRACT_ADDRESS),
+      watch: true,
+      cacheTime: 30000,
+    });
+  };
+
+  const useMilestone = (campaignId, milestoneIndex) => {
+    return useContractRead({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "getMilestone",
+      args:
+        campaignId !== undefined && milestoneIndex !== undefined
+          ? [campaignId, milestoneIndex]
+          : undefined,
+      enabled:
+        Boolean(campaignId !== undefined && milestoneIndex !== undefined && CONTRACT_ADDRESS),
+      watch: true,
+      cacheTime: 30000,
+    });
+  };
+
+  const useMilestoneVoted = (campaignId, milestoneIndex, contributor) => {
+    return useContractRead({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "hasVotedOnMilestone",
+      args:
+        campaignId !== undefined && milestoneIndex !== undefined && contributor
+          ? [campaignId, milestoneIndex, contributor]
+          : undefined,
+      enabled:
+        Boolean(campaignId !== undefined && milestoneIndex !== undefined && contributor && CONTRACT_ADDRESS),
+      watch: true,
+      cacheTime: 30000,
+    });
+  };
+
+  const useCampaignMilestones = (campaignId) => {
+    const { data: milestoneCount, isLoading: loadingCount } = useMilestoneCount(
+      campaignId
+    );
+
+    const count = milestoneCount
+      ? Number(milestoneCount.toString())
+      : 0;
+
+    const milestoneCalls = useMemo(() => {
+      if (!campaignId || count === 0) return [];
+      return Array.from({ length: count }, (_, index) => ({
+        address: CONTRACT_ADDRESS,
+        abi: CROWDFUNDING_ABI,
+        functionName: "getMilestone",
+        args: [campaignId, index],
+      }));
+    }, [campaignId, count]);
+
+    const {
+      data: milestoneData,
+      isLoading: loadingMilestones,
+      error: milestoneError,
+    } = useContractReads({
+      contracts: milestoneCalls,
+      enabled: milestoneCalls.length > 0,
+      watch: true,
+    });
+
+    const milestones = useMemo(() => {
+      if (!milestoneData) return [];
+      return milestoneData
+        .map((result, index) => {
+          if (result.status === "success") {
+            const [
+              title,
+              description,
+              amount,
+              completed,
+              voteRequested,
+              fundsReleased,
+              approvals,
+              rejections,
+              createdAt,
+            ] = result.result;
+            return {
+              campaignId,
+              index,
+              title,
+              description,
+              amount,
+              completed,
+              voteRequested,
+              fundsReleased,
+              approvals,
+              rejections,
+              createdAt,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }, [milestoneData, campaignId]);
+
+    return {
+      data: milestones,
+      count,
+      isLoading: loadingCount || loadingMilestones,
+      error: milestoneError,
     };
   };
 
@@ -679,6 +889,11 @@ export const useContract = () => {
     useContributeToCampaignSimple,
     useWithdrawFunds,
     useGetRefund,
+    useAddMilestone,
+    useRequestMilestoneVote,
+    useVoteOnMilestone,
+    useReleaseMilestoneFunds,
+    useCampaignMilestones,
     useCampaign,
     useActiveCampaigns,
     useUserCampaigns,
