@@ -223,16 +223,16 @@ export default function CreateCampaignForm() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-10">
+    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-0">
       <div className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
           <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 p-8 sm:p-10">
-            <div className="mb-8">
+            <div className="mb-6">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-600 dark:text-blue-300">
                 New campaign
               </p>
              
-              <p className="mt-4 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-400">
+              <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-400">
                 Complete the form below to define your goal, story, and funding timeline.
               </p>
             </div>
@@ -251,8 +251,8 @@ export default function CreateCampaignForm() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid gap-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                     Campaign Title
@@ -433,25 +433,20 @@ export default function CreateCampaignForm() {
                   className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
                 />
               </div>
-
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Make sure your campaign message is clear and the funding goal is achievable.
-                  </p>
-                </div>
+              <div className="flex flex-col items-center justify-center gap-4">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Make sure your campaign message is clear and the funding goal is achievable.
+                </p>
                 <button
-                  type="submit"
-                  disabled={isLoading || uploading}
-                  className="inline-flex items-center justify-center rounded-3xl bg-gradient-to-r from-blue-600 to-violet-600 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                type="submit"
+                disabled={isLoading || uploading}
+                className="rounded-3xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {uploading
-                    ? "Uploading to IPFS..."
-                    : isLoading
-                    ? "Creating Campaign..."
-                    : "Create Campaign"}
-                </button>
-              </div>
+                  ? "Uploading to IPFS..."
+                  : isLoading? "Creating Campaign...": "Create Campaign"}
+                  </button>
+                  </div>
             </form>
           </div>
         </div>
