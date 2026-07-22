@@ -675,14 +675,14 @@ export default function Home() {
       {/* Features Section */}
       <section className="relative z-10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <div className="text-center mb-4">
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
               Built for modern crowdfunding
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-0">
               Why founders trust CrowdFund
             </h2>
-            <p className="mx-auto max-w-3xl text-lg text-white/75">
+            <p className="mx-auto max-w-3xl text-lg text-white/74">
               Powerful campaign tools, secure transactions, and better visibility for supporters—designed to help great ideas thrive.
             </p>
           </div>
