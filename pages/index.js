@@ -12,9 +12,20 @@ import {
   FiDatabase,
   FiFlag,
   FiThumbsUp,
+  FiClock,
+  FiCheckCircle,
+  FiTrendingUp,
+  FiBookOpen,
+  FiBriefcase,
+  FiBook,
+  FiHeart,
+  FiZap,
+  FiPenTool,
 } from "react-icons/fi";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
+import { useContract } from "../hooks/useContract";
+import CampaignCard from "../components/Campaign/CampaignCard";
 
 export default function Home() {
   const router = useRouter();
@@ -162,7 +173,69 @@ export default function Home() {
       description:
         "Community votes determine how donations are allocated to the most promising and impactful ideas.",
     },
-];
+  ];
+
+  const howItWorks = [
+    {
+      icon: FiCheckCircle,
+      title: "Publish with confidence",
+      description:
+        "Use straightforward campaign setup tools and launch with full visibility for backers.",
+    },
+    {
+      icon: FiClock,
+      title: "Track progress in real time",
+      description:
+        "Monitor funding milestones, contributions, and campaign momentum from one dashboard.",
+    },
+    {
+      icon: FiUsers,
+      title: "Connect with supporters",
+      description:
+        "Build trust with clear updates, campaign transparency, and reliable on-chain data.",
+    },
+  ];
+
+  const campaignCategories = [
+    {
+      icon: FiBookOpen,
+      title: "Student Projects",
+      description: "Fund ideas from classrooms and campus innovators.",
+    },
+    {
+      icon: FiBriefcase,
+      title: "Startups",
+      description: "Support scalable startups and early-stage founders.",
+    },
+    {
+      icon: FiBook,
+      title: "Education",
+      description: "Back scholarships, learning tools, and school programs.",
+    },
+    {
+      icon: FiHeart,
+      title: "Medical",
+      description: "Help fund urgent care, recovery, and health solutions.",
+    },
+    {
+      icon: FiGlobe,
+      title: "Social Causes",
+      description: "Support community impact, relief, and advocacy campaigns.",
+    },
+    {
+      icon: FiZap,
+      title: "Research & Innovation",
+      description: "Invest in experiments and next-generation breakthroughs.",
+    },
+  ,
+  ];
+
+  const { useActiveCampaigns } = useContract();
+  const { data: recentCampaigns, isLoading: recentCampaignsLoading } = useActiveCampaigns(0, 4);
+  const visibleRecentCampaigns = Array.isArray(recentCampaigns)
+    ? recentCampaigns.slice(0, 4)
+    : [];
+
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -242,11 +315,11 @@ export default function Home() {
     overflow-hidden
     bg-cover
     bg-no-repeat
-    bg-[78%_-40px]
-      sm:bg-[center_-400px]
+    bg-[8%_-40px]
+      sm:bg-[78%_-00px]
   "
   style={{
-    backgroundImage: "url('/qwe.png')",
+    backgroundImage: "url('/qweas.png')",
   }}
 >
   {/* Wallet Connected Popup - Full Page Blur */}
@@ -412,9 +485,9 @@ export default function Home() {
   <div className="relative z-10 max-w-7xl pt-[60px] mx-auto px-4 sm:px-6 lg:px-8 mt-0 mb-12">
     <div className="text-center">
       {isLoaded && user && (
-        <div className="absolute -mt-[60px] ml-[520px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
+        <div className="absolute -mt-[60px] ml-[500px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
           <p
-            className={`mx-auto  max-w-[20rem] break-words text-center text-lg font-semibold leading-tight text-cyan-100 transition-all duration-500 ease-out sm:max-w-[32rem] sm:text-xl ${
+            className={`text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3 mx-auto [text-shadow:0_0_10px_rgba(255,255,255,0.8)] max-w-[20rem] break-words text-center leading-tight  transition-all duration-500 ease-out sm:max-w-[32rem]  ${
               isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
             }`}
           >
@@ -502,7 +575,7 @@ export default function Home() {
 
         <button
           onClick={() => router.push("/campaigns")}
-          className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
+          className="bg-transparent  backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
         >
           Explore Campaigns
         </button>
@@ -513,71 +586,172 @@ export default function Home() {
 </section>
             <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
-      {/* Features Section */}
-      <section className="relative z-10 py-10 ">
+      {/* Recent Campaigns Section */}
+      <section className="relative z-10 py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white dark:text-white mb-4">
-              Why Choose CrowdFund Pro?
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
+            <div>
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
+                Recent campaigns launched
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
+                Discover the latest ideas gaining traction
+              </h2>
+            </div>
+            <button
+              onClick={() => router.push("/campaigns")}
+              className=" inline-flex items-center justify-center rounded-full border border-cyan-300/30 bg-transparent backdrop-blur-sm px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              Explore all campaigns
+              <FiArrowRight className="ml-2 h-4 w-4" />
+            </button>
+          </div>
+
+          {recentCampaignsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+              {[...Array(4)].map((_, index) => (
+                <div
+                  key={index}
+                  className="h-72 rounded-[1.5rem] border border-white/10 bg-transparent p-4 animate-pulse "
+                />
+              ))}
+            </div>
+          ) : visibleRecentCampaigns.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+              {visibleRecentCampaigns.map((campaign) => (
+                <CampaignCard
+                  key={campaign.id}
+                  campaign={campaign}
+                  isLandingCard
+                  className="border-white/10 shadow-2xl bg-transparent"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-8 text-center text-white/80">
+              No recent campaigns are available right now.
+            </div>
+          )}
+        </div>
+      </section>
+
+            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+
+      {/* Explore Fundraising Categories Section */}
+      <section className="relative z-10 py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
+              Explore fundraising categories
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
+              Find the right category for your next campaign
             </h2>
-            <p className="text-xl text-white/80 dark:text-gray-400">
-              Experience the power of decentralized crowdfunding
+            <p className="mx-auto mt-4 max-w-2xl text-white/75">
+              Discover projects across six professional categories, each designed to connect funders with the causes they care about most.
             </p>
           </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-  {features.map((feature, index) => (
-    <div
-      key={index}
-      className={`
-        text-center py-4
-        ${features.length === 6 && index === 4 ? "lg:col-start-2" : ""}
-      `}
-    >
-      <div className="w-16 h-16 bg-cyan-400/50 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <feature.icon className="w-8 h-8 text-white" />
-      </div>
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {campaignCategories.map((category, index) => (
+              <div
+                key={index}
+                className="group rounded-[1.75rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-cyan-400/10 text-cyan-200 mb-5 transition-colors duration-300 group-hover:bg-cyan-400/20 group-hover:text-white">
+                  <category.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">{category.title}</h3>
+                <p className="text-white/70 mb-6">{category.description}</p>
+               
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <h3 className="text-xl font-semibold text-white/90 dark:text-white mb-2">
-        {feature.title}
-      </h3>
+            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
-      <p className="text-white/70 dark:text-gray-400">
-        {feature.description}
-      </p>
-    </div>
-  ))}
-</div>
+      {/* Features Section */}
+      <section className="relative z-10 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
+              Built for modern crowdfunding
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Why founders trust CrowdFund
+            </h2>
+            <p className="mx-auto max-w-3xl text-lg text-white/75">
+              Powerful campaign tools, secure transactions, and better visibility for supporters—designed to help great ideas thrive.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5  backdrop-blur-sm p-8  transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
+              >
+                <div className="absolute inset-x-0 top-0 h-32 bg-transparent" />
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-3xl bg-cyan-400/15 text-cyan-200 mb-6 transition group-hover:bg-cyan-400/25 group-hover:text-white">
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <h3 className="relative text-xl font-semibold text-white mb-3">
+                  {feature.title}
+                </h3>
+                <p className="relative  text-white/70">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
             <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent " /> 
 
       {/* Stats Section */}
-      <section className="relative z-10 py-14 ">
+      <section className="relative z-10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-cyan-400/80 dark:text-blue-400 mb-2">
-                {loading ? "..." : stats.campaignsLaunched}
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-10 shadow-2xl shadow-cyan-500/10 backdrop-blur-xl">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
+                  Real-time platform momentum
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+            Our Impact Stats
+                </h2>
               </div>
-              <div className="text-white dark:text-gray-400">
-                Campaigns Launched
-              </div>
+              <p className="max-w-xl text-sm leading-7 text-white/70 md:text-right">
+                Live campaign metrics, funds raised, and supporter activity that show how CrowdFund works for creators and contributors.
+              </p>
             </div>
-            <div>
-              <div className="text-4xl font-bold text-cyan-400/80 dark:text-blue-400 mb-2">
-                {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
+
+            <div className="mt-10 grid gap-6 sm:grid-cols-3">
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+                <div className="text-3xl font-extrabold text-white mb-3">
+                  {loading ? "..." : stats.campaignsLaunched}
+                </div>
+                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
+                  Campaigns Launched
+                </div>
               </div>
-              <div className="text-white dark:text-gray-400">
-                Funds Raised
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+                <div className="text-3xl font-extrabold text-white mb-3">
+                  {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
+                </div>
+                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
+                  Funds Raised
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-cyan-400/80 dark:text-blue-400 mb-2">
-                {loading ? "..." : stats.contributors}
-              </div>
-              <div className="text-white dark:text-gray-400">
-                Contributors
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+                <div className="text-3xl font-extrabold text-white mb-3">
+                  {loading ? "..." : stats.contributors}
+                </div>
+                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
+                  Contributors
+                </div>
               </div>
             </div>
           </div>
@@ -593,7 +767,7 @@ export default function Home() {
             <div className="flex items-center justify-center space-x-2 mb-4">
               <div className="w-8 h-8 flex items-center justify-center">
                  <img
-              src="/logo1.png"          // Place your logo in the public folder
+              src="/logo2.gif"          // Place your logo in the public folder
               alt="CrowdFund Logo"
               className="w-full h-full object-contain"
             />
@@ -604,7 +778,7 @@ export default function Home() {
               Decentralized crowdfunding for the future
             </p>
             <p className="text-gray-400 text-sm">
-              © 2025 CrowdFund. Built on Ethereum.
+              © 2026 Project: CrowdFund_G52.
             </p><br></br><br></br>
           </div>
         </div>
@@ -612,3 +786,4 @@ export default function Home() {
     </div>
   );
 }
+
