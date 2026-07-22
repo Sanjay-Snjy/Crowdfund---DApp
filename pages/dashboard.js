@@ -18,6 +18,22 @@ function Dashboard() {
   const { data: userCampaigns } = useUserCampaigns(address);
   const { data: userContributions } = useUserContributions(address);
 
+  const successRate = userCampaigns?.length
+    ? Math.round(
+        (userCampaigns.filter((campaign) => {
+          try {
+            const raised = parseFloat(campaign.raisedAmount?.toString() || "0");
+            const target = parseFloat(campaign.targetAmount?.toString() || "0");
+            return target > 0 && raised >= target;
+          } catch {
+            return false;
+          }
+        }).length /
+          userCampaigns.length) *
+          100
+      )
+    : 0;
+
   useEffect(() => {
     if (!isConnected) {
       router.push("/");
@@ -35,13 +51,11 @@ function Dashboard() {
   if (!isConnected) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Connect Your Wallet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please connect your wallet to access the dashboard.
+        <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
+          <div className="rounded-[32px] border border-slate-200 bg-white/90 p-10 text-center shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-950 dark:text-white">
+            <h2 className="text-3xl font-semibold mb-3">Connect Your Wallet</h2>
+            <p className="text-slate-600 dark:text-slate-400">
+              Please connect your wallet to access your Crowdfunding dashboard.
             </p>
           </div>
         </div>
@@ -49,188 +63,179 @@ function Dashboard() {
     );
   }
 
-  return (    
+  return (
     <Layout>
-      <div className="space-y-8">
-        {/* Welcome Section */}
-        
-        <div className="relative rounded-3xl p-8 text-white overflow-hidden bg-[url('/banner2.gif')] opacity-100 bg-[length:100%_100%]  bg-cover bg-center bg-no-repeat">
-          <div className="max-w-xl">
-            <h1 className="text-3xl font-bold mb-4">
-              Crowd Funding Marketplace! 👋
-            </h1>
-        <p className="text-white  mb-6">
-              Discover amazing projects, support innovative ideas, or launch
-              your own crowdfunding campaign.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => router.push("/create-campaign")}
-                className="bg-white text-blue-600 px-6 py-3 rounded-4xl font-medium hover:bg-blue-50 transition-colors"
-              >
-                Create Campaign
-              </button>
-              <button
-                onClick={() => router.push("/campaigns")}
-                className="bg-blue-600 text-white px-6 py-3 rounded-4xl font-medium hover:bg-blue-700 transition-colors border border-blue-400"
-              >
-                Browse Campaigns
-              </button>
+      <div className="mx-auto max-w-8xl px-4 py-8 sm:px-6 lg:px-0 lg:py-0">
+        <div className="grid gap-8 xl:grid-cols-[1.45fr_0.75fr]">
+          <section className="rounded-[32px]  bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30 dark:text-white">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-blue-800 dark:text-slate-400">
+                  Dashboard
+                </p>
+                <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
+                  Your crowdfunding insights
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
+                  Monitor your campaign metrics, recent activity, and featured projects from one elegant workspace.
+                </p>
+              </div>
+             
             </div>
-          </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Created campaigns</p>
+                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-white">{userCampaigns?.length || 0}</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Campaigns you have launched.</p>
+              </div>
+              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total contributions</p>
+                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-white">{userContributions?.length || 0}</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Your active backers on the platform.</p>
+              </div>
+              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Active campaigns</p>
+                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-white">{activeCampaigns?.length || 0}</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Live campaigns on the marketplace.</p>
+              </div>
+              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Success rate</p>
+                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-white">{successRate}%</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Share of your campaigns that met the goal.</p>
+              </div>
+            </div>
+             <div className="mt-[50px] ml-[200px] flex flex-wrap gap-3">
+                <button
+                  onClick={() => router.push("/create-campaign")}
+                  className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
+                >
+                  Launch campaign
+                </button>
+                <button
+                  onClick={() => router.push("/campaigns")}
+                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                >
+                  Browse projects
+                </button>
+              </div>
+          </section>
+
+          <aside className="space-y-6">
+            <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450  p-6 shadow-xl shadow-slate-200/20 ">
+              <p className="text-sm uppercase tracking-[0.24em] text-blue-800 dark:text-slate-400">Quick insights</p>
+              <div className="mt-6 space-y-4">
+                <div className="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
+                  <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{activeCampaigns?.length || 0}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Created campaigns</p>
+                      <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{userCampaigns?.length || 0}</p>
+                    </div>
+                    <button
+                      onClick={() => router.push("/my-campaigns")}
+                      className="inline-flex items-center justify-center mt-8 rounded-full bg-blue-600 px-2 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-blue-700"
+                    >
+                      View my campaigns
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-6 shadow-xl shadow-slate-200/20 dark:text-white">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Activity snapshot</p>
+              <div className="mt-5 space-y-4">
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">No activity yet</p>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Your campaign events will appear here once funding begins.</p>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
 
-      
-
-        {/* Quick Stats for User */}
-         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            My Statistics
-          </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-[#e6e6e6]/60 dark:bg-darkb rounded-2xl backdrop-blur-md border border-secondary p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  My Campaigns
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {userCampaigns?.length || 0}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiTarget className="w-6 h-6 text-blue-900 dark:text-white" />
-              </div>
+        <section className="mt-10 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold">Platform statistics</h2>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Marketplace performance metrics across all campaigns.</p>
             </div>
           </div>
-
-          <div className="bg-[#e6e6e6]/60 dark:bg-darkb rounded-2xl backdrop-blur-md border border-secondary p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Contributions
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {userContributions?.length || 0}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiUsers className="w-6 h-6 text-blue-900 dark:text-white" />
-              </div>
-            </div>
+          <div className="mt-6">
+            <DashboardStats />
           </div>
+        </section>
 
-          <div className="bg-[#e6e6e6]/60 dark:bg-darkb rounded-2xl backdrop-blur-md border border-secondary p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Active Campaigns
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {activeCampaigns?.length || 0}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiActivity className="w-6 h-6 text-blue-900 dark:text-white" />
-              </div>
+        <section className="mt-10 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold">Featured campaigns</h2>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Highlighted campaigns worth exploring now.</p>
             </div>
-          </div>
-
-          <div className="bg-[#e6e6e6]/60 dark:bg-darkb rounded-2xl backdrop-blur-md border border-secondary p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Success Rate
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  85%
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-500/20 dark:bg-white/40 rounded-2xl flex items-center justify-center">
-                <FiTrendingUp className="w-6 h-6 text-blue-900 dark:text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-  {/* Statistics */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Platform Statistics
-          </h2>
-          <DashboardStats />
-        </div>
-        {/* Recent Active Campaigns */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Featured Campaigns
-            </h2>
             <button
               onClick={() => router.push("/campaigns")}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
             >
-              View All →
+              View all campaigns
             </button>
           </div>
 
           {loadingActive ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
+            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {[...Array(4)].map((_, index) => (
                 <div
-                  key={i}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 animate-pulse"
-                >
-                  <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                </div>
+                  key={index}
+                  className="h-96 rounded-[32px] bg-slate-200 dark:bg-slate-800 animate-pulse"
+                />
               ))}
             </div>
           ) : activeCampaigns && activeCampaigns.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
               {activeCampaigns.slice(0, 4).map((campaign) => (
                 <CampaignCard key={campaign.id} campaign={campaign} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-              <FiTarget className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                No Active Campaigns
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Be the first to create a campaign on our platform!
-              </p>
+            <div className="mt-6 rounded-[32px] border border-slate-200 bg-slate-50 p-10 text-center dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">No campaigns found</h3>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">There are no active campaigns available right now.</p>
               <button
                 onClick={() => router.push("/create-campaign")}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                className="mt-6 inline-flex rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
               >
-                Create Campaign
+                Start a campaign
               </button>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Recent Activity */}
-        <div className="bg-[#e6e6e6]/50 backdrop-blur-md border border-secondary dark:bg-gray-800 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Activity
-          </h3>
-          <div className="space-y-4">
-            {/* Sample activity items - you can populate this with real data */}
-            <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-3xl">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-900 dark:text-white">
-                  Welcome to CrowdFund Pro! Connect your wallet to see your
-                  activity.
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Just now
-                </p>
+        <section className="mt-10 rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/30 dark:border-slate-800 dark:bg-slate-950 dark:text-white">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold">Recent activity</h2>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Track approvals, contributions, and campaign updates.</p>
+            </div>
+            <span className="inline-flex rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+              Live feed
+            </span>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">No activity yet</p>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Once you launch a campaign, your progress and contributions will appear here.</p>
+                </div>
+                <span className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">Pending</span>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </Layout>
   );

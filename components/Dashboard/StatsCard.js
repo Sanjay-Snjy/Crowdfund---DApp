@@ -20,7 +20,7 @@ export function StatsCard({
   };
 
   return (
-    <div className="bg-[#e6e6e6]/60 backdrop-blur-sm dark:bg-darkb rounded-2xl p-6 border border-secondary dark:border-gray-450">
+    <div className="bg-slate-50 backdrop-blur-sm dark:bg-darkb rounded-3xl p-6 border border-secondary dark:border-gray-450">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-600 dark:text-gray-200 text-sm font-medium">
