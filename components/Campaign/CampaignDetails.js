@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useContractReads } from "wagmi";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import {
@@ -37,12 +37,20 @@ export default function CampaignDetails({ campaignId }) {
     useContributeToCampaignSimple,
     useWithdrawFunds,
     useGetRefund,
+    useAddMilestone,
+    useRequestMilestoneVote,
+    useVoteOnMilestone,
+    useReleaseMilestoneFunds,
+    useCampaignMilestones,
     useContribution,
   } = useContract();
 
   const [metadata, setMetadata] = useState(null);
   const [contributionAmount, setContributionAmount] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
+  const [newMilestoneDescription, setNewMilestoneDescription] = useState("");
+  const [newMilestoneAmount, setNewMilestoneAmount] = useState("");
 
   const { data: campaign, isLoading: campaignLoading } =
     useCampaign(campaignId);
@@ -52,6 +60,41 @@ export default function CampaignDetails({ campaignId }) {
     useContributeToCampaignSimple();
   const { withdrawFunds, isLoading: withdrawing } = useWithdrawFunds();
   const { getRefund, isLoading: refunding } = useGetRefund();
+  const { addMilestone, isLoading: addingMilestone } = useAddMilestone();
+  const { requestMilestoneVote, isLoading: requestingVote } = useRequestMilestoneVote();
+  const { voteOnMilestone, isLoading: votingOnMilestone } = useVoteOnMilestone();
+  const { releaseMilestoneFunds, isLoading: releasingMilestone } = useReleaseMilestoneFunds();
+  const {
+    data: milestones,
+    count: milestonesCount,
+    isLoading: loadingMilestones,
+  } = useCampaignMilestones(campaignId);
+
+  const milestoneVoteCalls = useMemo(() => {
+    if (!campaignId || !address || !milestonesCount || milestonesCount === 0)
+      return [];
+
+    return Array.from({ length: milestonesCount }, (_, index) => ({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "hasVotedOnMilestone",
+      args: [campaignId, index, address],
+    }));
+  }, [campaignId, address, milestonesCount]);
+
+  const { data: milestoneVoteData } = useContractReads({
+    contracts: milestoneVoteCalls,
+    enabled:
+      milestoneVoteCalls.length > 0 && Boolean(CONTRACT_ADDRESS),
+    watch: true,
+  });
+
+  const milestoneVoteStatuses = useMemo(() => {
+    if (!milestoneVoteData) return [];
+    return milestoneVoteData.map((result) =>
+      result?.status === "success" ? result.result : false
+    );
+  }, [milestoneVoteData]);
 
   // Fetch campaign contributions
   const { data: contributions, isLoading: loadingContributions } =
@@ -195,6 +238,59 @@ export default function CampaignDetails({ campaignId }) {
       });
     } catch (error) {
       console.error("Refund error:", error);
+    }
+  };
+
+  const handleAddMilestone = async () => {
+    if (!newMilestoneTitle || !newMilestoneDescription || !newMilestoneAmount) {
+      toast.error("Please complete all milestone fields");
+      return;
+    }
+
+    try {
+      await addMilestone?.({
+        args: [
+          campaignId,
+          newMilestoneTitle,
+          newMilestoneDescription,
+          ethers.utils.parseEther(newMilestoneAmount),
+        ],
+      });
+      setNewMilestoneTitle("");
+      setNewMilestoneDescription("");
+      setNewMilestoneAmount("");
+    } catch (error) {
+      console.error("Add milestone error:", error);
+    }
+  };
+
+  const handleRequestMilestoneVote = async (milestoneIndex) => {
+    try {
+      await requestMilestoneVote?.({
+        args: [campaignId, milestoneIndex],
+      });
+    } catch (error) {
+      console.error("Request milestone vote error:", error);
+    }
+  };
+
+  const handleVoteOnMilestone = async (milestoneIndex, approve) => {
+    try {
+      await voteOnMilestone?.({
+        args: [campaignId, milestoneIndex, approve],
+      });
+    } catch (error) {
+      console.error("Vote on milestone error:", error);
+    }
+  };
+
+  const handleReleaseMilestoneFunds = async (milestoneIndex) => {
+    try {
+      await releaseMilestoneFunds?.({
+        args: [campaignId, milestoneIndex],
+      });
+    } catch (error) {
+      console.error("Release milestone funds error:", error);
     }
   };
 
@@ -429,7 +525,7 @@ export default function CampaignDetails({ campaignId }) {
         {/* Tabs */}
         <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
           <nav className="flex space-x-8">
-            {["overview", "updates", "contributors"].map((tab) => (
+            {["overview", "milestones", "updates", "contributors"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -525,6 +621,179 @@ export default function CampaignDetails({ campaignId }) {
             <p className="text-gray-500 dark:text-gray-400">
               No updates available for this campaign yet.
             </p>
+          </div>
+        )}
+
+        {activeTab === "milestones" && (
+          <div className="space-y-6">
+            {isCreator && (
+              <div className="bg-gray-50 dark:bg-zinc-900 border border-secondary rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Add New Milestone
+                </h3>
+                <div className="grid gap-4">
+                  <input
+                    value={newMilestoneTitle}
+                    onChange={(e) => setNewMilestoneTitle(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="Milestone title"
+                  />
+                  <textarea
+                    value={newMilestoneDescription}
+                    onChange={(e) => setNewMilestoneDescription(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="Milestone description"
+                    rows={4}
+                  />
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={newMilestoneAmount}
+                    onChange={(e) => setNewMilestoneAmount(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="Amount in ETH"
+                  />
+                  <button
+                    onClick={handleAddMilestone}
+                    disabled={addingMilestone}
+                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors disabled:cursor-not-allowed"
+                  >
+                    {addingMilestone ? "Adding milestone..." : "Add Milestone"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {loadingMilestones ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            ) : milestones && milestones.length > 0 ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Campaign Milestones
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Track milestone approvals and release requests.
+                    </p>
+                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {milestones.length} milestone{milestones.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {milestones.map((milestone, index) => {
+                    const hasVoted = milestoneVoteStatuses[index] ?? false;
+                    return (
+                      <div
+                        key={index}
+                        className="bg-white dark:bg-zinc-900 border border-secondary rounded-2xl p-6"
+                      >
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                              {milestone.title}
+                            </h4>
+                            <p className="mt-2 text-gray-600 dark:text-gray-400">
+                              {milestone.description}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                              {milestone.completed ? "Completed" : "Pending"}
+                            </span>
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                              {milestone.voteRequested ? "Vote Requested" : "Awaiting Request"}
+                            </span>
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              {milestone.fundsReleased ? "Released" : "Locked"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
+                          <div>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {formatEther(milestone.amount)} ETH
+                            </span>
+                            <div>Amount</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {milestone.approvals}
+                            </span>
+                            <div>Approvals</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {milestone.rejections}
+                            </span>
+                            <div>Rejections</div>
+                          </div>
+                        </div>
+
+                        <div className="mt-5 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:flex-wrap gap-3">
+                          {isCreator && !milestone.voteRequested && !milestone.fundsReleased && (
+                            <button
+                              onClick={() => handleRequestMilestoneVote(index)}
+                              disabled={requestingVote}
+                              className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                            >
+                              {requestingVote ? "Requesting..." : "Request Vote"}
+                            </button>
+                          )}
+
+                          {isCreator && milestone.voteRequested && !milestone.fundsReleased && (
+                            <button
+                              onClick={() => handleReleaseMilestoneFunds(index)}
+                              disabled={releasingMilestone}
+                              className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                            >
+                              {releasingMilestone ? "Releasing..." : "Release Funds"}
+                            </button>
+                          )}
+
+                          {isConnected && !isCreator && milestone.voteRequested && !milestone.fundsReleased && (
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => handleVoteOnMilestone(index, true)}
+                                disabled={hasVoted || votingOnMilestone}
+                                className="px-4 py-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleVoteOnMilestone(index, false)}
+                                disabled={hasVoted || votingOnMilestone}
+                                className="px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+
+                          {!isCreator && hasVoted && (
+                            <span className="text-sm text-green-700 dark:text-green-300">
+                              You have already voted on this milestone.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No milestones have been added for this campaign yet.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

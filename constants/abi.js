@@ -761,6 +761,205 @@ export const CROWDFUNDING_ABI = [
         name: "_campaignId",
         type: "uint256",
       },
+      {
+        internalType: "string",
+        name: "_title",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_description",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "addCampaignMilestone",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_milestoneIndex",
+        type: "uint256",
+      },
+    ],
+    name: "requestMilestoneVote",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_milestoneIndex",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "_approve",
+        type: "bool",
+      },
+    ],
+    name: "voteOnMilestone",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_milestoneIndex",
+        type: "uint256",
+      },
+    ],
+    name: "releaseMilestoneFunds",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+    ],
+    name: "getMilestoneCount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_milestoneIndex",
+        type: "uint256",
+      },
+    ],
+    name: "getMilestone",
+    outputs: [
+      {
+        internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "description",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "completed",
+        type: "bool",
+      },
+      {
+        internalType: "bool",
+        name: "voteRequested",
+        type: "bool",
+      },
+      {
+        internalType: "bool",
+        name: "fundsReleased",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "approvals",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "rejections",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "createdAt",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_milestoneIndex",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_contributor",
+        type: "address",
+      },
+    ],
+    name: "hasVotedOnMilestone",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_campaignId",
+        type: "uint256",
+      },
     ],
     name: "getRefund",
     outputs: [],

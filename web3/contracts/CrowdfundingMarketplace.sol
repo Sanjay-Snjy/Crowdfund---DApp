@@ -52,6 +52,36 @@ contract CrowdfundingMarketplace is ReentrancyGuard, Ownable, Pausable {
         uint256 oldCommission,
         uint256 newCommission
     );
+
+    event MilestoneAdded(
+        uint256 indexed campaignId,
+        uint256 indexed milestoneIndex,
+        string title,
+        uint256 amount
+    );
+
+    event MilestoneCompleted(
+        uint256 indexed campaignId,
+        uint256 indexed milestoneIndex
+    );
+
+    event MilestoneVoteRequested(
+        uint256 indexed campaignId,
+        uint256 indexed milestoneIndex
+    );
+
+    event MilestoneVoted(
+        uint256 indexed campaignId,
+        uint256 indexed milestoneIndex,
+        address indexed contributor,
+        bool approved
+    );
+
+    event MilestoneFundsReleased(
+        uint256 indexed campaignId,
+        uint256 indexed milestoneIndex,
+        uint256 amount
+    );
     
     // Structs
     struct Campaign {
@@ -243,7 +273,186 @@ contract CrowdfundingMarketplace is ReentrancyGuard, Ownable, Pausable {
         
         emit CampaignWithdrawn(_campaignId, msg.sender, campaign.raisedAmount);
     }
-    
+
+    /**
+     * @dev Add a milestone to a campaign
+     * @param _campaignId Campaign ID
+     * @param _title Milestone title
+     * @param _description Milestone description
+     * @param _amount Milestone amount in wei
+     */
+    function addCampaignMilestone(
+        uint256 _campaignId,
+        string memory _title,
+        string memory _description,
+        uint256 _amount
+    ) external validCampaign(_campaignId) onlyCampaignCreator(_campaignId) campaignNotEnded(_campaignId) {
+        require(bytes(_title).length > 0, "Milestone title cannot be empty");
+        require(_amount > 0, "Milestone amount must be greater than zero");
+
+        uint256 totalAllocated = 0;
+        Milestone[] storage milestones = campaignMilestones[_campaignId];
+        for (uint256 i = 0; i < milestones.length; i++) {
+            totalAllocated += milestones[i].amount;
+        }
+
+        require(totalAllocated + _amount <= campaigns[_campaignId].targetAmount, "Milestone allocation exceeds target");
+
+        milestones.push(
+            Milestone({
+                title: _title,
+                description: _description,
+                amount: _amount,
+                completed: false,
+                voteRequested: false,
+                fundsReleased: false,
+                approvals: 0,
+                rejections: 0,
+                createdAt: block.timestamp
+            })
+        );
+
+        emit MilestoneAdded(_campaignId, milestones.length - 1, _title, _amount);
+    }
+
+    /**
+     * @dev Mark a milestone as completed and request a vote
+     * @param _campaignId Campaign ID
+     * @param _milestoneIndex Milestone index
+     */
+    function requestMilestoneVote(uint256 _campaignId, uint256 _milestoneIndex)
+        external
+        validCampaign(_campaignId)
+        onlyCampaignCreator(_campaignId)
+        campaignNotEnded(_campaignId)
+    {
+        Milestone storage milestone = campaignMilestones[_campaignId][_milestoneIndex];
+        require(!milestone.completed, "Milestone already completed");
+        require(!milestone.voteRequested, "Vote already requested");
+
+        milestone.completed = true;
+        milestone.voteRequested = true;
+
+        emit MilestoneCompleted(_campaignId, _milestoneIndex);
+        emit MilestoneVoteRequested(_campaignId, _milestoneIndex);
+    }
+
+    /**
+     * @dev Vote on a milestone release request
+     * @param _campaignId Campaign ID
+     * @param _milestoneIndex Milestone index
+     * @param _approve True to approve, false to reject
+     */
+    function voteOnMilestone(
+        uint256 _campaignId,
+        uint256 _milestoneIndex,
+        bool _approve
+    ) external validCampaign(_campaignId) nonReentrant {
+        require(contributions[_campaignId][msg.sender] > 0, "Only contributors can vote");
+        Milestone storage milestone = campaignMilestones[_campaignId][_milestoneIndex];
+        require(milestone.voteRequested, "Milestone vote not requested");
+        require(!milestone.fundsReleased, "Funds already released for this milestone");
+        require(!milestoneVoted[_campaignId][_milestoneIndex][msg.sender], "Contributor already voted");
+
+        milestoneVoted[_campaignId][_milestoneIndex][msg.sender] = true;
+
+        if (_approve) {
+            milestone.approvals++;
+        } else {
+            milestone.rejections++;
+        }
+
+        emit MilestoneVoted(_campaignId, _milestoneIndex, msg.sender, _approve);
+    }
+
+    /**
+     * @dev Release funds for a milestone if majority approves
+     * @param _campaignId Campaign ID
+     * @param _milestoneIndex Milestone index
+     */
+    function releaseMilestoneFunds(uint256 _campaignId, uint256 _milestoneIndex)
+        external
+        validCampaign(_campaignId)
+        onlyCampaignCreator(_campaignId)
+        nonReentrant
+    {
+        Milestone storage milestone = campaignMilestones[_campaignId][_milestoneIndex];
+        require(milestone.voteRequested, "Milestone vote not requested");
+        require(!milestone.fundsReleased, "Funds already released");
+        require(milestone.completed, "Milestone not completed");
+
+        uint256 totalContributors = campaigns[_campaignId].contributorsCount;
+        require(totalContributors > 0, "No contributors available for voting");
+
+        uint256 totalVotes = milestone.approvals + milestone.rejections;
+        require(totalVotes > 0, "No votes cast for milestone");
+
+        require(milestone.approvals * 100 > totalVotes * 50, "Majority approval required");
+
+        milestone.fundsReleased = true;
+        releasedAmount[_campaignId] += milestone.amount;
+
+        campaigns[_campaignId].creator.transfer(milestone.amount);
+
+        emit MilestoneFundsReleased(_campaignId, _milestoneIndex, milestone.amount);
+    }
+
+    /**
+     * @dev Get milestone count for a campaign
+     * @param _campaignId Campaign ID
+     */
+    function getMilestoneCount(uint256 _campaignId) external view returns (uint256) {
+        return campaignMilestones[_campaignId].length;
+    }
+
+    /**
+     * @dev Get milestone details for a campaign
+     * @param _campaignId Campaign ID
+     * @param _milestoneIndex Milestone index
+     */
+    function getMilestone(uint256 _campaignId, uint256 _milestoneIndex)
+        external
+        view
+        returns (
+            string memory title,
+            string memory description,
+            uint256 amount,
+            bool completed,
+            bool voteRequested,
+            bool fundsReleased,
+            uint256 approvals,
+            uint256 rejections,
+            uint256 createdAt
+        )
+    {
+        Milestone storage milestone = campaignMilestones[_campaignId][_milestoneIndex];
+        return (
+            milestone.title,
+            milestone.description,
+            milestone.amount,
+            milestone.completed,
+            milestone.voteRequested,
+            milestone.fundsReleased,
+            milestone.approvals,
+            milestone.rejections,
+            milestone.createdAt
+        );
+    }
+
+    /**
+     * @dev Get contributor vote status for a milestone
+     * @param _campaignId Campaign ID
+     * @param _milestoneIndex Milestone index
+     * @param _contributor Contributor address
+     */
+    function hasVotedOnMilestone(
+        uint256 _campaignId,
+        uint256 _milestoneIndex,
+        address _contributor
+    ) external view returns (bool) {
+        return milestoneVoted[_campaignId][_milestoneIndex][_contributor];
+    }
+
     /**
      * @dev Get refund for failed campaign
      * @param _campaignId Campaign ID to get refund from
