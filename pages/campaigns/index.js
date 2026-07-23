@@ -66,7 +66,7 @@ export default function CampaignsPage() {
   return (
     <Layout>
       <div className="mx-auto max-w-8xl px-0 py-0 sm:px-0 lg:px-0">
-        <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/30 dark:border-slate-800 dark:bg-slate-950 dark:text-white">
+        <div className="rounded-[32px] bg-transparent p-2  dark:border-slate-800 dark:bg-slate-950 dark:text-white">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
@@ -76,7 +76,7 @@ export default function CampaignsPage() {
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-[28px] border border-slate-200 bg-[#e6e6e6]/60 p-6 shadow-sm backdrop-blur-sm 0 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">
                 Total campaigns
               </p>
@@ -84,7 +84,7 @@ export default function CampaignsPage() {
                 {totalCampaigns}
               </p>
             </div>
-            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-[28px] border border-slate-200 bg-[#e6e6e6]/60 p-6 shadow-sm backdrop-blur-sm 0 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">
                 Active campaigns
               </p>
@@ -92,7 +92,7 @@ export default function CampaignsPage() {
                 {activeCampaigns}
               </p>
             </div>
-            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-[28px] border border-slate-200 bg-[#e6e6e6]/60 p-6 shadow-sm backdrop-blur-sm 0 p-4 text-center dark:border-slate-800 dark:bg-slate-900">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">
                 Funded campaigns
               </p>
