@@ -8,13 +8,38 @@ function normalizeAddress(address) {
 
 export default function handler(req, res) {
   if (req.method === "GET") {
-    const { clerkUserId } = req.query;
-    if (!clerkUserId) {
-      return res.status(400).json({ error: "Missing clerkUserId" });
+    const { clerkUserId, walletAddresses } = req.query;
+
+    if (clerkUserId) {
+      const entry = walletMappings.get(clerkUserId);
+      return res.status(200).json({ walletAddress: entry?.walletAddress || null });
     }
 
-    const entry = walletMappings.get(clerkUserId);
-    return res.status(200).json({ walletAddress: entry?.walletAddress || null });
+    if (walletAddresses) {
+      const addressString = Array.isArray(walletAddresses)
+        ? walletAddresses.join(",")
+        : walletAddresses;
+      const normalizedAddresses = addressString
+        .split(",")
+        .map((address) => normalizeAddress(address))
+        .filter(Boolean);
+
+      const walletProfiles = [];
+      walletMappings.forEach((entry) => {
+        if (normalizedAddresses.includes(entry.walletAddress)) {
+          walletProfiles.push({
+            walletAddress: entry.walletAddress,
+            name: entry.name || null,
+            email: entry.email || null,
+            verifiedAt: entry.verifiedAt || null,
+          });
+        }
+      });
+
+      return res.status(200).json({ walletProfiles });
+    }
+
+    return res.status(400).json({ error: "Missing clerkUserId or walletAddresses" });
   }
 
   if (req.method === "POST") {
