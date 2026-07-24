@@ -256,7 +256,10 @@ export default function Home() {
     document.documentElement.classList.remove("dark");
     document.documentElement.style.colorScheme = "light";
   };
-
+  const handleGoToCampaigns = () => {
+    applyLightTheme();
+    router.push("/campaigns");
+  };
   const handleGoToDashboard = () => {
     applyLightTheme();
     router.push("/dashboard");
@@ -524,10 +527,10 @@ export default function Home() {
             <SignedIn>
               {isConnected ? (
                 <button
-                  onClick={handleGoToDashboard}
+                  onClick={handleGoToCampaigns}
                   className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
                 >
-                  Go to Dashboard
+                  Explore Campaigns
                   <FiArrowRight className="ml-2 w-5 h-5" />
                 </button>
               ) : (
@@ -550,10 +553,10 @@ export default function Home() {
           <>
             {isConnected ? (
               <button
-                onClick={handleGoToDashboard}
+                onClick={handleGoToCampaigns}
                 className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
               >
-                Go to Dashboard
+                Explore Campaigns
                 <FiArrowRight className="ml-2 w-5 h-5" />
               </button>
             ) : (
@@ -575,16 +578,16 @@ export default function Home() {
 
         <SignedIn>
           <button
-            onClick={() => router.push("/campaigns")}
+            onClick={handleGoToDashboard}
             className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
           >
-            Explore Campaigns
+            Go to Dashboard
           </button>
         </SignedIn>
         <SignedOut>
           <SignInButton mode="modal">
             <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors">
-              Explore Campaigns
+              Go to Dashboard
             </button>
           </SignInButton>
         </SignedOut>
@@ -705,34 +708,36 @@ export default function Home() {
               Powerful campaign tools, secure transactions, and better visibility for supporters—designed to help great ideas thrive.
             </p>
           </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 -mt-6">
             {features.map((feature, index) => (
-              <div
-                key={index}
-                className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5  backdrop-blur-sm p-8  transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
-              >
-                <div className="absolute inset-x-0 top-0 h-32 bg-transparent" />
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-3xl bg-cyan-400/15 text-cyan-200 mb-6 transition group-hover:bg-cyan-400/25 group-hover:text-white">
-                  <feature.icon className="h-6 w-6" />
-                </div>
-                <h3 className="relative text-xl font-semibold text-white mb-3">
-                  {feature.title}
-                </h3>
-                <p className="relative  text-white/70">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
+    <div
+      key={index}
+      className="group relative mx-auto flex w-full max-w-4xl items-start gap-6 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
+    >
+      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-3xl bg-cyan-400/15 text-cyan-200 transition group-hover:bg-cyan-400/25 group-hover:text-white">
+        <feature.icon className="h-6 w-6" />
+      </div>
+
+      <div className="flex-1">
+        <h3 className="mb-2 text-xl font-semibold text-white">
+          {feature.title}
+        </h3>
+
+        <p className="text-white/70">
+          {feature.description}
+        </p>
+      </div>
+    </div>
+  ))}
+</div>
         </div>
       </section>
             <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent " /> 
 
       {/* Stats Section */}
-      <section className="relative z-10 py-16">
+      <section className="relative z-10 py-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-10 shadow-2xl shadow-cyan-500/10 backdrop-blur-xl">
+          <div className="rounded-[2rem]  bg-transparent p-10 ">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
@@ -748,7 +753,7 @@ export default function Home() {
             </div>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
                 <div className="text-3xl font-extrabold text-white mb-3">
                   {loading ? "..." : stats.campaignsLaunched}
                 </div>
@@ -756,7 +761,7 @@ export default function Home() {
                   Campaigns Launched
                 </div>
               </div>
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
                 <div className="text-3xl font-extrabold text-white mb-3">
                   {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
                 </div>
@@ -764,7 +769,7 @@ export default function Home() {
                   Funds Raised
                 </div>
               </div>
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-black/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
+              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
                 <div className="text-3xl font-extrabold text-white mb-3">
                   {loading ? "..." : stats.contributors}
                 </div>

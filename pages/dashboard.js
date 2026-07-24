@@ -5,7 +5,7 @@ import Layout from "../components/Layout/Layout";
 import DashboardStats from "../components/Dashboard/DashboardStats";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import { useContract } from "../hooks/useContract";
-import { FiTrendingUp, FiUsers, FiTarget, FiActivity } from "react-icons/fi";
+import { FiGrid, FiTrendingUp, FiUsers, FiTarget, FiActivity } from "react-icons/fi";
 
 function Dashboard() {
   const { address, isConnected } = useAccount();
@@ -65,13 +65,31 @@ function Dashboard() {
 
   return (
     <Layout>
-      <div className="mx-auto max-w-8xl px-4 py-8 sm:px-6 lg:px-0 lg:py-0">
-        <div className="grid gap-8 xl:grid-cols-[1.45fr_0.75fr]">
+      <div className="mx-auto px-5 ml-3 py-8 sm:px-6 lg:px-0 lg:py-0 -mt-3">
+       <section className="mb-4 rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-sm shadow-slate-900/20">
+  <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
+        <FiGrid className="h-4 w-4" />
+        Dashboard Overview
+      </div>
+
+      <h1 className="mt-4 text-3xl font-semibold tracking-tight">
+        Ideas backed. Progress visible.
+      </h1>
+
+      <p className="mt-2 max-w-2xl text-sm text-slate-200">
+        Everything you’re building and backing, in one place.
+      </p>
+    </div>
+  </div>
+</section>
+        <div className="grid gap-4 xl:grid-cols-[1.45fr_0.75fr]">
           <section className="rounded-[32px]  bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30 dark:text-white">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-blue-800 dark:text-slate-400">
-                  Dashboard
+                  Your Space
                 </p>
                 <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">
                   Your crowdfunding insights
@@ -121,10 +139,10 @@ function Dashboard() {
               </div>
           </section>
 
-          <aside className="space-y-6">
-            <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450  p-6 shadow-xl shadow-slate-200/20 ">
+          <aside className="space-y-4">
+            <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-6 shadow-xl shadow-slate-200/20 ">
               <p className="text-sm uppercase tracking-[0.24em] text-blue-800 dark:text-slate-400">Quick insights</p>
-              <div className="mt-6 space-y-4">
+              <div className="mt-4 space-y-4">
                 <div className="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
                   <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{activeCampaigns?.length || 0}</p>
@@ -158,7 +176,7 @@ function Dashboard() {
           </aside>
         </div>
 
-        <section className="mt-10 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
+        <section className="mt-4 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold">Platform statistics</h2>
@@ -170,18 +188,72 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="mt-10 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
+        <section className="mt-4 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-darkb border border-secondary dark:border-gray-450 p-8 shadow-xl shadow-slate-200/30  dark:text-white">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold">Featured campaigns</h2>
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Highlighted campaigns worth exploring now.</p>
             </div>
-            <button
-              onClick={() => router.push("/campaigns")}
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
-            >
-              View all campaigns
-            </button>
+           <button
+  type="button"
+  onClick={() => router.push("/campaigns")}
+  className="
+    group relative z-10
+    inline-flex items-center justify-center gap-2
+    overflow-hidden rounded-full border-2 border-gray-50
+    bg-gray-50 px-4 py-2
+    text-sm text-gray-900
+    shadow-sm backdrop-blur-md
+    transition-colors
+    border border-secondary
+
+    before:absolute
+    before:-left-full
+    before:-z-10
+    before:aspect-square
+    before:w-full
+    before:rounded-full
+    before:bg-blue-600
+    before:transition-all
+    before:duration-700
+
+    hover:text-white
+    before:hover:left-0
+    before:hover:w-full
+    before:hover:scale-150
+    before:hover:duration-700
+
+    dark:border-slate-700
+    dark:bg-slate-900
+    dark:text-white
+  "
+>
+  View all campaigns
+
+  <svg
+    className="
+      h-8 w-8
+      rotate-45
+      rounded-full
+      border border-gray-700
+      p-2
+      transition-all
+      duration-300
+      ease-linear
+
+      group-hover:rotate-90
+      group-hover:border-transparent
+      group-hover:bg-gray-50
+    "
+    viewBox="0 0 16 19"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
+      className="fill-gray-800"
+    />
+  </svg>
+</button>
           </div>
 
           {loadingActive ? (

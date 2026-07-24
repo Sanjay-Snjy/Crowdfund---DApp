@@ -3,7 +3,7 @@ export const PINATA_API_KEY = process.env.NEXT_PUBLIC_PINATA_API_KEY;
 export const PINATA_SECRET_KEY = process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY;
 export const PINATA_JWT = process.env.NEXT_PUBLIC_PINATA_JWT;
 
-export const CAMPAIGN_CREATION_FEE = "1000000000000000"; // 0.001 ETH in wei
+export const CAMPAIGN_CREATION_FEE = "0"; // no upfront creation fee
 
 // Validate required environment variables
 if (typeof window !== "undefined") {
@@ -41,19 +41,26 @@ export const NETWORK_CONFIGS = {
 };
 
 export const SIDEBAR_ITEMS = [
+   {
+    id: "campaigns",
+    label: "All Campaigns",
+    icon: "FiList",
+    path: "/campaigns",
+  },
   
+  {
+    id: "top",
+    label: "Top",
+    icon: "FiTrendingUp",
+    path: "/top",
+  },
   {
     id: "dashboard",
     label: "Dashboard",
     icon: "FiGrid",
     path: "/dashboard",
   },
-  {
-    id: "campaigns",
-    label: "All Campaigns",
-    icon: "FiList",
-    path: "/campaigns",
-  },
+ 
   {
     id: "create",
     label: "Create Campaign",

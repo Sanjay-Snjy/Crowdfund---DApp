@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import ErrorBoundary from "./ErrorBoundary";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -108,7 +109,9 @@ return (
           <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
 
           <main className="flex-1 pt-20 p-4 md:p-6 mt-20">
-            <div>{children}</div>
+            <ErrorBoundary>
+              <div>{children}</div>
+            </ErrorBoundary>
           </main>
         </div>
       </div>

@@ -72,6 +72,102 @@ export default function DashboardStats() {
       }
     }).length || 0;
 
+  const toUnix = (value) => {
+    if (value == null) return 0;
+    const stringValue = value?.toString?.() ?? String(value);
+    return Number(stringValue) || 0;
+  };
+
+  const now = Math.floor(Date.now() / 1000);
+  const oneMonth = 30 * 24 * 60 * 60;
+  const recentWindowStart = now - oneMonth;
+  const previousWindowStart = now - 2 * oneMonth;
+
+  const recentCampaigns = campaigns?.filter((campaign) => {
+    const createdAt = toUnix(campaign?.createdAt);
+    return createdAt >= recentWindowStart;
+  }) || [];
+
+  const previousCampaigns = campaigns?.filter((campaign) => {
+    const createdAt = toUnix(campaign?.createdAt);
+    return createdAt >= previousWindowStart && createdAt < recentWindowStart;
+  }) || [];
+
+  const calculateTrendValue = (current, previous) => {
+    if (previous <= 0) {
+      return current <= 0 ? "0%" : "+100%";
+    }
+    const delta = ((current - previous) / previous) * 100;
+    return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}%`;
+  };
+
+  const recentRaised =
+    recentCampaigns.reduce((sum, campaign) => {
+      try {
+        return sum + parseFloat(formatEther(campaign?.raisedAmount || 0));
+      } catch (error) {
+        return sum;
+      }
+    }, 0) || 0;
+
+  const previousRaised =
+    previousCampaigns.reduce((sum, campaign) => {
+      try {
+        return sum + parseFloat(formatEther(campaign?.raisedAmount || 0));
+      } catch (error) {
+        return sum;
+      }
+    }, 0) || 0;
+
+  const recentContributors =
+    recentCampaigns.reduce((sum, campaign) => {
+      try {
+        return sum + safeNumber(campaign?.contributorsCount);
+      } catch (error) {
+        return sum;
+      }
+    }, 0) || 0;
+
+  const previousContributors =
+    previousCampaigns.reduce((sum, campaign) => {
+      try {
+        return sum + safeNumber(campaign?.contributorsCount);
+      } catch (error) {
+        return sum;
+      }
+    }, 0) || 0;
+
+  const recentSuccessfulCount =
+    recentCampaigns.filter((campaign) => {
+      try {
+        const raised = parseFloat(formatEther(campaign?.raisedAmount || 0));
+        const target = parseFloat(formatEther(campaign?.targetAmount || 0));
+        return !isNaN(raised) && !isNaN(target) && raised >= target;
+      } catch (error) {
+        return false;
+      }
+    }).length || 0;
+
+  const previousSuccessfulCount =
+    previousCampaigns.filter((campaign) => {
+      try {
+        const raised = parseFloat(formatEther(campaign?.raisedAmount || 0));
+        const target = parseFloat(formatEther(campaign?.targetAmount || 0));
+        return !isNaN(raised) && !isNaN(target) && raised >= target;
+      } catch (error) {
+        return false;
+      }
+    }).length || 0;
+
+  const recentCampaignCount = recentCampaigns.length;
+  const previousCampaignCount = previousCampaigns.length;
+  const recentActiveCount = recentCampaigns.filter(
+    (campaign) => Boolean(campaign?.active)
+  ).length;
+  const previousActiveCount = previousCampaigns.filter(
+    (campaign) => Boolean(campaign?.active)
+  ).length;
+
   // Safely format contract stats
   const totalCampaignsCount = safeNumber(contractStats?.totalCampaigns);
   const totalFeesAmount = contractStats?.totalFees || 0;
@@ -83,7 +179,10 @@ export default function DashboardStats() {
       icon: FiTarget,
       color: "blue",
       trend: "up",
-      trendValue: "+12%",
+      trendValue: calculateTrendValue(
+        recentCampaignCount,
+        previousCampaignCount
+      ),
     },
     {
       title: "Total Raised",
@@ -91,7 +190,7 @@ export default function DashboardStats() {
       icon: FiDollarSign,
       color: "blue",
       trend: "up",
-      trendValue: "+8.2%",
+      trendValue: calculateTrendValue(recentRaised, previousRaised),
     },
     {
       title: "Active Campaigns",
@@ -99,7 +198,7 @@ export default function DashboardStats() {
       icon: FiActivity,
       color: "blue",
       trend: "up",
-      trendValue: "+5.1%",
+      trendValue: calculateTrendValue(recentActiveCount, previousActiveCount),
     },
     {
       title: "Total Contributors",
@@ -107,7 +206,10 @@ export default function DashboardStats() {
       icon: FiUsers,
       color: "blue",
       trend: "up",
-      trendValue: "+15.3%",
+      trendValue: calculateTrendValue(
+        recentContributors,
+        previousContributors
+      ),
     },
     {
       title: "Successful Campaigns",
@@ -115,7 +217,10 @@ export default function DashboardStats() {
       icon: FiAward,
       color: "blue",
       trend: "up",
-      trendValue: "+3.7%",
+      trendValue: calculateTrendValue(
+        recentSuccessfulCount,
+        previousSuccessfulCount
+      ),
     },
     {
       title: "Platform Fees",
@@ -123,7 +228,7 @@ export default function DashboardStats() {
       icon: FiTrendingUp,
       color: "blue",
       trend: "up",
-      trendValue: "+9.1%",
+      trendValue: "N/A",
     },
   ];
 

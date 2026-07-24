@@ -191,13 +191,9 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       top-2 mx-2 ml-4 z-30 bg-[#e6e6e6]/60 dark:bg-darkb border border-secondary  dark:border-gray-450 
-      transition-all duration-300 rounded-3xl fixed z-50 backdrop-blur-md backdrop-saturate-150
-    
+       fixed top-2 left-2 right-2 z-50 bg-[#e6e6e6]/60 dark:bg-darkb border border-secondary dark:border-gray-450
+       transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
-      style={{
-        width: isCollapsed ? "94%" : "81.5%",
-      }}
     >
       <div className="flex items-center justify-between px-4 py-3">
         {/* Left Section */}
@@ -210,16 +206,12 @@ export default function Header({ onMenuToggle, isCollapsed }) {
             <FiMenu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </buttona>
 
-          {/* Search Bar */}
-          <div className="hidden sm:flex items-center relative">
-            <FiSearch className="absolute left-0 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search campaigns..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="-ml-4 pl-10 pr-4 py-2 w-64 bg-gray-100 dark:bg-darkb border border-secondary dark:border-gray-500 rounded-4xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-            />
+          {/* Logo + App Name (replaces search) */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-4xl flex items-center justify-center">
+              <img src="/logo3.gif" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
+            </div>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">CrowdFund</span>
           </div>
         </div>
 

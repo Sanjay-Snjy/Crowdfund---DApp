@@ -10,6 +10,7 @@ import {
   FiUser,
   FiHeart,
   FiSettings,
+  FiTrendingUp,
   FiMenu,
   FiX,
   FiChevronLeft,
@@ -24,6 +25,7 @@ const iconMap = {
   FiUser,
   FiHeart,
   FiSettings,
+  FiTrendingUp,
 };
 
 export default function Sidebar({
@@ -60,54 +62,14 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-2 left-2 bg-[#e6e6e6]/60  backdrop-blur-md dark:bg-darkb border border-secondary dark:border-gray-450 z-40 transition-all duration-300 ease-out 
+        fixed top-[86px] h-80% left-4 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-darkb border border-secondary dark:border-gray-450 z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        ${isCollapsed ? "w-16" : "w-64"}
+        w-16
         md:translate-x-0 rounded-3xl overflow-y-auto
       `}
       >
         {/* Header */}
-        <div className="m-1 flex items-center justify-between p-3 border border-secondary dark:border-gray-450 rounded-3xl ">
-          {!isCollapsed && (
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 ml-5 rounded-4xl flex items-center justify-center">
-                   <img
-              src="/logo3.gif"          // Place your logo in the public folder
-              alt="CrowdFund Logo"
-              className="w-18 h-18 object-contain  dark:hidden"
-            />
-                 <img
-              src="/logo2.gif"
-              alt="CrowdFund Logo"
-              className="hidden w-18 h-18 object-contain dark:block"
-            />
-              </div>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                CrowdFund 
-              </span>
-            </div>
-          )}
-
-          {/* Desktop Collapse Toggle */}
-          <buttona
-            onClick={onToggleCollapse}
-            className="hidden md:flex p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <FiChevronLeft
-              className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${
-                isCollapsed ? "rotate-180" : ""
-              }`}
-            />
-          </buttona>
-
-          {/* Mobile Close */}
-          <buttona
-            onClick={onToggle}
-            className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <FiX className="w-5 h-5 text-gray-500" />
-          </buttona>
-        </div>
+        <div className="m-1 p-0 rounded-3xl" />
 
         {/* Navigation */}
         <nav className="flex-1 p-2 space-y-2">
@@ -120,15 +82,14 @@ export default function Sidebar({
                 key={item.id}
                 href={item.path}
                 className={`
-                  flex items-center space-x-3 px-4  py-3 rounded-4xl transition-all duration-300
+                  flex items-center justify-center px-4 py-3 rounded-4xl transition-all duration-300
                   ${
                     isActive
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-600"
                       : "text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }
-                  ${isCollapsed ? "justify-center" : ""}
                 `}
-                title={isCollapsed ? item.label : ""}
+                title={item.label}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!isCollapsed && (

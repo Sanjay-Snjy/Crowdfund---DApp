@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import { FiUpload, FiX, FiInfo } from "react-icons/fi";
+import { useAccount, useBalance, useNetwork } from "wagmi";
 import { useContract } from "../../hooks/useContract";
 import { uploadCampaignMetadata } from "../../utils/ipfs";
 import { CAMPAIGN_CREATION_FEE } from "../../constants";
@@ -11,6 +12,12 @@ import { CONTRACT_ADDRESS } from "../../constants";
 
 export default function CreateCampaignForm() {
   const router = useRouter();
+  const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { data: balanceData } = useBalance({
+    address,
+    enabled: Boolean(address),
+  });
   const { useCreateCampaignSimple } = useContract();
   const { createCampaignAsync, isLoading } = useCreateCampaignSimple();
 
@@ -29,20 +36,57 @@ export default function CreateCampaignForm() {
   const [uploading, setUploading] = useState(false);
   const [showTagPopup, setShowTagPopup] = useState(false);
 
+  const [rates, setRates] = useState(null);
+  const creationFeeWei = ethers.utils.parseEther(CAMPAIGN_CREATION_FEE || "0");
+  const configuredChainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 0);
+  const configuredNetworkName =
+    process.env.NEXT_PUBLIC_NETWORK ||
+    process.env.NEXT_PUBLIC_CHAIN_NAME ||
+    "the configured network";
+  const walletBalanceWei = balanceData?.value
+    ? ethers.BigNumber.from(balanceData.value.toString())
+    : ethers.BigNumber.from(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchRates = async () => {
+      try {
+        const res = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=inr,usd,eur,gbp"
+        );
+        const data = await res.json();
+        if (mounted && data?.ethereum) {
+          setRates(data.ethereum);
+        }
+      } catch (err) {
+        console.error("Failed to load currency rates", err);
+      }
+    };
+
+    fetchRates();
+    const interval = setInterval(fetchRates, 1000 * 60 * 5); // refresh every 5 minutes
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   const tagList = formData.tags
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
 
   const categories = [
-    "Technology",
-    "Creative",
-    "Medical",
-    "Education",
-    "Environment",
-    "Community",
-    "Business",
-    "General",
+  "Student Projects",
+  "Medical",
+  "Startup",
+  "Education",
+  "Research and Innovation",
+  "Social Causes",
+  "Technology",
+  "Agriculture",
+  "Arts and Culture",
+  "Environment",
   ];
 
   const suggestedTags = [
@@ -123,6 +167,25 @@ export default function CreateCampaignForm() {
 
     if (!validateForm()) return;
 
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet before creating a campaign.");
+      return;
+    }
+
+    if (configuredChainId && chain?.id && chain.id !== configuredChainId) {
+      toast.error(
+        `Please switch your wallet to ${configuredNetworkName} (${configuredChainId}) before creating a campaign.`
+      );
+      return;
+    }
+
+    if (walletBalanceWei.lt(creationFeeWei)) {
+      toast.error(
+        `Insufficient funds for this transaction. Your wallet balance is too low to cover the required fee on the selected network.`
+      );
+      return;
+    }
+
     // Check if createCampaignAsync function is available
     if (!createCampaignAsync) {
       toast.error(
@@ -161,7 +224,6 @@ export default function CreateCampaignForm() {
       // Prepare contract parameters
       const targetAmountWei = ethers.utils.parseEther(formData.targetAmount);
       const durationSeconds = parseInt(formData.duration) * 24 * 60 * 60; // Convert days to seconds
-      const creationFee = ethers.utils.parseEther(CAMPAIGN_CREATION_FEE); // Use fee from constants
 
       console.log("Contract call parameters:", {
         title: formData.title,
@@ -169,7 +231,7 @@ export default function CreateCampaignForm() {
         metadataHash: uploadResult.metadataHash,
         targetAmount: targetAmountWei.toString(),
         duration: durationSeconds,
-        value: creationFee.toString(),
+        value: creationFeeWei.toString(),
         contractAddress: CONTRACT_ADDRESS,
       });
 
@@ -184,7 +246,7 @@ export default function CreateCampaignForm() {
           targetAmountWei, // uint256 _targetAmount
           durationSeconds, // uint256 _duration
         ],
-        value: creationFee,
+        value: creationFeeWei,
       });
 
       console.log("Transaction submitted:", tx);
@@ -285,18 +347,20 @@ export default function CreateCampaignForm() {
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Target Amount (ETH)
+                    Category
                   </label>
-                  <input
-                    type="number"
-                    name="targetAmount"
-                    value={formData.targetAmount}
+                  <select
+                    name="category"
+                    value={formData.category}
                     onChange={handleInputChange}
-                    step="0.01"
-                    min="0.01"
-                    placeholder="0.00"
                     className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  />
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -316,68 +380,40 @@ export default function CreateCampaignForm() {
                 </div>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
+              
+                   <div className="grid gap-6 md:grid-cols-1">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="relative">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Tags
+                    Target Amount (ETH)
                   </label>
                   <input
-                    type="text"
-                    name="tags"
-                    value={formData.tags}
+                    type="number"
+                    name="targetAmount"
+                    value={formData.targetAmount}
                     onChange={handleInputChange}
-                    placeholder="startup, tech, innovation"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="0.00"
                     className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowTagPopup((prev) => !prev)}
-                    className="mt-3 inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-800"
-                  >
-                    {showTagPopup ? "Hide suggested tags" : "Show suggested tags"}
-                  </button>
-
-                  {showTagPopup && (
-                    <div className="absolute left-0 right-0 top-full z-10 mt-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-950 dark:shadow-black/20">
-                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400 mb-3">
-                        Pick a tag
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {suggestedTags.map((tag) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => {
-                              handleSuggestedTagClick(tag);
-                              setShowTagPopup(false);
-                            }}
-                            className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-800"
-                          >
-                            {tag}
-                          </button>
-                        ))}
+                  {formData.targetAmount && rates && (
+                    <div className="mt-2 flex flex-wrap gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
+                        USD {(parseFloat(formData.targetAmount || 0) * rates.usd).toFixed(2)}
+                      </div>
+                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
+                        INR {(parseFloat(formData.targetAmount || 0) * rates.inr).toFixed(2)}
+                      </div>
+                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
+                        EUR {(parseFloat(formData.targetAmount || 0) * rates.eur).toFixed(2)}
+                      </div>
+                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
+                        GBP {(parseFloat(formData.targetAmount || 0) * rates.gbp).toFixed(2)}
                       </div>
                     </div>
                   )}
                 </div>
+       
               </div>
 
               <div>
@@ -471,6 +507,14 @@ export default function CreateCampaignForm() {
                 <p className="text-base text-slate-200">
                   {formData.targetAmount ? `${formData.targetAmount} ETH` : "0.00 ETH"}
                 </p>
+                {formData.targetAmount && rates && (
+                  <div className="mt-2 flex flex-wrap gap-2 text-sm text-slate-400">
+                    <span className="rounded-full bg-slate-800/60 px-3 py-1">USD {(parseFloat(formData.targetAmount || 0) * rates.usd).toFixed(2)}</span>
+                    <span className="rounded-full bg-slate-800/60 px-3 py-1">INR {(parseFloat(formData.targetAmount || 0) * rates.inr).toFixed(2)}</span>
+                    <span className="rounded-full bg-slate-800/60 px-3 py-1">EUR {(parseFloat(formData.targetAmount || 0) * rates.eur).toFixed(2)}</span>
+                    <span className="rounded-full bg-slate-800/60 px-3 py-1">GBP {(parseFloat(formData.targetAmount || 0) * rates.gbp).toFixed(2)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">

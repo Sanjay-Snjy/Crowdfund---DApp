@@ -38,7 +38,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
 
   return (
     <div
-      className={`bg-white border border-slate-200 shadow-lg shadow-slate-200/40 rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-slate-950 dark:border-slate-800 dark:shadow-none ${
+      className={`${isLandingCard ? "bg-transparent border-transparent rounded-2xl backdrop-blur-sm border border-secondary"  : "bg-white border border-slate-200 shadow-lg shadow-slate-200/40 dark:bg-slate-950 dark:border-slate-800 dark:shadow-none"} rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
         viewMode === "list"
           ? "flex flex-col gap-6 md:flex-row md:items-center"
           : ""
@@ -81,7 +81,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
 
       <div className={`p-6 ${viewMode === "list" ? "md:w-2/3" : ""}`}>
         <div className="mb-4">
-          <h3 className={`text-xl font-semibold tracking-tight ${isLandingCard ? "text-white" : "text-slate-950 dark:text-white"}`}>
+          <h3 className={`text-md font-semibold tracking-tight leading-5 line-clamp-2 ${isLandingCard ? "text-white" : "text-slate-950 dark:text-white"}`}>
             {campaign.title}
           </h3>
           {!isLandingCard && (
@@ -143,7 +143,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           <>
             <SignedIn>
               <Link href={`/campaign/${campaign.id}`}>
-                <button className="w-full rounded-3xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.01]">
+                <button className="w-full rounded-3xl bg-gradient-to-r from-cyan-600 to-cyan-600 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.01]">
                   View Details
                 </button>
               </Link>
