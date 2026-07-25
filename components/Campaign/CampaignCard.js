@@ -138,7 +138,18 @@ export default function CampaignCard({
           <h3 className={`text-md font-semibold tracking-tight leading-5 line-clamp-2 ${isLandingCard ? "text-white" : "text-slate-950 dark:text-white"}`}>
             {campaign.title}
           </h3>
-          
+          <div className={`mt-3 flex flex-wrap gap-3 text-xs ${isLandingCard ? "text-slate-200/90" : "text-slate-500 dark:text-slate-400"}`}>
+            {campaign.creator && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm">
+                <FiUser className="h-3.5 w-3.5" />
+                {creatorName}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm">
+              <FiTarget className="h-3.5 w-3.5" />
+              {parseFloat(targetAmount).toFixed(2)} ETH
+            </span>
+          </div>
           {!isLandingCard && (
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400 line-clamp-3">
               {campaign.description}

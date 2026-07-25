@@ -183,7 +183,7 @@ export default function ContributionsPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3 -mt-4">
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="rounded-[24px] border border-slate-200/70 bg-white px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Total contributed</p>
@@ -191,8 +191,8 @@ export default function ContributionsPage() {
                   {totalContributed.toFixed(4)} ETH
                 </p>
               </div>
-              <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-                <FiDollarSign className="h-5 w-5" />
+              <div className="rounded-3xl bg-blue-100 p-4 text-blue-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <FiDollarSign className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -205,8 +205,8 @@ export default function ContributionsPage() {
                   {contributions.length}
                 </p>
               </div>
-              <div className="rounded-2xl bg-sky-100 p-3 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400">
-                <FiHeart className="h-5 w-5" />
+              <div className="rounded-3xl bg-blue-100 p-4 text-blue-600 dark:bg-sky-900/30 dark:text-sky-400">
+                <FiHeart className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -221,8 +221,8 @@ export default function ContributionsPage() {
                     : "0.00"} ETH
                 </p>
               </div>
-              <div className="rounded-2xl bg-violet-100 p-3 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400">
-                <FiTrendingUp className="h-5 w-5" />
+              <div className="rounded-3xl bg-blue-100 p-4 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                <FiTrendingUp className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function ContributionsPage() {
             </p>
             <button
               onClick={() => router.push("/campaigns")}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white transition hover:from-blue-600 hover:to-purple-700"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 font-medium text-white transition hover:from-blue-600 hover:to-purple-700"
             >
               Browse campaigns
               <FiArrowRight className="h-4 w-4" />
