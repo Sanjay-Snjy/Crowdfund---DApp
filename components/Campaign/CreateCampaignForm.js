@@ -296,10 +296,10 @@ export default function CreateCampaignForm() {
   };
 
   return (
-    <div className="max-w-8xl -mt-2 mx-auto px-32 py-6 sm:py-0">
-      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <div className="space-y-6">
-          <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 p-8 sm:p-10">
+    <div className="max-w-8xl -mt-2 mx-auto px-0 py-6 sm:py-0">
+      <div className="grid gap-2 lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="space-y-0">
+          <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 px-8 py-2 sm:px-8 py-6">
             <div className="mb-5">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-600 dark:text-blue-300">
                 New campaign
@@ -310,7 +310,7 @@ export default function CreateCampaignForm() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/40 px-5 py-2 mb-7">
+            <div className="rounded-3xl -mt-2 border border-blue-100 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/40 px-5 py-2 mb-4">
               <div className="flex items-start gap-3">
                 <FiInfo className="mt-1 h-5 w-5 text-blue-600" />
                 <div>
@@ -324,8 +324,8 @@ export default function CreateCampaignForm() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 -mt-2">
-              <div className="grid gap-4">
+            <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-2">
+              <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                     Campaign Title
@@ -353,147 +353,164 @@ export default function CreateCampaignForm() {
                     className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
                   />
                 </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div>
+                    <label className="-mt-2  block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Category
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="-mt-2 block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Duration (Days)
+                    </label>
+                    <input
+                      type="number"
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleInputChange}
+                      min="1"
+                      max="365"
+                      placeholder="30"
+                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
+               <div>
+<div>
+  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+    Target Amount (ETH)
+  </label>
+
+  <div className="grid gap-4 lg:grid-cols-[1fr_1fr] items-start">
+    {/* Target Amount Input */}
+    <div>
+      <input
+        type="number"
+        name="targetAmount"
+        value={formData.targetAmount}
+        onChange={handleInputChange}
+        step="0.01"
+        min="0.01"
+        placeholder="0.00"
+        className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+      />
+    </div>
+
+    {/* Conversion Cards */}
+    {rates && (
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-slate-700 dark:bg-slate-800">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            USD
+          </p>
+          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+            {(parseFloat(formData.targetAmount || 0) * rates.usd).toFixed(2)}
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-slate-700 dark:bg-slate-800">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            INR
+          </p>
+          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+            {(parseFloat(formData.targetAmount || 0) * rates.inr).toFixed(2)}
+          </p>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+</div>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="space-y-2">
+                
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Duration (Days)
+                    Campaign Image
                   </label>
-                  <input
-                    type="number"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleInputChange}
-                    min="1"
-                    max="365"
-                    placeholder="30"
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  />
-                </div>
-              </div>
-
-              
-                   <div className="grid gap-6 md:grid-cols-1">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Target Amount (ETH)
-                  </label>
-                  <input
-                    type="number"
-                    name="targetAmount"
-                    value={formData.targetAmount}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    min="0.01"
-                    placeholder="0.00"
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-                  />
-                  {formData.targetAmount && rates && (
-                    <div className="mt-2 flex flex-wrap gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
-                        USD {(parseFloat(formData.targetAmount || 0) * rates.usd).toFixed(2)}
-                      </div>
-                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
-                        INR {(parseFloat(formData.targetAmount || 0) * rates.inr).toFixed(2)}
-                      </div>
-                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
-                        EUR {(parseFloat(formData.targetAmount || 0) * rates.eur).toFixed(2)}
-                      </div>
-                      <div className="rounded-full bg-slate-50 px-3 py-1 dark:bg-slate-800">
-                        GBP {(parseFloat(formData.targetAmount || 0) * rates.gbp).toFixed(2)}
-                      </div>
+                  {imagePreview ? (
+                    <div className="relative overflow-hidden rounded-[28px] border border-slate-200 dark:border-slate-700">
+                      <img
+                        src={imagePreview}
+                        alt="Campaign preview"
+                        className="h-56 w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/80 text-white transition hover:bg-slate-800"
+                      >
+                        <FiX className="h-5 w-5" />
+                      </button>
                     </div>
+                  ) : (
+                    <label className="flex min-h-[140px] flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-blue-500 dark:border-slate-700 dark:bg-slate-950">
+                      <FiUpload className="h-12 w-12 text-slate-400 dark:text-slate-500 mb-4" />
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          Upload a campaign image
+                        </p>
+                        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                          PNG, JPG, GIF up to 10MB.
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
                   )}
                 </div>
-       
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  Campaign Image
-                </label>
-                {imagePreview ? (
-                  <div className="relative overflow-hidden rounded-[28px] border border-slate-200 dark:border-slate-700">
-                    <img
-                      src={imagePreview}
-                      alt="Campaign preview"
-                      className="h-56 w-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/80 text-white transition hover:bg-slate-800"
-                    >
-                      <FiX className="h-5 w-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <label className="flex min-h-[220px] flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-blue-500 dark:border-slate-700 dark:bg-slate-950">
-                    <FiUpload className="h-12 w-12 text-slate-400 dark:text-slate-500 mb-4" />
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        Upload a campaign image
-                      </p>
-                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                        PNG, JPG, GIF up to 10MB.
-                      </p>
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
+                <div>
+                  <label className="-mt-0 block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Additional Information
                   </label>
-                )}
-              </div>
+                  <textarea
+                    name="additionalInfo"
+                    value={formData.additionalInfo}
+                    onChange={handleInputChange}
+                    rows={3}
+                    placeholder="Share extra context, milestones, or team details"
+                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  Additional Information
-                </label>
-                <textarea
-                  name="additionalInfo"
-                  value={formData.additionalInfo}
-                  onChange={handleInputChange}
-                  rows={4}
-                  placeholder="Share extra context, milestones, or team details"
-                  className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
-                />
-              </div>
-              <div className="flex flex-col items-center justify-center gap-4">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Make sure your campaign message is clear and the funding goal is achievable.
-                </p>
-                <button
-                type="submit"
-                disabled={isLoading || uploading}
-                className="rounded-3xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {uploading
-                  ? "Uploading to IPFS..."
-                  : isLoading? "Creating Campaign...": "Create Campaign"}
+                <div className="-mt-[40px] flex flex-col items-center justify-center gap-4">
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400">
+                    Ensure your campaign is clear and achievable.
+                  </p>
+                  <button
+                    type="submit"
+                    disabled={isLoading || uploading}
+                    className="w-full -mt-1 rounded-3xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-[16px] text-md font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {uploading
+                      ? "Uploading to IPFS..."
+                      : isLoading
+                      ? "Creating Campaign..."
+                      : "Create Campaign"}
                   </button>
-                  </div>
+                </div>
+              </div>
             </form>
           </div>
         </div>
