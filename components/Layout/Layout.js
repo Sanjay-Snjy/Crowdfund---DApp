@@ -49,7 +49,7 @@ return (
       <div className="fixed inset-0 bg-gray-50 dark:bg-darkc z-0 pointer-events-none" />
       
       <div
-        className="relative flex-1 flex flex-col"
+        className="relative flex-1 flex flex-col "
         onMouseMove={(e) => {
           setMousePosition({
             x: e.clientX,

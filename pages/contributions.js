@@ -159,7 +159,7 @@ export default function ContributionsPage() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-4 -mt-[18px] ml-1">
         <div className="rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-2xl shadow-slate-900/20">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -182,7 +182,7 @@ export default function ContributionsPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3 -mt-4">
           <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <div>
@@ -269,7 +269,7 @@ export default function ContributionsPage() {
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                        <div className="flex h-12 wx-12 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                           <FiHeart className="h-5 w-5" />
                         </div>
                         <div className="flex-1">

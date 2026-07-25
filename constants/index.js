@@ -41,18 +41,12 @@ export const NETWORK_CONFIGS = {
 };
 
 export const SIDEBAR_ITEMS = [
-   {
-    id: "campaigns",
+   
+  {
+    id: "all-campaigns",
     label: "All Campaigns",
     icon: "FiList",
-    path: "/campaigns",
-  },
-  
-  {
-    id: "top",
-    label: "Top",
-    icon: "FiTrendingUp",
-    path: "/top",
+    path: "/all-campaigns",
   },
   {
     id: "dashboard",

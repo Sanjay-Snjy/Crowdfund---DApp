@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useAccount } from "wagmi";
+import { useUser } from "@clerk/nextjs";
 import Layout from "../../components/Layout/Layout";
 import CampaignCard from "../../components/Campaign/CampaignCard";
 import { useContract } from "../../hooks/useContract";
@@ -12,7 +14,16 @@ export default function CampaignsPage() {
   const [sortBy, setSortBy] = useState("newest");
 
   const router = useRouter();
+  const { address } = useAccount();
   const { useActiveCampaigns } = useContract();
+  const { user } = useUser();
+  const currentUserName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "";
+
   const { data: campaigns, isLoading } = useActiveCampaigns(0, 50);
 
   const totalCampaigns = campaigns?.length || 0;
@@ -66,43 +77,7 @@ export default function CampaignsPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-2xl shadow-slate-900/20">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
-                <FiGrid className="h-4 w-4" />
-                Campaign marketplace
-              </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-                Discover inspiring projects
-              </h1>
-              <p className="mt-2 text-sm text-slate-200">
-                Browse active campaigns, compare momentum, and support ideas that matter to you.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
-              <p className="text-sm text-slate-300">Community spotlight</p>
-              <p className="mt-1 text-lg font-semibold">{totalCampaigns} live opportunities</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Total campaigns</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{totalCampaigns}</p>
-          </div>
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{activeCampaigns}</p>
-          </div>
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Funded campaigns</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{fundedCampaigns}</p>
-          </div>
-        </div>
-
+    
         <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="relative">
@@ -117,42 +92,30 @@ export default function CampaignsPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
-              <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
-                <FiFilter className="mr-2 h-4 w-4 text-slate-500" />
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full bg-transparent text-sm text-slate-900 outline-none dark:text-white"
-                >
-                  <option value="all">All statuses</option>
-                  <option value="active">Active</option>
-                  <option value="funded">Funded</option>
-                </select>
-              </div>
-              <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full bg-transparent text-sm text-slate-900 outline-none dark:text-white"
-                >
-                  <option value="newest">Newest first</option>
-                  <option value="ending">Ending soon</option>
-                  <option value="funded">Most funded</option>
-                  <option value="popular">Most popular</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Showing</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
-                {sortedCampaigns.length} campaigns
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
+              <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                            <select
+                              value={filterStatus}
+                              onChange={(e) => setFilterStatus(e.target.value)}
+                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-white"
+                            >
+                              <option value="all">All statuses</option>
+                              <option value="active">Active</option>
+                              <option value="funded">Funded</option>
+                            </select>
+                          </div>
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                            <select
+                              value={sortBy}
+                              onChange={(e) => setSortBy(e.target.value)}
+                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-white"
+                            >
+                              <option value="newest">Newest first</option>
+                              <option value="ending">Ending soon</option>
+                              <option value="funded">Most funded</option>
+                              <option value="popular">Most popular</option>
+                            </select>
+                          </div>
+              <div className="flex items-center gap-2">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
@@ -174,7 +137,12 @@ export default function CampaignsPage() {
                 <FiList className="h-5 w-5" />
               </button>
             </div>
+            </div>
+         
+          
           </div>
+
+         
         </div>
 
         <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -190,6 +158,8 @@ export default function CampaignsPage() {
                 <CampaignCard
                   key={campaign.id}
                   campaign={campaign}
+                  currentUserAddress={address}
+                  currentUserName={currentUserName}
                   viewMode={viewMode}
                   className={viewMode === "list" ? "md:flex-row" : ""}
                 />

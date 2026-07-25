@@ -14,6 +14,30 @@ export const formatAddress = (address) => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
+export const getCreatorDisplayName = (
+  creator,
+  metadataCreator,
+  profile,
+  currentUserAddress,
+  currentUserName
+) => {
+  if (
+    currentUserAddress &&
+    currentUserName &&
+    creator?.toString?.()?.toLowerCase() ===
+      currentUserAddress?.toString?.()?.toLowerCase()
+  ) {
+    return currentUserName;
+  }
+
+  if (profile?.name) return profile.name;
+  if (profile?.email) return profile.email.split("@")[0];
+  if (metadataCreator && !validateEthereumAddress(metadataCreator)) {
+    return metadataCreator;
+  }
+  return formatAddress(creator);
+};
+
 export const formatDate = (timestamp) => {
   const date = new Date(parseInt(timestamp) * 1000);
   return date.toLocaleDateString("en-US", {
@@ -63,6 +87,10 @@ export const copyToClipboard = async (text) => {
   }
 };
 
+export const validateEthereumAddress = (address) => {
+  return ethers.utils.isAddress(address);
+};
+
 export const generateRandomGradient = () => {
   const gradients = [
     "from-blue-500 to-purple-600",
@@ -75,10 +103,6 @@ export const generateRandomGradient = () => {
     "from-emerald-500 to-teal-600",
   ];
   return gradients[Math.floor(Math.random() * gradients.length)];
-};
-
-export const validateEthereumAddress = (address) => {
-  return ethers.utils.isAddress(address);
 };
 
 export const validateAmount = (amount) => {

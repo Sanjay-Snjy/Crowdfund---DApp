@@ -1,6 +1,7 @@
 import { useAccount, useContractReads } from "wagmi";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
+import { useUser } from "@clerk/nextjs";
 import Layout from "../components/Layout/Layout";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import { useContract } from "../hooks/useContract";
@@ -11,9 +12,17 @@ import { CROWDFUNDING_ABI } from "../constants/abi";
 
 export default function MyCampaignsPage() {
   const { address, isConnected } = useAccount();
+  const { user } = useUser();
   const router = useRouter();
   const { useUserCampaigns } = useContract();
   const [campaigns, setCampaigns] = useState([]);
+
+  const currentUserName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "";
 
   const { data: campaignIds, isLoading: loadingIds } =
     useUserCampaigns(address);
@@ -243,7 +252,12 @@ export default function MyCampaignsPage() {
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.id} campaign={campaign} />
+                <CampaignCard
+                  key={campaign.id}
+                  campaign={campaign}
+                  currentUserAddress={address}
+                  currentUserName={currentUserName}
+                />
               ))}
             </div>
           </div>

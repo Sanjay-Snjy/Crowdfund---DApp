@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
+import { useAccount } from "wagmi";
 import { FiUser, FiClock, FiTarget, FiTrendingUp } from "react-icons/fi";
 import {
   formatEther,
   formatAddress,
   calculateTimeLeft,
   calculateProgress,
+  getCreatorDisplayName,
 } from "../../utils/helpers";
 import { getFromIPFS } from "../../utils/ipfs";
 
-export default function CampaignCard({ campaign, className = "", isLandingCard = false, viewMode = "grid" }) {
+export default function CampaignCard({
+  campaign,
+  creatorProfile = null,
+  currentUserAddress = null,
+  currentUserName = "",
+  className = "",
+  isLandingCard = false,
+  viewMode = "grid",
+}) {
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [resolvedCreatorProfile, setResolvedCreatorProfile] = useState(null);
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -28,6 +39,44 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
     fetchMetadata();
   }, [campaign.metadataHash]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchCreatorProfile = async () => {
+      if (!campaign?.creator) {
+        setResolvedCreatorProfile(null);
+        return;
+      }
+
+      const creatorAddress = campaign.creator.toString?.()?.toLowerCase();
+      if (!creatorAddress) {
+        setResolvedCreatorProfile(null);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/wallet-link?walletAddresses=${encodeURIComponent(
+            creatorAddress
+          )}`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+
+        if (Array.isArray(data.walletProfiles) && data.walletProfiles.length > 0) {
+          setResolvedCreatorProfile(data.walletProfiles[0]);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to fetch creator profile:", error);
+        }
+      }
+    };
+
+    fetchCreatorProfile();
+    return () => controller.abort();
+  }, [campaign?.creator]);
+
   const progress = calculateProgress(
     campaign.raisedAmount,
     campaign.targetAmount
@@ -35,10 +84,17 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
   const timeLeft = calculateTimeLeft(campaign.deadline);
   const raisedAmount = formatEther(campaign.raisedAmount);
   const targetAmount = formatEther(campaign.targetAmount);
+  const creatorName = getCreatorDisplayName(
+    campaign.creator,
+    metadata?.creator,
+    creatorProfile || resolvedCreatorProfile,
+    currentUserAddress,
+    currentUserName
+  );
 
   return (
     <div
-      className={`${isLandingCard ? "bg-transparent border-transparent rounded-2xl backdrop-blur-sm border border-secondary"  : "bg-white border border-slate-200 shadow-lg shadow-slate-200/40 dark:bg-slate-950 dark:border-slate-800 dark:shadow-none"} rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
+      className={`${isLandingCard ? "bg-white/10 border-transparent rounded-2xl backdrop-blur-[1px] border border-secondary"  : "bg-white border border-slate-200 shadow-lg shadow-slate-200/40 dark:bg-slate-950 dark:border-slate-800 dark:shadow-none"} rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
         viewMode === "list"
           ? "flex flex-col gap-6 md:flex-row md:items-center"
           : ""
@@ -50,7 +106,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           <img
             src={metadata.image}
             alt={campaign.title}
-            className="h-56 w-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+            className="h-[150px] w-full object-cover transition-transform duration-500 ease-out hover:scale-105"
           />
         ) : (
           <div className="flex h-56 items-center justify-center bg-slate-100 text-6xl font-bold text-slate-300 dark:bg-slate-900 dark:text-slate-600">
@@ -58,25 +114,23 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           </div>
         )}
 
-        {!isLandingCard && (
-          <div className="absolute inset-x-0 top-4 flex items-center justify-between px-4">
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm ${
-                campaign.active
-                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
-                  : "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
-              }`}
-            >
-              {campaign.active ? "Active" : "Inactive"}
+        <div className="absolute inset-x-0 top-4 flex items-center justify-between px-4">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm ${
+              campaign.active
+                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                : "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200"
+            }`}
+          >
+            {campaign.active ? "Active" : "Inactive"}
+          </span>
+          {!timeLeft.expired && (
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm ${isLandingCard ? "bg-slate-900/80 text-white" : "bg-slate-900/80 text-white"}`}>
+              <FiClock className="inline h-3 w-3 mr-1" />
+              {timeLeft.text}
             </span>
-            {!timeLeft.expired && (
-              <span className="rounded-full bg-slate-900/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-                <FiClock className="inline h-3 w-3 mr-1" />
-                {timeLeft.text}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className={`p-6 ${viewMode === "list" ? "md:w-2/3" : ""}`}>
@@ -84,6 +138,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
           <h3 className={`text-md font-semibold tracking-tight leading-5 line-clamp-2 ${isLandingCard ? "text-white" : "text-slate-950 dark:text-white"}`}>
             {campaign.title}
           </h3>
+          
           {!isLandingCard && (
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400 line-clamp-3">
               {campaign.description}
@@ -96,7 +151,7 @@ export default function CampaignCard({ campaign, className = "", isLandingCard =
             <div className="mb-5 text-sm text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-2">
                 <FiUser className="h-4 w-4" />
-                <span>by {formatAddress(campaign.creator)}</span>
+                <span>by {creatorName}</span>
               </div>
             </div>
 

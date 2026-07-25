@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useAccount, useContractRead, useContractReads } from "wagmi";
+import { useUser } from "@clerk/nextjs";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import {
@@ -24,6 +25,7 @@ import {
   calculateProgress,
   formatDate,
   copyToClipboard,
+  getCreatorDisplayName,
 } from "../../utils/helpers";
 import { CONTRACT_ADDRESS } from "../../constants";
 import { CROWDFUNDING_ABI } from "../../constants/abi";
@@ -31,6 +33,7 @@ import { CROWDFUNDING_ABI } from "../../constants/abi";
 export default function CampaignDetails({ campaignId }) {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const { user } = useUser();
   const {
     useCampaign,
     useCampaignStats,
@@ -46,6 +49,7 @@ export default function CampaignDetails({ campaignId }) {
   } = useContract();
 
   const [metadata, setMetadata] = useState(null);
+  const [creatorProfile, setCreatorProfile] = useState(null);
   const [contributionAmount, setContributionAmount] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
@@ -121,6 +125,44 @@ export default function CampaignDetails({ campaignId }) {
     fetchMetadata();
   }, [campaign?.metadataHash]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchCreatorProfile = async () => {
+      if (!campaign?.creator) {
+        setCreatorProfile(null);
+        return;
+      }
+
+      const creatorAddress = campaign.creator.toString?.()?.toLowerCase();
+      if (!creatorAddress) {
+        setCreatorProfile(null);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/wallet-link?walletAddresses=${encodeURIComponent(
+            creatorAddress
+          )}`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+
+        if (Array.isArray(data.walletProfiles) && data.walletProfiles.length > 0) {
+          setCreatorProfile(data.walletProfiles[0]);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to load campaign creator profile:", error);
+        }
+      }
+    };
+
+    fetchCreatorProfile();
+    return () => controller.abort();
+  }, [campaign?.creator]);
+
   if (campaignLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -155,6 +197,19 @@ export default function CampaignDetails({ campaignId }) {
   const timeLeft = calculateTimeLeft(campaign.deadline);
   const raisedAmount = formatEther(campaign.raisedAmount);
   const targetAmount = formatEther(campaign.targetAmount);
+  const currentUserName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "";
+  const creatorName = getCreatorDisplayName(
+    campaign.creator,
+    metadata?.creator,
+    creatorProfile,
+    address,
+    currentUserName
+  );
   const isCreator = address?.toLowerCase() === campaign.creator?.toLowerCase();
   const isSuccessful = parseFloat(raisedAmount) >= parseFloat(targetAmount);
   const canWithdraw =
@@ -380,7 +435,7 @@ export default function CampaignDetails({ campaignId }) {
                     Created by
                   </p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {formatAddress(campaign.creator)}
+                    {creatorName}
                     {isCreator && (
                       <span className="ml-2 text-blue-500">(You)</span>
                     )}

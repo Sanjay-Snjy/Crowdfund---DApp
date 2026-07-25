@@ -2,13 +2,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout/Layout";
 import { useContract } from "../hooks/useContract";
-import { FiSearch, FiGrid } from "react-icons/fi";
+import { useUser } from "@clerk/nextjs";
+import { useAccount } from "wagmi";
+import { FiFilter, FiGrid, FiList, FiSearch } from "react-icons/fi";
 import {
   calculateProgress,
   calculateTimeLeft,
   formatAddress,
   formatEther,
   validateEthereumAddress,
+  getCreatorDisplayName,
 } from "../utils/helpers";
 import { getFromIPFS } from "../utils/ipfs";
 
@@ -88,21 +91,27 @@ const HERO_SLIDES = [
     subtitle2: "Support projects that preserve nature and restore ecosystems.",
   },
 ];
-function TopCampaignCard({ campaign, creatorProfile, metadata }) {
+function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddress, currentUserName, viewMode = "grid" }) {
   const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount);
   const timeLeft = calculateTimeLeft(campaign.deadline);
-  const creatorName =
-    creatorProfile?.name ||
-    // Use metadata creator only when it's a human-readable name (not an address)
-    (metadata?.creator && !validateEthereumAddress(metadata.creator)
-      ? metadata.creator
-      : formatAddress(campaign.creator));
+  const creatorName = getCreatorDisplayName(
+    campaign.creator,
+    metadata?.creator,
+    creatorProfile,
+    currentUserAddress,
+    currentUserName
+  );
   const raised = parseFloat(formatEther(campaign.raisedAmount)).toFixed(2);
   const target = parseFloat(formatEther(campaign.targetAmount)).toFixed(2);
+  const isListView = viewMode === "list";
 
   return (
-    <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950">
-      <div className="relative overflow-hidden h-56">
+    <div
+      className={`overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950 ${
+        isListView ? "flex flex-col md:flex-row" : "flex flex-col"
+      }`}
+    >
+      <div className={`relative overflow-hidden ${isListView ? "h-[40px] md:h-auto md:w-64 lg:w-72" : "h-[180px]"}`}>
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950/10 via-transparent to-slate-950/20" />
         {metadata?.image ? (
           <img
@@ -124,36 +133,43 @@ function TopCampaignCard({ campaign, creatorProfile, metadata }) {
         </div>
       </div>
 
-      <div className="space-y-4 p-5">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
-            {campaign.title}
-          </h3>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            By {creatorName}
-          </p>
+      <div className={`flex flex-1 flex-col justify-between ${isListView ? "p-5 md:p-6" : "p-5"}`}>
+        <div className="space-y-2">
+          <div>
+            <h3 className="text-3d font-semibold text-slate-950 dark:text-white -mt-2">
+              {campaign.title}
+            </h3>
+            {isListView && campaign.description && (
+              <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400 line-clamp-3">
+                {campaign.description}
+              </p>
+            )}
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              By {creatorName}
+            </p>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-3 -mt-6">
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Raised</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{raised} ETH</p>
+            </div>
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Target</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{target} ETH</p>
+            </div>
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Progress</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{Math.round(progress)}%</p>
+            </div>
+          </div>
+
+          <div className="rounded-3xl bg-slate-100 py-1 px-2 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+            {timeLeft.text} left · {campaign.contributorsCount || 0} backers
+          </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Raised</p>
-            <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{raised} ETH</p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Target</p>
-            <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{target} ETH</p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Progress</p>
-            <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{Math.round(progress)}%</p>
-          </div>
-        </div>
-
-        <div className="rounded-3xl bg-slate-100 p-3 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-          {timeLeft.text} left · {campaign.contributorsCount || 0} backers
-        </div>
-
-        <Link href={`/campaign/${campaign.id}`} className="block rounded-3xl bg-blue-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
+        <Link href={`/campaign/${campaign.id}`} className="mt-4 block rounded-3xl bg-blue-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
           View campaign
         </Link>
       </div>
@@ -162,6 +178,15 @@ function TopCampaignCard({ campaign, creatorProfile, metadata }) {
 }
 
 export default function TopPage() {
+  const { address: currentUserAddress } = useAccount();
+  const { user } = useUser();
+  const currentUserName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "";
+
   const { useActiveCampaigns } = useContract();
   const { data: campaigns, isLoading } = useActiveCampaigns(0, 100);
   const totalCampaigns = campaigns?.length || 0;
@@ -174,6 +199,9 @@ export default function TopPage() {
     ).length || 0;
   const [activeCategory, setActiveCategory] = useState("Discover");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState("grid");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [creatorProfiles, setCreatorProfiles] = useState({});
   const loadedCreatorAddresses = useRef(new Set());
@@ -182,7 +210,6 @@ export default function TopPage() {
   const displayedCampaigns = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
-    
     return (campaigns || [])
       .filter((campaign) => {
         if (!campaign) return false;
@@ -194,6 +221,9 @@ export default function TopPage() {
           "";
         const title = campaign.title?.toString?.() || "";
         const description = campaign.description?.toString?.() || "";
+        const raisedAmount = parseFloat(campaign.raisedAmount?.toString?.() || "0");
+        const targetAmount = parseFloat(campaign.targetAmount?.toString?.() || "0");
+        const isFunded = raisedAmount >= targetAmount;
 
         const matchesSearch =
           normalizedSearch === "" ||
@@ -201,16 +231,41 @@ export default function TopPage() {
           description.toLowerCase().includes(normalizedSearch);
 
         if (!matchesSearch) return false;
-        if (activeCategory === "Discover") return true;
 
-        return category.toLowerCase() === activeCategory.toLowerCase();
+        if (activeCategory !== "Discover" && category.toLowerCase() !== activeCategory.toLowerCase()) {
+          return false;
+        }
+
+        if (filterStatus === "active") return campaign.active;
+        if (filterStatus === "funded") return isFunded;
+
+        return true;
       })
       .sort((a, b) => {
         const aId = parseInt(a.id?.toString?.() || "0", 10);
         const bId = parseInt(b.id?.toString?.() || "0", 10);
-        return bId - aId;
+        const aRaised = parseFloat(a.raisedAmount?.toString?.() || "0");
+        const bRaised = parseFloat(b.raisedAmount?.toString?.() || "0");
+        const aDeadline = parseInt(a.deadline?.toString?.() || "0", 10);
+        const bDeadline = parseInt(b.deadline?.toString?.() || "0", 10);
+        const aContributors = a.contributorsCount || 0;
+        const bContributors = b.contributorsCount || 0;
+
+        switch (sortBy) {
+          case "ending":
+            return aDeadline - bDeadline;
+          case "funded":
+            return bRaised - aRaised;
+          case "popular":
+            return bContributors - aContributors;
+          case "newest":
+          default:
+            return bId - aId;
+        }
       });
-  }, [campaigns, activeCategory, searchTerm, campaignMetadataMap]);
+  }, [campaigns, activeCategory, searchTerm, filterStatus, sortBy, campaignMetadataMap]);
+
+  const sortedCampaigns = displayedCampaigns;
 
   const campaignCreators = useMemo(() => {
     return Array.from(
@@ -312,8 +367,8 @@ export default function TopPage() {
 
   return (
     <Layout>
-      <div className="space-y-6 -mt-[18px] ml-2">
-        <section className="relative overflow-hidden h-[328px] rounded-[32px] border border-slate-200/70 bg-slate-900 p-0 text-white shadow-xl">
+      <div className="space-y-6 -mt-[18px] ml-1">
+        <section className="relative overflow-hidden h-[328px] rounded-[32px] border border-slate-200/70 bg-slate-900 p-0 text-white ">
       <div className="absolute inset-0">
   {HERO_SLIDES.map((slide, index) => (
     <div
@@ -379,38 +434,100 @@ export default function TopPage() {
 </div>
         </section>
 
- <div className="ml-auto grid max-w-xl gap-4 md:grid-cols-3">
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+
+
+        <section className="rounded-[32px] ">
+            <div className="rounded-[32px]  bg-[#e6e6e6]/0 border border-transparent px-6 py-4 dark:border-slate-700 dark:bg-slate-900">
+                      <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
+                        <div className="relative">
+                          <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="Search campaigns"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                          />
+                        </div>
+            
+                        <div className="flex flex-wrap items-center justify-end gap-3">
+                          <FiFilter className="mr-2 h-6 w-6 text-slate-500" />
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                            <select
+                              value={filterStatus}
+                              onChange={(e) => setFilterStatus(e.target.value)}
+                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-white"
+                            >
+                              <option value="all">All statuses</option>
+                              <option value="active">Active</option>
+                              <option value="funded">Funded</option>
+                            </select>
+                          </div>
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                            <select
+                              value={sortBy}
+                              onChange={(e) => setSortBy(e.target.value)}
+                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-white"
+                            >
+                              <option value="newest">Newest first</option>
+                              <option value="ending">Ending soon</option>
+                              <option value="funded">Most funded</option>
+                              <option value="popular">Most popular</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+            
+                      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        
+                      <div className="ml-[0px] grid max-w-xl gap-4 md:grid-cols-3">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Total campaigns</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{totalCampaigns}</p>
               </div>
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{activeCampaigns}</p>
               </div>
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Funded campaigns</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{fundedCampaigns}</p>
               </div>
             </div>
-        <section className="rounded-[32px] bg-transparent p-6">
-             <div className="min-w-[240px] flex-1 md:flex-none">
-              <label className="sr-only" htmlFor="topSearch">
-                Search campaigns
-              </label>
-              <div className="relative">
-                <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  id="topSearch"
-                  type="search"
-                  value={searchTerm}
-                  placeholder="Search campaigns"
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                />
-              </div>
-            </div>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Showing</p>
+                          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
+                            {sortedCampaigns.length} campaigns
+                          </p>
+                        </div>
+                        <div className="ml-auto flex items-center gap-2">
+                          <button
+                            onClick={() => setViewMode("grid")}
+                            className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
+                              viewMode === "grid"
+                                ? "bg-blue-600 text-white"
+                                : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                            }`}
+                          >
+                            <FiGrid className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => setViewMode("list")}
+                            className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
+                              viewMode === "list"
+                                ? "bg-blue-600 text-white"
+                                : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                            }`}
+                          >
+                            <FiList className="h-5 w-5" />
+                          </button>
+                        </div>
+               
+                      </div>
+                      
+                    </div>
+         
+          <div className="flex items-center justify-between gap-4 ml-[50px] flex-wrap">
             <div className="flex overflow-x-auto no-scrollbar gap-2 py-2">
               {CATEGORIES.map((category) => {
                 const isActive = category === activeCategory;
@@ -434,17 +551,14 @@ export default function TopPage() {
           </div>
         </section>
 
-        <section className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <section className="rounded-[32px] bg-transparent  px-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Showing campaigns</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
+              <h2 className="mt-0 ml-2 text-2xl font-semibold text-slate-900 dark:text-white">
                 {activeCategory} campaigns
               </h2>
             </div>
-            <div className="rounded-3xl bg-slate-100 px-4 py-3 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-              {displayedCampaigns.length} campaigns found
-            </div>
+            
           </div>
 
           {isLoading ? (
@@ -454,13 +568,16 @@ export default function TopPage() {
               ))}
             </div>
           ) : displayedCampaigns.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className={viewMode === "list" ? "flex flex-col gap-4 px-28" : "grid gap-5  grid-cols-4"}>
               {displayedCampaigns.map((campaign) => (
                 <TopCampaignCard
                   key={campaign.id}
                   campaign={campaign}
                   metadata={campaignMetadataMap[campaign.id?.toString?.()]}
                   creatorProfile={creatorProfiles[campaign.creator?.toString?.()?.toLowerCase()]}
+                  currentUserAddress={currentUserAddress}
+                  currentUserName={currentUserName}
+                  viewMode={viewMode}
                 />
               ))}
             </div>

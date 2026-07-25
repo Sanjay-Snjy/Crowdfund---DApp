@@ -29,7 +29,7 @@ import CampaignCard from "../components/Campaign/CampaignCard";
 
 export default function Home() {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const { user, isLoaded } = useUser();
   const [stats, setStats] = useState({
     campaignsLaunched: 0,
@@ -227,7 +227,6 @@ export default function Home() {
       title: "Research & Innovation",
       description: "Invest in experiments and next-generation breakthroughs.",
     },
-  ,
   ];
 
   const { useActiveCampaigns } = useContract();
@@ -236,7 +235,53 @@ export default function Home() {
     ? recentCampaigns.slice(0, 4)
     : [];
 
+  const [recentCreatorProfiles, setRecentCreatorProfiles] = useState({});
   const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const campaignAddresses = Array.from(
+      new Set(
+        visibleRecentCampaigns
+          .map((campaign) => campaign.creator?.toString?.()?.toLowerCase())
+          .filter(Boolean)
+      )
+    );
+
+    if (!campaignAddresses.length) {
+      setRecentCreatorProfiles({});
+      return;
+    }
+
+    const controller = new AbortController();
+    const query = campaignAddresses.map(encodeURIComponent).join(",");
+
+    const loadCreatorProfiles = async () => {
+      try {
+        const response = await fetch(
+          `/api/wallet-link?walletAddresses=${query}`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+
+        if (Array.isArray(data.walletProfiles)) {
+          const nextProfiles = {};
+          data.walletProfiles.forEach((profile) => {
+            if (profile?.walletAddress) {
+              nextProfiles[profile.walletAddress.toLowerCase()] = profile;
+            }
+          });
+          setRecentCreatorProfiles(nextProfiles);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to load campaign creator profiles:", error);
+        }
+      }
+    };
+
+    loadCreatorProfiles();
+    return () => controller.abort();
+  }, [visibleRecentCampaigns]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -258,7 +303,7 @@ export default function Home() {
   };
   const handleGoToCampaigns = () => {
     applyLightTheme();
-    router.push("/campaigns");
+    router.push("/all-campaigns");
   };
   const handleGoToDashboard = () => {
     applyLightTheme();
@@ -300,6 +345,12 @@ export default function Home() {
     };
   }, [greetingIndex, isLoaded, user]);
 
+  const currentUserName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "";
   const displayName = user?.firstName || user?.username || user?.fullName || "there";
   const displayGreeting = greetingIndex === 0 ? `Hello, ${displayName}!` : `${greetingPhrases[greetingIndex]}!`;
 
@@ -500,7 +551,7 @@ export default function Home() {
       )}
       <h1 className="text-2xl md:text-5xl font-bold text-white mb-6">
       Trusted Crowdfunding Platform!
-        <span className="mt-3 block text-4xl text-blue-200">Decentralized Funding</span>
+        <span className="mt-3 block text-4xl text-blue-200">Decentralized & Secure</span>
       </h1>
       <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
      Launch campaigns, support innovations, and empower projects with trusted support. Ensure every contribution is transparent, secure, and accountable through blockchain technology.
@@ -644,6 +695,9 @@ export default function Home() {
                 <CampaignCard
                   key={campaign.id}
                   campaign={campaign}
+                  creatorProfile={recentCreatorProfiles[campaign.creator?.toString?.()?.toLowerCase()]}
+                  currentUserAddress={address}
+                  currentUserName={currentUserName}
                   isLandingCard
                   className="border-white/10 shadow-2xl bg-transparent"
                 />
@@ -678,14 +732,13 @@ export default function Home() {
             {campaignCategories.map((category, index) => (
               <div
                 key={index}
-                className="group rounded-[1.75rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
+                className="inline-flex rounded-[1.75rem] p-2 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
               >
                 <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-cyan-400/10 text-cyan-200 mb-5 transition-colors duration-300 group-hover:bg-cyan-400/20 group-hover:text-white">
                   <category.icon className="h-6 w-6" />
+
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">{category.title}</h3>
-                <p className="text-white/70 mb-6">{category.description}</p>
-               
+                 <h3 className="inline-flex mt-[10px] ml-[24px] text-xl font-semibold text-white mb-3">{category.title}</h3>
               </div>
             ))}
           </div>

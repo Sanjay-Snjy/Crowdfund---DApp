@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import { FiUpload, FiX, FiInfo } from "react-icons/fi";
 import { useAccount, useBalance, useNetwork } from "wagmi";
+import { useUser } from "@clerk/nextjs";
 import { useContract } from "../../hooks/useContract";
 import { uploadCampaignMetadata } from "../../utils/ipfs";
 import { CAMPAIGN_CREATION_FEE } from "../../constants";
@@ -13,6 +14,7 @@ import { CONTRACT_ADDRESS } from "../../constants";
 export default function CreateCampaignForm() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const { user, isLoaded } = useUser();
   const { chain } = useNetwork();
   const { data: balanceData } = useBalance({
     address,
@@ -211,8 +213,17 @@ export default function CreateCampaignForm() {
       };
 
       toast.loading("Uploading to IPFS...", { id: "upload" });
+      const creatorName =
+        user?.fullName ||
+        [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+        user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+        "Anonymous";
+
       const uploadResult = await uploadCampaignMetadata(
-        metadataData,
+        {
+          ...metadataData,
+          creator: creatorName,
+        },
         imageFile
       );
       toast.dismiss("upload");
@@ -285,8 +296,8 @@ export default function CreateCampaignForm() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-0">
-      <div className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
+    <div className="max-w-8xl -mt-2 mx-auto px-32 py-6 sm:py-0">
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
           <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 p-8 sm:p-10">
             <div className="mb-6">
@@ -487,14 +498,14 @@ export default function CreateCampaignForm() {
           </div>
         </div>
 
-        <aside className="space-y-6">
-          <div className="sticky top-6 rounded-[32px] border border-secondary bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/20">
+        <aside className="space-y-6 w-[500px] ">
+          <div className="sticky top-24 rounded-[32px] border border-secondary bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/20">
             <h3 className="text-xl font-semibold">Campaign Preview</h3>
             <p className="mt-3 text-sm text-slate-300">
               Review the details before submission. This preview mirrors what supporters will see.
             </p>
 
-            <div className="mt-6 space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-5">
+            <div className="mt-6 ml-2 space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-5">
               <div className="space-y-2">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Title</p>
                 <p className="text-lg font-semibold text-white">
@@ -502,19 +513,12 @@ export default function CreateCampaignForm() {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 ml-2">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Goal</p>
                 <p className="text-base text-slate-200">
                   {formData.targetAmount ? `${formData.targetAmount} ETH` : "0.00 ETH"}
                 </p>
-                {formData.targetAmount && rates && (
-                  <div className="mt-2 flex flex-wrap gap-2 text-sm text-slate-400">
-                    <span className="rounded-full bg-slate-800/60 px-3 py-1">USD {(parseFloat(formData.targetAmount || 0) * rates.usd).toFixed(2)}</span>
-                    <span className="rounded-full bg-slate-800/60 px-3 py-1">INR {(parseFloat(formData.targetAmount || 0) * rates.inr).toFixed(2)}</span>
-                    <span className="rounded-full bg-slate-800/60 px-3 py-1">EUR {(parseFloat(formData.targetAmount || 0) * rates.eur).toFixed(2)}</span>
-                    <span className="rounded-full bg-slate-800/60 px-3 py-1">GBP {(parseFloat(formData.targetAmount || 0) * rates.gbp).toFixed(2)}</span>
-                  </div>
-                )}
+                
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
@@ -530,27 +534,9 @@ export default function CreateCampaignForm() {
                 </div>
               </div>
 
-              <div className="rounded-3xl bg-slate-950/80 px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Tags</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {tagList.length > 0 ? (
-                    tagList.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs text-slate-200"
-                      >
-                        {tag}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-sm text-slate-500">No tags added yet</span>
-                  )}
-                </div>
-              </div>
-
               <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
-                <p className="mt-3 text-sm leading-6 text-slate-300">
+                <p className="mt-3 text-sm leading-6 text-slate-300 w-full">
                   {formData.description || "Start with a strong campaign description that explains why your project matters."}
                 </p>
               </div>
