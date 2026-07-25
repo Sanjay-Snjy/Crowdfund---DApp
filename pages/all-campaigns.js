@@ -317,7 +317,7 @@ export default function TopPage() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 5000);
+    }, 4000);
 
     return () => clearInterval(timer);
   }, []);

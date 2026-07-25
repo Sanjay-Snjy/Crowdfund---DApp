@@ -300,7 +300,7 @@ export default function CreateCampaignForm() {
       <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
           <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 p-8 sm:p-10">
-            <div className="mb-6">
+            <div className="mb-5">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-600 dark:text-blue-300">
                 New campaign
               </p>
@@ -310,7 +310,7 @@ export default function CreateCampaignForm() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/40 p-5 mb-7">
+            <div className="rounded-3xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/40 px-5 py-2 mb-7">
               <div className="flex items-start gap-3">
                 <FiInfo className="mt-1 h-5 w-5 text-blue-600" />
                 <div>
@@ -324,7 +324,7 @@ export default function CreateCampaignForm() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 -mt-2">
               <div className="grid gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -348,7 +348,7 @@ export default function CreateCampaignForm() {
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={5}
+                    rows={4}
                     placeholder="Describe your campaign, goals, and how funds will be used"
                     className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
                   />

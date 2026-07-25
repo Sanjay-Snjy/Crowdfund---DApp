@@ -277,31 +277,31 @@ export default function AdminPage() {
               label: "Total campaigns",
               value: totalCampaigns,
               icon: FiActivity,
-              accent: "from-sky-500 to-blue-600",
+              accent: "bg-blue-100",
             },
             {
               label: "Platform fees",
               value: `${availableFees} ETH`,
               icon: FiDollarSign,
-              accent: "from-emerald-500 to-green-600",
+              accent: "bg-blue-100",
             },
             {
               label: "Contract balance",
               value: `${contractBalance} ETH`,
               icon: FiShield,
-              accent: "from-violet-500 to-purple-600",
+              accent: "bg-blue-100",
             },
             {
               label: "Status",
               value: isPaused ? "Paused" : "Active",
               icon: isPaused ? FiPause : FiPlay,
-              accent: isPaused ? "from-amber-500 to-orange-600" : "from-emerald-500 to-green-600",
+              accent: isPaused ? "from-amber-100 to-orange-200" : "from-emerald-100 to-green-200",
             },
           ].map((stat) => {
             const Icon = stat.icon;
             return (
               <div key={stat.label} className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <div className={`inline-flex rounded-2xl bg-gradient-to-br ${stat.accent} p-3 text-white`}>
+                <div className={`inline-flex rounded-2xl bg-gradient-to-br ${stat.accent} p-3 text-blue-600`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
@@ -330,7 +330,7 @@ export default function AdminPage() {
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
               <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
                 <div className="flex items-center gap-2">
-                  <FiDollarSign className="h-5 w-5 text-emerald-500" />
+                  <FiDollarSign className="h-5 w-5 text-blue-500" />
                   <h3 className="font-semibold text-slate-900 dark:text-white">Treasury</h3>
                 </div>
                 <div className="mt-4 space-y-4">
@@ -364,17 +364,17 @@ export default function AdminPage() {
 
               <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
                 <div className="flex items-center gap-2">
-                  <FiShield className="h-5 w-5 text-violet-500" />
+                  <FiShield className="h-5 w-5 text-blue-500" />
                   <h3 className="font-semibold text-slate-900 dark:text-white">Platform controls</h3>
                 </div>
                 <div className="mt-4 space-y-3">
                   <button
                     onClick={handlePauseContract}
                     disabled={isPausing || isUnpausing}
-                    className={`flex w-full items-center justify-center rounded-xl px-4 py-3 font-medium text-white transition ${
+                    className={`flex w-full items-center justify-center rounded-xl px-4 py-3 font-medium text-black transition ${
                       isPaused
-                        ? "bg-emerald-600 hover:bg-emerald-700"
-                        : "bg-amber-500 hover:bg-amber-600"
+                        ? "bg-emerald-100 hover:bg-emerald-400"
+                        : "bg-blue-100 hover:bg-blue-400"
                     }`}
                   >
                     {isPausing || isUnpausing ? (
@@ -437,7 +437,7 @@ export default function AdminPage() {
           <aside className="space-y-6">
             <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center gap-2">
-                <FiZap className="h-5 w-5 text-amber-500" />
+                <FiZap className="h-5 w-5 text-blue-500" />
                 <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Quick actions</h2>
               </div>
               <div className="mt-4 space-y-3">

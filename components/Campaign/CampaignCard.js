@@ -140,12 +140,12 @@ export default function CampaignCard({
           </h3>
           <div className={`mt-3 flex flex-wrap gap-3 text-xs ${isLandingCard ? "text-slate-200/90" : "text-slate-500 dark:text-slate-400"}`}>
             {campaign.creator && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1">
                 <FiUser className="h-3.5 w-3.5" />
                 {creatorName}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1">
               <FiTarget className="h-3.5 w-3.5" />
               {parseFloat(targetAmount).toFixed(2)} ETH
             </span>
@@ -159,12 +159,7 @@ export default function CampaignCard({
 
         {!isLandingCard && (
           <>
-            <div className="mb-5 text-sm text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-2">
-                <FiUser className="h-4 w-4" />
-                <span>by {creatorName}</span>
-              </div>
-            </div>
+          
 
             <div className="mb-5 rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
               <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-3">
