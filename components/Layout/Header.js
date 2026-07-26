@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useSignMessage } from "wagmi";
-import { FiMenu, FiSun, FiMoon, FiBell, FiSearch } from "react-icons/fi";
+import { FiMenu, FiSun, FiMoon, FiBell, FiSearch, FiUserCheck } from "react-icons/fi";
 
 export default function Header({ onMenuToggle, isCollapsed }) {
   const [isDark, setIsDark] = useState(false);
@@ -207,55 +207,59 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           </buttona>
 
           {/* Logo + App Name (replaces search) */}
-          <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="flex items-center gap-3 rounded-2xl transition hover:opacity-90 focus:outline-none"
+          >
             <div className="w-10 h-10 rounded-4xl flex items-center justify-center">
               <img src="/logo3.gif" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">CrowdFund</span>
-          </div>
+          </button>
         </div>
-
-        {/* Right Section */}
-        <div className="flex items-center space-x-3">
-          {walletUserName && (
-            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-darkb/70 dark:text-gray-200">
-              {walletUserName}
+ {walletUserName && (
+            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-darkb/70 dark:text-gray-200">
+             <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" /> &nbsp; {walletUserName}
             </div>
           )}
+        {/* Right Section */}
+        <div className="flex items-center space-x-3">
+         
 
-          {isConnected && address && (
+        {/*  {isConnected && address && (
             <div className="hidden md:flex items-center rounded-4xl border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
               {address.slice(0, 6)}...{address.slice(-4)}
             </div>
-          )}
+          )}*/}
 
           {/* Theme Toggle */}
           <buttona
             onClick={toggleTheme}
-            className="p-2 rounded-4xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-4xl hover:bg-white dark:hover:bg-gray-800 transition-colors"
           >
             {isDark ? (
-              <FiSun className="w-5 h-5 text-yellow-500" />
+              <FiSun className="w-5 h-5 text-gray-500" />
             ) : (
               <FiMoon className="w-5 h-5 text-gray-600" />
             )}
           </buttona>
 
-          {/* Notifications */}
+          {/* Notifications 
           {isConnected && (
             <buttona className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <FiBell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
             </buttona>
-          )}
+          )}*/}
 
-          {/* Network Status */}
+          {/* Network Status 
           <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-100 border border-gray-400 dark:bg-darkb rounded-4xl">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">
               {process.env.NEXT_PUBLIC_NETWORK || "Unknown"}
             </span>
-          </div>
+          </div>*/}
 
           {/* Connect Wallet Button */}
             <ConnectButton 

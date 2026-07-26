@@ -124,7 +124,7 @@ return (
         `}>
           <div className="p-4 md:p-6 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              © {new Date().getFullYear()} CrowdFund Pro. All rights reserved.
+              © {new Date().getFullYear()} CrowdFund - DApp. 
             </p>
           </div>
         </div>

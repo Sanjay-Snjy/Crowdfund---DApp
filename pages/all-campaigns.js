@@ -478,9 +478,8 @@ export default function TopPage() {
                         </div>
                       </div>
             
-                      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        
-                      <div className="ml-[0px] grid max-w-xl gap-4 md:grid-cols-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="ml-[0px] grid max-w-xl gap-4 md:grid-cols-3">
               <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Total campaigns</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{totalCampaigns}</p>
@@ -494,12 +493,12 @@ export default function TopPage() {
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{fundedCampaigns}</p>
               </div>
             </div>
-            <div>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">Showing</p>
-                          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
-                            {sortedCampaigns.length} campaigns
-                          </p>
-                        </div>
+            <div className="ml-2">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Showing</p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
+                  {sortedCampaigns.length} campaigns
+                </p>
+            </div>
                         <div className="ml-auto flex items-center gap-2">
                           <button
                             onClick={() => setViewMode("grid")}
