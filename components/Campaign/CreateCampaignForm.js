@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
-import { FiUpload, FiX, FiInfo } from "react-icons/fi";
+import { FiUpload, FiX, FiInfo, FiPlus, FiCheckCircle, FiAlertTriangle } from "react-icons/fi";
 import { useAccount, useBalance, useNetwork } from "wagmi";
 import { useUser } from "@clerk/nextjs";
 import { useContract } from "../../hooks/useContract";
@@ -37,6 +37,8 @@ export default function CreateCampaignForm() {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [showTagPopup, setShowTagPopup] = useState(false);
+  const [milestones, setMilestones] = useState([]);
+  const milestoneListRef = useRef(null);
 
   const [rates, setRates] = useState(null);
   const creationFeeWei = ethers.utils.parseEther(CAMPAIGN_CREATION_FEE || "0");
@@ -123,6 +125,74 @@ export default function CreateCampaignForm() {
     }));
   };
 
+  const updateMilestone = (index, field, value) => {
+    setMilestones((prev) =>
+      prev.map((milestone, milestoneIndex) => {
+        if (milestoneIndex !== index) return milestone;
+
+        if (field === "title") {
+          return { ...milestone, title: value };
+        }
+
+        const nextValue = Number(value);
+        return {
+          ...milestone,
+          percentage: Number.isNaN(nextValue) ? 0 : Math.max(0, Math.min(100, nextValue)),
+        };
+      })
+    );
+  };
+
+  const addMilestone = () => {
+    if (milestones.length >= 3) {
+      toast.error("You can add up to 3 milestones.");
+      return;
+    }
+
+    setMilestones((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        title: `Milestone ${prev.length + 1}`,
+        percentage: 0,
+        status: "Pending",
+      },
+    ]);
+
+    requestAnimationFrame(() => {
+      milestoneListRef.current?.scrollTo({
+        top: milestoneListRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+  };
+
+  const removeMilestone = (index) => {
+    setMilestones((prev) => prev.filter((_, milestoneIndex) => milestoneIndex !== index));
+  };
+
+  const totalAllocation = useMemo(() => {
+    return milestones.reduce((sum, milestone) => sum + (Number(milestone.percentage) || 0), 0);
+  }, [milestones]);
+
+  const isAllocationValid = milestones.length >= 1 && milestones.length <= 3 && totalAllocation === 100;
+
+  const allocationMessage = useMemo(() => {
+    if (milestones.length < 1) {
+      return "At least one milestone is required.";
+    }
+
+    if (milestones.length > 3) {
+      return "Maximum of 3 milestones allowed.";
+    }
+
+    if (totalAllocation !== 100) {
+      return "Total allocation must equal 100%.";
+    }
+
+    return "✓ Milestone allocation is valid.";
+  }, [milestones.length, totalAllocation]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -161,11 +231,28 @@ export default function CreateCampaignForm() {
       toast.error("Valid duration is required");
       return false;
     }
+    if (milestones.length < 1) {
+      toast.error("At least one milestone is required");
+      return false;
+    }
+    if (milestones.length > 3) {
+      toast.error("Maximum of 3 milestones allowed");
+      return false;
+    }
+    if (!isAllocationValid) {
+      toast.error("Milestone allocation must total 100%");
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (milestones.length < 1) {
+      toast.error("Please add at least 1 milestone before creating a campaign.");
+      return;
+    }
 
     if (!validateForm()) return;
 
@@ -210,6 +297,11 @@ export default function CreateCampaignForm() {
           .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
+        milestones: milestones.map(({ title, percentage, status }) => ({
+          title,
+          percentage,
+          status,
+        })),
       };
 
       toast.loading("Uploading to IPFS...", { id: "upload" });
@@ -296,10 +388,10 @@ export default function CreateCampaignForm() {
   };
 
   return (
-    <div className="max-w-8xl -mt-2 mx-auto px-0 py-6 sm:py-0">
-      <div className="grid gap-2 lg:grid-cols-[1.3fr_0.7fr]">
+    <div className=" -mt-2 mx-auto -ml-[0.4px]  px-0 py-0">
+      <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-0">
-          <div className="rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 px-8 py-2 sm:px-8 py-6">
+          <div className=" rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 px-8 py-2 sm:px-8 py-6">
             <div className="mb-5">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-600 dark:text-blue-300">
                 New campaign
@@ -515,52 +607,98 @@ export default function CreateCampaignForm() {
           </div>
         </div>
 
-        <aside className="space-y-6 w-[500px] ">
-          <div className="sticky top-24 rounded-[32px] border border-secondary bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/20">
-            <h3 className="text-xl font-semibold">Campaign Preview</h3>
-            <p className="mt-3 text-sm text-slate-300">
-              Review the details before submission. This preview mirrors what supporters will see.
+        <aside className="space-y-6 w-[502px]">
+          <div className="sticky top-24 rounded-[32px] border border-slate-800/80 bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/20">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.32em] text-white dark:text-blue-300">Milestone Planner</h3>
+            <p className="mt-1 text-[15px] leading-6 text-slate-300">
+              Define project milestones and allocate fund percentages.
             </p>
 
-            <div className="mt-6 ml-2 space-y-4 rounded-3xl border border-slate-800 bg-slate-900 p-5">
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Title</p>
-                <p className="text-lg font-semibold text-white">
-                  {formData.title || "Campaign title goes here"}
-                </p>
-              </div>
+            <div className="mt-2 max-h-[340px] space-y-3 overflow-y-auto rounded-[24px] border border-slate-800 bg-slate-900/00 p-1">
+              {milestones.map((milestone, index) => (
+                <div
+                  key={milestone.id}
+                  className="rounded-[20px] border border-slate-800 bg-slate-950/70 p-4 transition hover:border-cyan-400/40 hover:bg-slate-900"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/10 text-xs font-semibold text-cyan-300">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm font-medium text-slate-300">Milestone {index + 1}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeMilestone(index)}
+                      className="rounded-full border border-slate-700 bg-slate-900/70 px-2.5 py-1 text-[11px] font-medium text-slate-300 transition hover:border-rose-400/30 hover:text-rose-300"
+                    >
+                      Remove
+                    </button>
+                  </div>
 
-              <div className="space-y-2 ml-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Goal</p>
-                <p className="text-base text-slate-200">
-                  {formData.targetAmount ? `${formData.targetAmount} ETH` : "0.00 ETH"}
-                </p>
-                
-              </div>
+                  <div className="mt-3 space-y-3">
+                    <input
+                      type="text"
+                      value={milestone.title}
+                      onChange={(e) => updateMilestone(index, "title", e.target.value)}
+                      placeholder="Milestone title"
+                      className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
+                    />
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-3xl bg-slate-950/80 px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Duration</p>
-                  <p className="mt-2 text-sm text-slate-100">
-                    {formData.duration ? `${formData.duration} days` : "Not set"}
-                  </p>
+                    <div className="flex items-center gap-3">
+                      <label className="min-w-[92px] text-sm text-slate-400">Percentage</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={milestone.percentage}
+                        onChange={(e) => updateMilestone(index, "percentage", e.target.value)}
+                        className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
+                      />
+                      <span className="text-sm font-semibold text-slate-400">%</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="rounded-3xl bg-slate-950/80 px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Category</p>
-                  <p className="mt-2 text-sm text-slate-100">{formData.category}</p>
-                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-[24px] border border-slate-800 bg-slate-900/70 p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-slate-300">Total Allocation</span>
+                <span className="font-semibold text-white">{totalAllocation}%</span>
               </div>
 
-              <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Summary</p>
-                <p className="mt-3 text-sm leading-6 text-slate-300 w-full">
-                  {formData.description || "Start with a strong campaign description that explains why your project matters."}
-                </p>
+              <div className="mt-3 h-2.5 rounded-full bg-slate-800">
+                <div
+                  className="h-2.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300"
+                  style={{ width: `${Math.min(totalAllocation, 100)}%` }}
+                />
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 text-sm">
+                {isAllocationValid ? (
+                  <>
+                    <FiCheckCircle className="h-4 w-4 text-emerald-400" />
+                    <span className="text-emerald-300">{allocationMessage}</span>
+                  </>
+                ) : (
+                  <>
+                    <FiAlertTriangle className="h-4 w-4 text-amber-400" />
+                    <span className="text-amber-300">{allocationMessage}</span>
+                  </>
+                )}
               </div>
             </div>
-          </div>
 
-         
+            <button
+              type="button"
+              onClick={addMilestone}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-[20px] border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-200 transition hover:-translate-y-0.5 hover:bg-cyan-500/20"
+            >
+              <FiPlus className="h-4 w-4" />
+              Add Milestone
+            </button>
+          </div>
         </aside>
       </div>
     </div>
