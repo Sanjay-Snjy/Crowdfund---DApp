@@ -614,7 +614,10 @@ export default function CreateCampaignForm() {
               Define project milestones and allocate fund percentages.
             </p>
 
-            <div className="mt-2 max-h-[340px] space-y-3 overflow-y-auto rounded-[24px] border border-slate-800 bg-slate-900/00 p-1">
+            <div
+              ref={milestoneListRef}
+              className="mt-2 max-h-[340px] space-y-3 overflow-y-auto rounded-[24px] border border-slate-800 bg-slate-900/90 p-1"
+            >
               {milestones.map((milestone, index) => (
                 <div
                   key={milestone.id}
