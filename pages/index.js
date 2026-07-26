@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { useAccount, useContractRead } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FiArrowRight,
   FiTarget,
@@ -26,6 +26,7 @@ import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
 import { useContract } from "../hooks/useContract";
 import CampaignCard from "../components/Campaign/CampaignCard";
+import { getFromIPFS } from "../utils/ipfs";
 
 export default function Home() {
   const router = useRouter();
@@ -196,47 +197,164 @@ export default function Home() {
     },
   ];
 
-  const campaignCategories = [
+  const categoryDefinitions = [
     {
       icon: FiBookOpen,
       title: "Student Projects",
-      description: "Fund ideas from classrooms and campus innovators.",
+      description: "Support innovative student ideas and academic research.",
     },
     {
       icon: FiBriefcase,
       title: "Startups",
-      description: "Support scalable startups and early-stage founders.",
+      description: "Help entrepreneurs turn ideas into successful businesses.",
     },
     {
       icon: FiBook,
       title: "Education",
-      description: "Back scholarships, learning tools, and school programs.",
+      description: "Fund scholarships, learning programs, and educational initiatives.",
     },
     {
       icon: FiHeart,
       title: "Medical",
-      description: "Help fund urgent care, recovery, and health solutions.",
+      description: "Support healthcare treatments and medical emergencies.",
     },
     {
       icon: FiGlobe,
       title: "Social Causes",
-      description: "Support community impact, relief, and advocacy campaigns.",
+      description: "Contribute to community welfare and charitable projects.",
     },
     {
       icon: FiZap,
       title: "Research & Innovation",
-      description: "Invest in experiments and next-generation breakthroughs.",
+      description: "Empower breakthrough technologies and scientific discoveries.",
     },
   ];
 
   const { useActiveCampaigns } = useContract();
-  const { data: recentCampaigns, isLoading: recentCampaignsLoading } = useActiveCampaigns(0, 4);
-  const visibleRecentCampaigns = Array.isArray(recentCampaigns)
-    ? recentCampaigns.slice(0, 4)
+  const { data: campaignsForLanding, isLoading: recentCampaignsLoading } = useActiveCampaigns(0, 100);
+  const visibleRecentCampaigns = Array.isArray(campaignsForLanding)
+    ? campaignsForLanding.slice(0, 4)
     : [];
 
   const [recentCreatorProfiles, setRecentCreatorProfiles] = useState({});
+  const [campaignMetadataMap, setCampaignMetadataMap] = useState({});
   const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!Array.isArray(campaignsForLanding) || !campaignsForLanding.length) {
+      setCampaignMetadataMap({});
+      return;
+    }
+
+    const fetchMetadataForCampaigns = async () => {
+      const entries = await Promise.all(
+        campaignsForLanding.map(async (campaign) => {
+          const id = campaign.id?.toString?.();
+          if (!id || campaignMetadataMap[id] || !campaign.metadataHash) {
+            return null;
+          }
+
+          const result = await getFromIPFS(campaign.metadataHash);
+          return result.success ? [id, result.data] : null;
+        })
+      );
+
+      const nextMap = entries.reduce((acc, entry) => {
+        if (entry) {
+          const [id, data] = entry;
+          acc[id] = data;
+        }
+        return acc;
+      }, {});
+
+      if (Object.keys(nextMap).length) {
+        setCampaignMetadataMap((prev) => ({ ...prev, ...nextMap }));
+      }
+    };
+
+    fetchMetadataForCampaigns();
+  }, [campaignsForLanding, campaignMetadataMap]);
+
+  const liveCampaignData = useMemo(() => {
+    const campaigns = Array.isArray(campaignsForLanding)
+      ? campaignsForLanding.filter((campaign) => campaign?.active !== false)
+      : [];
+
+    const categoryTotals = campaigns.reduce((acc, campaign) => {
+      const id = campaign.id?.toString?.();
+      const metadata = id ? campaignMetadataMap[id] : null;
+      const rawCategory = campaign.category?.toString?.() || metadata?.category?.toString?.() || "General";
+      const normalizedCategory = rawCategory.toLowerCase();
+
+      let categoryTitle = "General";
+      if (normalizedCategory.includes("student")) {
+        categoryTitle = "Student Projects";
+      } else if (normalizedCategory.includes("startup")) {
+        categoryTitle = "Startups";
+      } else if (normalizedCategory.includes("education")) {
+        categoryTitle = "Education";
+      } else if (normalizedCategory.includes("medical")) {
+        categoryTitle = "Medical";
+      } else if (normalizedCategory.includes("social")) {
+        categoryTitle = "Social Causes";
+      } else if (normalizedCategory.includes("research") || normalizedCategory.includes("innovation")) {
+        categoryTitle = "Research & Innovation";
+      }
+
+      if (!acc[categoryTitle]) {
+        acc[categoryTitle] = {
+          title: categoryTitle,
+          campaigns: 0,
+          ethRaised: 0,
+        };
+      }
+
+      acc[categoryTitle].campaigns += 1;
+      acc[categoryTitle].ethRaised += Number(campaign.raisedAmount?.toString?.() || "0") / 1e18;
+
+      return acc;
+    }, {});
+
+    const categoryCards = categoryDefinitions.map((definition) => ({
+      ...definition,
+      campaigns: categoryTotals[definition.title]?.campaigns || 0,
+      ethRaised: categoryTotals[definition.title]?.ethRaised || 0,
+    }));
+
+    return {
+      activeCampaigns: campaigns.length,
+      totalContributors: campaigns.reduce(
+        (sum, campaign) => sum + Number(campaign.contributorsCount || 0),
+        0
+      ),
+      totalRaisedEth: campaigns.reduce(
+        (sum, campaign) => sum + Number(campaign.raisedAmount?.toString?.() || "0") / 1e18,
+        0
+      ),
+      categoryCards,
+    };
+  }, [campaignsForLanding, campaignMetadataMap]);
+
+  const categoryOverviewStats = useMemo(() => {
+    const liveCategoryCount = liveCampaignData.categoryCards.filter((category) => category.campaigns > 0).length;
+
+    return [
+      {
+        icon: FiTarget,
+        label: `${liveCategoryCount} Categories`,
+      },
+      {
+        icon: FiTrendingUp,
+        label: `${liveCampaignData.activeCampaigns} Active Campaigns`,
+      },
+      {
+        icon: FiUsers,
+        label: `${liveCampaignData.totalContributors} Contributors`,
+      },
+    ];
+  }, [liveCampaignData]);
+
+  const campaignCategories = liveCampaignData.categoryCards;
 
   useEffect(() => {
     const campaignAddresses = Array.from(
@@ -728,19 +846,61 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {campaignCategories.map((category, index) => (
-              <div
-                key={index}
-                className="inline-flex rounded-[1.75rem] p-2 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-cyan-400/10 text-cyan-200 mb-5 transition-colors duration-300 group-hover:bg-cyan-400/20 group-hover:text-white">
-                  <category.icon className="h-6 w-6" />
+          <div className="mb-10 grid gap-10 md:grid-cols-3">
+            {categoryOverviewStats.map((stat, index) => {
+              const Icon = stat.icon;
 
+              return (
+                <div
+                  key={index}
+                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/20 bg-tranparent p-4 shadow-lg shadow-cyan-500/10 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center rounded-2xl  text-cyan-200">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="text-md font-semibold text-white">{stat.label}</span>
+                  </div>
                 </div>
-                 <h3 className="inline-flex mt-[10px] ml-[24px] text-xl font-semibold text-white mb-3">{category.title}</h3>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {campaignCategories.map((category, index) => {
+              const Icon = category.icon;
+
+              return (
+                <div
+                  key={index}
+                  className="group rounded-[1.75rem] border border-white/5 bg-white/5 p-6 backdrop-blur-[10px] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/15"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-200 transition-colors duration-300 group-hover:bg-cyan-400/20 group-hover:text-white">
+                      <Icon className="h-5 w-5" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-300/80">
+                        {category.description}
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-cyan-100/70">
+                        <span className="inline-flex items-center gap-1.5">
+                          <FiTarget className="h-3.5 w-3.5" />
+                          {category.campaigns} Campaigns
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <FiTrendingUp className="h-3.5 w-3.5" />
+                          {category.ethRaised.toFixed(1)} ETH Raised
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -761,11 +921,11 @@ export default function Home() {
               Powerful campaign tools, secure transactions, and better visibility for supporters—designed to help great ideas thrive.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 -mt-6">
+          <div className="grid grid-cols-2 gap-6 -mt-6">
             {features.map((feature, index) => (
     <div
       key={index}
-      className="group relative mx-auto flex w-full max-w-4xl items-start gap-6 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
+      className="group relative mx-auto flex w-full max-w-4xl items-start gap-6 overflow-hidden rounded-[2rem] border border-white/5 bg-white/5 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
     >
       <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-3xl bg-cyan-400/15 text-cyan-200 transition group-hover:bg-cyan-400/25 group-hover:text-white">
         <feature.icon className="h-6 w-6" />
