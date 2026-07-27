@@ -497,15 +497,7 @@ export default function Home() {
   {/* Wallet Connected Popup - Full Page Blur */}
   {showConnectedPopup && (
     <>
-      {/* Blurred Background Overlay - Covers Entire Page */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-md z-40" />
       
-      {/* Centered Popup - Vertical Center */}
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-green-100 text-green-500 px-8 py-6 border-2 border-green-500 rounded-4xl text-lg font-medium shadow-2xl animate-scale-in">
-          ✓ Wallet Connected
-        </div>
-      </div>
     </>
   )}
 
