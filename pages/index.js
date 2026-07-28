@@ -857,7 +857,7 @@ export default function Home() {
               return (
                 <div
                   key={index}
-                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/20 bg-tranparent p-4  backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
+                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/40 bg-tranparent p-4  backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center rounded-2xl  text-cyan-200">
@@ -888,7 +888,7 @@ export default function Home() {
                       <h3 className="text-lg font-semibold text-white">{category.title}</h3>
                       <p className="mt-2 text-sm leading-6 text-slate-300/80">
                         {category.description}
-                      </p>
+                      </p>  
 
                       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-cyan-100/70">
                         <span className="inline-flex items-center gap-1.5">
@@ -909,12 +909,12 @@ export default function Home() {
         </div>
       </section>
 
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Features Section */}
-      <section className="relative z-10 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-4">
+      <section className="relative z-10 px-[40px] py-8">
+        <div className="px-[40px]">
+          <div className="text-left mb-4">
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
               Built for modern crowdfunding
             </p>
