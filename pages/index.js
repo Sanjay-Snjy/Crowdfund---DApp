@@ -837,27 +837,27 @@ export default function Home() {
 
       {/* Explore Fundraising Categories Section */}
       <section className="relative z-10 px-[40px] py-8">
-        <div className="max-w-7xl  px-4 sm:px-6 lg:px-8">
+        <div className="px-[36px]">
           <div className="mb-12 text-left">
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
               Explore fundraising categories
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-[36px] font-bold text-white">
               Find the right category for your next campaign
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-white/75">
+            <p className="mt-4 max-w-2xl text-white/75">
               Discover projects across six professional categories, each designed to connect funders with the causes they care about most.
             </p>
           </div>
 
-          <div className="mb-10 grid gap-10 md:grid-cols-3">
+          <div className="mb-10 mr-[500px] grid gap-10 md:grid-cols-3">
             {categoryOverviewStats.map((stat, index) => {
               const Icon = stat.icon;
 
               return (
                 <div
                   key={index}
-                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/20 bg-tranparent p-4 shadow-lg shadow-cyan-500/10 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
+                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/20 bg-tranparent p-4  backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center rounded-2xl  text-cyan-200">
