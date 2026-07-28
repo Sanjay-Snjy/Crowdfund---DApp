@@ -94,7 +94,7 @@ export default function CampaignCard({
 
   return (
     <div
-      className={`${isLandingCard ? "bg-white/10 border-transparent rounded-2xl backdrop-blur-[1px] border border-secondary"  : "bg-white border border-slate-200 shadow-lg shadow-slate-200/40 dark:bg-slate-950 dark:border-slate-800 dark:shadow-none"} rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
+      className={`${isLandingCard ? "bg-white/0 border-transparent rounded-xl backdrop-blur-[2px] border border-secondary"  : "bg-white border border-slate-200 shadow-lg shadow-slate-200/40 dark:bg-slate-950 dark:border-slate-800 dark:shadow-none"} rounded-[32px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
         viewMode === "list"
           ? "flex flex-col gap-6 md:flex-row md:items-center"
           : ""

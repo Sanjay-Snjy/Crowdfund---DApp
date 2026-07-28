@@ -643,12 +643,12 @@ export default function Home() {
 </header>
 
       {/* Hero Section */}
-  <section className="relative overflow-hidden mt-40">
+  <section className="relative overflow-hidden mt-[120px] ml-[40px]">
   {/* Content */}
-  <div className="relative z-10 max-w-7xl pt-[60px] mx-auto px-4 sm:px-6 lg:px-8 mt-0 mb-12">
-    <div className="text-center">
+  <div className="relative z-10 max-w-7xl pt-[60px]  px-4 sm:px-6 lg:px-8 mt-0 mb-12">
+    <div className="text-left">
       {isLoaded && user && (
-        <div className="absolute -mt-[60px] ml-[500px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
+        <div className="absolute -mt-[60px] ml-[00px] flex min-h-[2.8rem] items-center justify-left px-2 sm:min-h-[3.2rem]">
           <p
             className={`text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3 mx-auto [text-shadow:0_0_10px_rgba(255,255,255,0.8)] max-w-[20rem] break-words text-center leading-tight  transition-all duration-500 ease-out sm:max-w-[32rem]  ${
               isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
@@ -658,15 +658,15 @@ export default function Home() {
           </p>
         </div>
       )}
-      <h1 className="text-2xl md:text-5xl font-bold text-white mb-6">
+      <h1 className="text-xl md:text-[40px] font-bold text-white mb-6">
       Trusted Crowdfunding Platform!
-        <span className="mt-3 block text-4xl text-blue-200">Decentralized & Secure</span>
+        <span className="mt-5 block text-3xl text-blue-200">Decentralized & Secure</span>
       </h1>
-      <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+      <p className="text-lg -mt-2 text-blue-100 mb-8 max-w-2xl ">
      Launch campaigns, support innovations, and empower projects with trusted support. Ensure every contribution is transparent, secure, and accountable through blockchain technology.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="flex flex-col sm:flex-row gap-4 justify-left">
         {hasValidClerkKey ? (
           <>
             <SignedOut>
@@ -756,27 +756,27 @@ export default function Home() {
 </div>
  
 </section>
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+            <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Recent Campaigns Section */}
-      <section className="relative z-10 py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative z-10 px-[40px] py-10 ml-[0px]">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
             <div>
               <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
                 Recent campaigns launched
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">
+              <h2 className="text-[36px] font-bold text-white">
                 Discover the latest ideas gaining traction
               </h2>
             </div>
             <SignedIn>
             
-          <div className="ml-[400px]">
+          <div className="ml-[300px]">
     <button
    onClick={() => router.push("/campaigns")}
   type="submit"
-  class="flex justify-center gap-2 items-center mx-auto shadow-xl text-lg text-white bg-transparent backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-cyan-500  before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 border-white/60 rounded-full group"
+  class="flex justify-center gap-2 items-center  shadow-xl text-lg text-white bg-transparent backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-cyan-500  before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 border-white/60 rounded-full group"
     >
    Explore
     <svg
@@ -833,12 +833,12 @@ export default function Home() {
         </div>
       </section>
 
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Explore Fundraising Categories Section */}
-      <section className="relative z-10 py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 text-center">
+      <section className="relative z-10 px-[40px] py-8">
+        <div className="max-w-7xl  px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-left">
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
               Explore fundraising categories
             </p>
