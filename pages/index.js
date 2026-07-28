@@ -949,11 +949,11 @@ export default function Home() {
 </div>
         </div>
       </section>
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent " /> 
+            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent " /> 
 
       {/* Stats Section */}
-      <section className="relative z-10 py-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative z-10 py-0 px-[10px]">
+        <div className="px-[40px]">
           <div className="rounded-[2rem]  bg-transparent p-10 ">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
