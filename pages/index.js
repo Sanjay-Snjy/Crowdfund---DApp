@@ -643,12 +643,12 @@ export default function Home() {
 </header>
 
       {/* Hero Section */}
-  <section className="relative overflow-hidden mt-[120px] ml-[40px]">
+  <section className="relative overflow-hidden mt-[120px] ml-[40px] ml-auto">
   {/* Content */}
   <div className="relative z-10 max-w-7xl pt-[60px]  px-4 sm:px-6 lg:px-8 mt-0 mb-12">
     <div className="text-left">
       {isLoaded && user && (
-        <div className="absolute -mt-[60px] ml-[00px] flex min-h-[2.8rem] items-center justify-left px-2 sm:min-h-[3.2rem]">
+        <div className="absolute -mt-[60px] ml-[00px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
           <p
             className={`text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3 mx-auto [text-shadow:0_0_10px_rgba(255,255,255,0.8)] max-w-[20rem] break-words text-center leading-tight  transition-all duration-500 ease-out sm:max-w-[32rem]  ${
               isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
@@ -836,70 +836,61 @@ export default function Home() {
             <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Explore Fundraising Categories Section */}
-      <section className="relative z-10 px-[40px] py-8">
-        <div className="px-[36px]">
-          <div className="mb-12 text-left">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
+      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="space-y-6 border-b border-slate-700/70 pb-10">
+            <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
               Explore fundraising categories
             </p>
-            <h2 className="text-[36px] font-bold text-white">
-              Find the right category for your next campaign
+            <h2 className="text-4xl font-semibold text-white sm:text-5xl">
+              Minimal categories for modern campaigns
             </h2>
-            <p className="mt-4 max-w-2xl text-white/75">
-              Discover projects across six professional categories, each designed to connect funders with the causes they care about most.
+            <p className="max-w-3xl text-lg leading-8 text-slate-300">
+              Clear category sections help supporters quickly identify the campaign type that matches their interests.
             </p>
           </div>
 
-          <div className="mb-10 mr-[500px] grid gap-10 md:grid-cols-3">
+          <div className="mt-10 grid gap-5 sm:grid-cols-3">
             {categoryOverviewStats.map((stat, index) => {
               const Icon = stat.icon;
-
               return (
-                <div
-                  key={index}
-                  className="items-center flex justify-center text-center rounded-[1.5rem] border border-cyan-300/40 bg-tranparent p-4  backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/5"
-                >
+                <div key={index} className="rounded-3xl border border-slate-700/70 bg-slate-950/60 p-5">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center rounded-2xl  text-cyan-200">
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className="text-md font-semibold text-white">{stat.label}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {campaignCategories.map((category, index) => {
-              const Icon = category.icon;
-
-              return (
-                <div
-                  key={index}
-                  className="group rounded-[1.75rem] border border-white/5 bg-white/5 p-6 backdrop-blur-[10px] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/15"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-200 transition-colors duration-300 group-hover:bg-cyan-400/20 group-hover:text-white">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-800 text-slate-200">
                       <Icon className="h-5 w-5" />
                     </div>
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Overview</p>
+                      <p className="text-lg font-semibold text-white">{stat.label}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-300/80">
-                        {category.description}
-                      </p>  
-
-                      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-cyan-100/70">
-                        <span className="inline-flex items-center gap-1.5">
-                          <FiTarget className="h-3.5 w-3.5" />
-                          {category.campaigns} Campaigns
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <FiTrendingUp className="h-3.5 w-3.5" />
-                          {category.ethRaised.toFixed(1)} ETH Raised
-                        </span>
-                      </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {campaignCategories.map((category, index) => {
+              const Icon = category.icon;
+              return (
+                <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white">{category.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-400">{category.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+                      <p className="font-semibold text-white">{category.campaigns}</p>
+                      <p className="mt-1 uppercase tracking-[0.24em] text-slate-500">Campaigns</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+                      <p className="font-semibold text-white">{category.ethRaised.toFixed(1)} ETH</p>
+                      <p className="mt-1 uppercase tracking-[0.24em] text-slate-500">Raised</p>
                     </div>
                   </div>
                 </div>
@@ -909,96 +900,89 @@ export default function Home() {
         </div>
       </section>
 
-            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+      <hr className="my-12 border-0 h-px bg-slate-800/70" />
 
       {/* Features Section */}
-      <section className="relative z-10 px-[40px] py-8">
-        <div className="px-[40px]">
-          <div className="text-left mb-4">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
+      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="space-y-6 border-b border-slate-700/70 pb-10">
+            <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
               Built for modern crowdfunding
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-0">
-              Why founders trust CrowdFund
+            <h2 className="text-4xl font-semibold text-white sm:text-5xl">
+              Professional tools made simple
             </h2>
-            <p className="mx-auto max-w-3xl text-lg text-white/74">
-              Powerful campaign tools, secure transactions, and better visibility for supporters—designed to help great ideas thrive.
+            <p className="max-w-3xl text-lg leading-8 text-slate-300">
+              Clean features for founders and backers, designed to keep every campaign polished and easy to follow.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-6 -mt-6">
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
             {features.map((feature, index) => (
-    <div
-      key={index}
-      className="group relative mx-auto flex w-full max-w-4xl items-start gap-6 overflow-hidden rounded-[2rem] border border-white/5 bg-white/5 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/10"
-    >
-      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-3xl bg-cyan-400/15 text-cyan-200 transition group-hover:bg-cyan-400/25 group-hover:text-white">
-        <feature.icon className="h-6 w-6" />
-      </div>
-
-      <div className="flex-1">
-        <h3 className="mb-2 text-xl font-semibold text-white">
-          {feature.title}
-        </h3>
-
-        <p className="text-white/70">
-          {feature.description}
-        </p>
-      </div>
-    </div>
-  ))}
-</div>
+              <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
+                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <div className="mt-5">
+                  <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent " /> 
+
+      <hr className="my-12 border-0 h-px bg-slate-800/70" />
 
       {/* Stats Section */}
       <section className="relative z-10 py-0 px-[10px]">
-        <div className="px-[40px]">
-          <div className="rounded-[2rem]  bg-transparent p-10 ">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-                  Real-time platform momentum
-                </p>
-                <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
-            Our Impact Stats
-                </h2>
-              </div>
-              <p className="max-w-xl text-sm leading-7 text-white/70 md:text-right">
-                Live campaign metrics, funds raised, and supporter activity that show how CrowdFund works for creators and contributors.
+        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-0">
+          <div className="space-y-6 border-b border-slate-700/70 pb-10">
+            <div className="max-w-3xl space-y-3">
+              <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
+                Real-time platform momentum
+              </p>
+              <h2 className="text-4xl font-semibold text-white sm:text-5xl">
+                Impact metrics that matter
+              </h2>
+              <p className="text-lg leading-8 text-slate-300">
+                Campaign performance and supporter activity displayed in a clean, easy-to-scan format.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+              <p className="text-4xl font-semibold text-white">
+                {loading ? "..." : stats.campaignsLaunched}
+              </p>
+              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
+                Campaigns launched
               </p>
             </div>
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
-                <div className="text-3xl font-extrabold text-white mb-3">
-                  {loading ? "..." : stats.campaignsLaunched}
-                </div>
-                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
-                  Campaigns Launched
-                </div>
-              </div>
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
-                <div className="text-3xl font-extrabold text-white mb-3">
-                  {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
-                </div>
-                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
-                  Funds Raised
-                </div>
-              </div>
-              <div className="rounded-[1.75rem] border border-cyan-300/10 bg-white/10 p-6 text-center shadow-xl shadow-cyan-500/5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30">
-                <div className="text-3xl font-extrabold text-white mb-3">
-                  {loading ? "..." : stats.contributors}
-                </div>
-                <div className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
-                  Contributors
-                </div>
-              </div>
+            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+              <p className="text-4xl font-semibold text-white">
+                {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
+              </p>
+              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
+                Funds raised
+              </p>
+            </div>
+
+            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+              <p className="text-4xl font-semibold text-white">
+                {loading ? "..." : stats.contributors}
+              </p>
+              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
+                Contributors
+              </p>
             </div>
           </div>
         </div>
       </section>
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent " /> 
+      <hr className="my-12 border-0 h-px bg-slate-800/70" />
 
       {/* Footer */}
       <footer className="relative z-10 text-white backdrop-blur-lg bg-cyan-600/10 ">

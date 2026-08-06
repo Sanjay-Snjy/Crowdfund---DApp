@@ -103,6 +103,10 @@ export default function Sidebar({
   const networkLabel = chain?.name || (isConnected ? "Unknown network" : "Not connected");
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
+  const sidebarWidthClass = isOpen
+    ? `w-64 ${isCollapsed ? "md:w-16" : "md:w-64"}`
+    : `w-16 ${isCollapsed ? "md:w-16" : "md:w-64"}`;
+
   const handleCopyAddress = async () => {
     if (!address) return;
 
@@ -264,10 +268,10 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-[86px] h-[86.5%] left-3 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-darkb border border-secondary dark:border-gray-450 z-40 transition-all duration-300 ease-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        w-16
-        md:translate-x-0 rounded-3xl overflow-y-auto flex flex-col
+        fixed top-[86px] bottom-6 left-3 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-darkb border border-secondary dark:border-gray-450 z-40 transition-all duration-300 ease-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        ${sidebarWidthClass}
+        rounded-3xl overflow-y-auto flex flex-col
       `}
       >
         {/* Header */}
@@ -306,6 +310,19 @@ export default function Sidebar({
             );
           })}
         </nav>
+
+        <div className="px-2 py-2">
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="flex w-full items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+          >
+            <FiChevronLeft
+              className={`h-4 w-4 transition-transform ${isCollapsed ? "-rotate-180" : "rotate-0"}`}
+            />
+            {!isCollapsed && "Collapse"}
+          </button>
+        </div>
 
         {/* Connection Status */}
         {!isCollapsed && (
