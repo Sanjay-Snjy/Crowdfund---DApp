@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       contract_address:
-        description: 'Deployed contract address to verify'
+        description: "Deployed contract address to verify"
         required: true
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,12 +18,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
-        run: |
-          cd web3
-          npm ci
+        working-directory: web3
+        run: npm install
 
       - name: Verify contract on Etherscan
         working-directory: web3
