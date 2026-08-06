@@ -132,14 +132,16 @@ function Dashboard() {
       )
     : 0;
 
-  const liveActiveCampaignsCount = useMemo(() => {
-    if (!activeCampaigns?.length) return 0;
+  const liveActiveCampaigns = useMemo(() => {
+    if (!activeCampaigns?.length) return [];
 
     return activeCampaigns.filter((campaign) => {
       const deadline = Number(campaign?.deadline?.toString?.() || 0);
       return campaign?.active && deadline * 1000 > Date.now();
-    }).length;
+    });
   }, [activeCampaigns]);
+
+  const liveActiveCampaignsCount = liveActiveCampaigns.length;
 
   useEffect(() => {
     if (!isConnected) {
@@ -294,10 +296,10 @@ function Dashboard() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
-                    <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{activeCampaigns?.length || 0}</p>
+                    <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{liveActiveCampaignsCount || 0}</p>
                   </div>
                   <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700 dark:bg-blue-900 dark:text-blue-200">
-                    {activeCampaigns?.length ? activeCampaigns[0]?.title || "—" : "None"}
+                    {liveActiveCampaignsCount ? liveActiveCampaigns[0]?.title || "—" : "None"}
                   </span>
                 </div>
                

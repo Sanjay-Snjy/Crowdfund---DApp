@@ -1,5 +1,7 @@
 // hardhat.config.js
 require("@nomicfoundation/hardhat-toolbox");
+// New verification plugin (migration from deprecated hardhat-etherscan)
+
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -30,6 +32,9 @@ module.exports = {
     sources: "./contracts",
     cache: "./cache",
     tests: "./test",
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY || "",
   },
 
   sourcify: {

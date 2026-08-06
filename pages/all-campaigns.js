@@ -107,7 +107,7 @@ function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddres
 
   return (
     <div
-      className={`overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950 ${
+      className={`overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950 ${
         isListView ? "flex flex-col md:flex-row" : "flex flex-col"
       }`}
     >

@@ -117,14 +117,30 @@ return (
       </div>
 
       {/* Footer - Solid background to hide the dotted pattern below */}
-      <footer className="relative z-10 bg-white dark:bg-darkb border-t border-gray-200 dark:border-gray-700">
-        <div className={`
-          transition-all duration-300 ease-out
-          ${sidebarCollapsed ? "md:ml-16" : "md:ml-64"}
-        `}>
-          <div className="p-4 md:p-6 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              © {new Date().getFullYear()} CrowdFund - DApp. 
+      <footer className="relative z-10 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-darkb border-t border-secondary text-slate-300">
+        <div
+          className={`transition-all duration-300 ease-out ${
+            sidebarCollapsed ? "md:ml-16" : "md:ml-64"
+          }`}
+        >
+          <div className="mx-auto flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div>
+              <p className="text-sm font-semibold text-black dark:text-white">CrowdFund DApp</p>
+              <p className="mt-1 text-xs text-slate-400">
+                Built for secure, modern crowdfunding on-chain.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+             
+              <a  className="transition hover:text-white">
+                Create 
+              </a>/
+              <a  className="transition hover:text-white">
+                Contribute
+              </a>
+            </div>
+            <p className="text-xs text-slate-500 sm:text-right">
+              © {new Date().getFullYear()} CrowdFund. All rights reserved.
             </p>
           </div>
         </div>
