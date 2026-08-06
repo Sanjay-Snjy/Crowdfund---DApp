@@ -643,12 +643,12 @@ export default function Home() {
 </header>
 
       {/* Hero Section */}
-  <section className="relative overflow-hidden mt-[120px] ml-[40px] ml-auto">
+  <section className="relative overflow-hidden mt-[120px] mx-auto w-full max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
   {/* Content */}
-  <div className="relative z-10 max-w-7xl pt-[60px]  px-4 sm:px-6 lg:px-8 mt-0 mb-12">
-    <div className="text-left">
+  <div className="relative z-10 pt-[60px] mt-0 mb-12">
+    <div className="text-center mx-auto max-w-3xl">
       {isLoaded && user && (
-        <div className="absolute -mt-[60px] ml-[00px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
+        <div className="absolute -mt-[60px] ml-[250px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
           <p
             className={`text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3 mx-auto [text-shadow:0_0_10px_rgba(255,255,255,0.8)] max-w-[20rem] break-words text-center leading-tight  transition-all duration-500 ease-out sm:max-w-[32rem]  ${
               isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
@@ -666,7 +666,7 @@ export default function Home() {
      Launch campaigns, support innovations, and empower projects with trusted support. Ensure every contribution is transparent, secure, and accountable through blockchain technology.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-left">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {hasValidClerkKey ? (
           <>
             <SignedOut>
@@ -759,7 +759,7 @@ export default function Home() {
             <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Recent Campaigns Section */}
-      <section className="relative z-10 px-[40px] py-10 ml-[0px]">
+      <section className="relative z-10 px-[140px] py-10 ml-[0px]">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
             <div>
@@ -836,27 +836,27 @@ export default function Home() {
             <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Explore Fundraising Categories Section */}
-      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
+      <section className="relative z-10 px-6 py-10 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <div className="space-y-6 border-b border-slate-700/70 pb-10">
-            <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
+          <div className="space-y-6  pb-10">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
               Explore fundraising categories
             </p>
             <h2 className="text-4xl font-semibold text-white sm:text-5xl">
               Minimal categories for modern campaigns
             </h2>
-            <p className="max-w-3xl text-lg leading-8 text-slate-300">
+            <p className="max-w-4xl text-lg leading-8 text-slate-300">
               Clear category sections help supporters quickly identify the campaign type that matches their interests.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-3">
             {categoryOverviewStats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <div key={index} className="rounded-3xl border border-slate-700/70 bg-slate-950/60 p-5">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-800 text-slate-200">
+                    <div className="flex h-11 w-[45px] items-center justify-center rounded-2xl bg-slate-800 text-slate-200">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
@@ -875,7 +875,7 @@ export default function Home() {
               return (
                 <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
+                    <div className="flex h-12 w-[80px] items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
                       <Icon className="h-6 w-6" />
                     </div>
                     <div>
@@ -900,24 +900,24 @@ export default function Home() {
         </div>
       </section>
 
-      <hr className="my-12 border-0 h-px bg-slate-800/70" />
+            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Features Section */}
       <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <div className="space-y-6 border-b border-slate-700/70 pb-10">
-            <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
+          <div className="space-y-6  pb-10">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
               Built for modern crowdfunding
             </p>
             <h2 className="text-4xl font-semibold text-white sm:text-5xl">
               Professional tools made simple
             </h2>
-            <p className="max-w-3xl text-lg leading-8 text-slate-300">
+            <p className="max-w-4xl text-lg leading-8 text-slate-300">
               Clean features for founders and backers, designed to keep every campaign polished and easy to follow.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          <div className=" grid gap-5 sm:grid-cols-2">
             {features.map((feature, index) => (
               <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
                 <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
@@ -933,14 +933,15 @@ export default function Home() {
         </div>
       </section>
 
-      <hr className="my-12 border-0 h-px bg-slate-800/70" />
+                <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+
 
       {/* Stats Section */}
       <section className="relative z-10 py-0 px-[10px]">
         <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-0">
-          <div className="space-y-6 border-b border-slate-700/70 pb-10">
+          <div className="space-y-6  pb-10">
             <div className="max-w-3xl space-y-3">
-              <p className="text-sm uppercase tracking-[0.35em] text-slate-400">
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
                 Real-time platform momentum
               </p>
               <h2 className="text-4xl font-semibold text-white sm:text-5xl">
