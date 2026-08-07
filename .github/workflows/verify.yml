@@ -18,11 +18,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web3/package-lock.json
 
       - name: Install dependencies
         working-directory: web3
-        run: npm install
+        run: npm ci
 
       - name: Verify contract on Etherscan
         working-directory: web3

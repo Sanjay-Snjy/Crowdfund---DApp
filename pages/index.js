@@ -92,49 +92,78 @@ export default function Home() {
 
   // Fetch and aggregate campaign statistics
   useEffect(() => {
+    let isMounted = true;
+
     const fetchStats = async () => {
-      if (!campaignCount) return;
+      if (!campaignCount) {
+        if (isMounted) {
+          setLoading(false);
+        }
+        return;
+      }
 
       try {
-        setLoading(true);
-        const publicClient = await import("wagmi").then((m) => m.publicClient);
-        let totalFunds = 0n;
-        let totalContributors = 0;
+        if (isMounted) {
+          setLoading(true);
+        }
 
-        // Fetch stats for each campaign
+        const publicClient = await import("wagmi").then((m) => m.publicClient);
         const campaignId = campaignCount.toNumber ? campaignCount.toNumber() : Number(campaignCount);
 
-        for (let i = 1; i <= campaignId; i++) {
-          try {
-            const result = await publicClient().readContract({
-              address: CONTRACT_ADDRESS,
-              abi: CROWDFUNDING_ABI,
-              functionName: "getCampaignStats",
-              args: [i],
-            });
+        const campaignStats = await Promise.all(
+          Array.from({ length: campaignId }, (_, index) => index + 1).map(async (campaignIndex) => {
+            try {
+              const result = await publicClient().readContract({
+                address: CONTRACT_ADDRESS,
+                abi: CROWDFUNDING_ABI,
+                functionName: "getCampaignStats",
+                args: [campaignIndex],
+              });
 
-            if (result) {
-              totalFunds += BigInt(result[0]); // raisedAmount
-              totalContributors += Number(result[2]); // contributorsCount
+              return result
+                ? {
+                    raisedAmount: BigInt(result[0]),
+                    contributorsCount: Number(result[2]),
+                  }
+                : null;
+            } catch (err) {
+              console.warn(`Error fetching stats for campaign ${campaignIndex}:`, err);
+              return null;
             }
-          } catch (err) {
-            console.warn(`Error fetching stats for campaign ${i}:`, err);
-          }
-        }
+          })
+        );
+
+        if (!isMounted) return;
+
+        const totals = campaignStats.reduce(
+          (acc, stats) => {
+            if (!stats) return acc;
+            acc.totalFunds += stats.raisedAmount;
+            acc.totalContributors += stats.contributorsCount;
+            return acc;
+          },
+          { totalFunds: 0n, totalContributors: 0 }
+        );
 
         setStats({
           campaignsLaunched: campaignId,
-          fundsRaised: totalFunds,
-          contributors: totalContributors,
+          fundsRaised: totals.totalFunds,
+          contributors: totals.totalContributors,
         });
       } catch (error) {
         console.error("Error fetching stats:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchStats();
+    void fetchStats();
+
+    return () => {
+      isMounted = false;
+    };
   }, [campaignCount]);
 
   const features = [
@@ -231,33 +260,43 @@ export default function Home() {
   ];
 
   const { useActiveCampaigns } = useContract();
-  const { data: campaignsForLanding, isLoading: recentCampaignsLoading } = useActiveCampaigns(0, 100);
-  const visibleRecentCampaigns = Array.isArray(campaignsForLanding)
-    ? campaignsForLanding.slice(0, 4)
-    : [];
+  const { data: campaignsForLanding, isLoading: recentCampaignsLoading } = useActiveCampaigns(0, 4);
+  const visibleRecentCampaigns = useMemo(
+    () => (Array.isArray(campaignsForLanding) ? campaignsForLanding.slice(0, 4) : []),
+    [campaignsForLanding]
+  );
 
   const [recentCreatorProfiles, setRecentCreatorProfiles] = useState({});
   const [campaignMetadataMap, setCampaignMetadataMap] = useState({});
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    if (!Array.isArray(campaignsForLanding) || !campaignsForLanding.length) {
+    if (!Array.isArray(visibleRecentCampaigns) || !visibleRecentCampaigns.length) {
       setCampaignMetadataMap({});
       return;
     }
 
+    let isCancelled = false;
+
     const fetchMetadataForCampaigns = async () => {
       const entries = await Promise.all(
-        campaignsForLanding.map(async (campaign) => {
+        visibleRecentCampaigns.map(async (campaign) => {
           const id = campaign.id?.toString?.();
           if (!id || campaignMetadataMap[id] || !campaign.metadataHash) {
             return null;
           }
 
-          const result = await getFromIPFS(campaign.metadataHash);
-          return result.success ? [id, result.data] : null;
+          try {
+            const result = await getFromIPFS(campaign.metadataHash);
+            return result.success ? [id, result.data] : null;
+          } catch (error) {
+            console.warn(`Error fetching IPFS metadata for campaign ${id}:`, error);
+            return null;
+          }
         })
       );
+
+      if (isCancelled) return;
 
       const nextMap = entries.reduce((acc, entry) => {
         if (entry) {
@@ -272,8 +311,12 @@ export default function Home() {
       }
     };
 
-    fetchMetadataForCampaigns();
-  }, [campaignsForLanding, campaignMetadataMap]);
+    void fetchMetadataForCampaigns();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [visibleRecentCampaigns]);
 
   const liveCampaignData = useMemo(() => {
     const campaigns = Array.isArray(campaignsForLanding)
@@ -356,22 +399,26 @@ export default function Home() {
 
   const campaignCategories = liveCampaignData.categoryCards;
 
-  useEffect(() => {
-    const campaignAddresses = Array.from(
-      new Set(
-        visibleRecentCampaigns
-          .map((campaign) => campaign.creator?.toString?.()?.toLowerCase())
-          .filter(Boolean)
-      )
-    );
+  const creatorAddresses = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          visibleRecentCampaigns
+            .map((campaign) => campaign.creator?.toString?.()?.toLowerCase())
+            .filter(Boolean)
+        )
+      ),
+    [visibleRecentCampaigns]
+  );
 
-    if (!campaignAddresses.length) {
+  useEffect(() => {
+    if (!creatorAddresses.length) {
       setRecentCreatorProfiles({});
       return;
     }
 
     const controller = new AbortController();
-    const query = campaignAddresses.map(encodeURIComponent).join(",");
+    const query = creatorAddresses.map(encodeURIComponent).join(",");
 
     const loadCreatorProfiles = async () => {
       try {
@@ -397,9 +444,9 @@ export default function Home() {
       }
     };
 
-    loadCreatorProfiles();
+    void loadCreatorProfiles();
     return () => controller.abort();
-  }, [visibleRecentCampaigns]);
+  }, [creatorAddresses]);
 
   useEffect(() => {
     const handleScroll = () => {

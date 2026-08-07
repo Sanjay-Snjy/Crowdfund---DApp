@@ -1,11 +1,12 @@
-// hardhat.config.js
-require("@nomicfoundation/hardhat-toolbox");
-// New verification plugin (migration from deprecated hardhat-etherscan)
+import { defineConfig, configVariable } from "hardhat/config";
+import dotenv from "dotenv";
+import hardhatEthers from "@nomicfoundation/hardhat-ethers";
+import hardhatVerify from "@nomicfoundation/hardhat-verify";
 
-require("dotenv").config();
+dotenv.config();
 
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
+export default defineConfig({
+  plugins: [hardhatEthers, hardhatVerify],
   solidity: {
     version: "0.8.19",
     settings: {
@@ -18,12 +19,13 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      type: "edr-simulated",
       chainId: 1337,
     },
     sepolia: {
-      url: process.env.NETWORK_RPC_URL,
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      type: "http",
+      url: process.env.NETWORK_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111,
     },
   },
@@ -33,11 +35,12 @@ module.exports = {
     cache: "./cache",
     tests: "./test",
   },
+ verify: {
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY || "",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
-
+},
   sourcify: {
     enabled: true,
   },
-};
+});
