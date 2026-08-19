@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout/Layout";
+<<<<<<< HEAD
 import { useCachedCampaignList } from "../utils/reactQuery";
 import { useUser } from "@clerk/nextjs";
 import { useAccount } from "wagmi";
 import { useContract } from "../hooks/useContract";
+=======
+import { useContract } from "../hooks/useContract";
+import { useUser } from "@clerk/nextjs";
+import { useAccount } from "wagmi";
+>>>>>>> 374b56cba16025b1bcb101eb5056d5b7dd36860f
 import { FiFilter, FiGrid, FiList, FiSearch } from "react-icons/fi";
 import {
   calculateProgress,
@@ -189,7 +195,11 @@ export default function TopPage() {
     "";
 
   const { useActiveCampaigns } = useContract();
+<<<<<<< HEAD
   const { data: campaigns, isLoading } = useCachedCampaignList(0, 100);
+=======
+  const { data: campaigns, isLoading } = useActiveCampaigns(0, 100);
+>>>>>>> 374b56cba16025b1bcb101eb5056d5b7dd36860f
   const totalCampaigns = campaigns?.length || 0;
   const activeCampaigns = campaigns?.filter((campaign) => campaign.active).length || 0;
   const fundedCampaigns =
