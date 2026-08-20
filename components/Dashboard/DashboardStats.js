@@ -12,8 +12,22 @@ import {
 
 export default function DashboardStats() {
   const { useContractStats, useActiveCampaigns, address } = useContract();
-  const { data: contractStats } = useContractStats();
-  const { data: campaigns } = useActiveCampaigns(0, 100);
+  const { data: contractStats, isLoading: loadingStats } = useContractStats();
+  const { data: campaigns, isLoading: loadingCampaigns } = useActiveCampaigns(0, 100);
+  
+  // Return loading skeleton if data is still fetching
+  if (loadingStats || loadingCampaigns) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-slate-50 backdrop-blur-sm dark:bg-darkb rounded-3xl p-6 border border-secondary dark:border-gray-450 animate-pulse">
+            <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
+            <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   // Helper function to safely convert values to numbers
   const safeNumber = (value) => {

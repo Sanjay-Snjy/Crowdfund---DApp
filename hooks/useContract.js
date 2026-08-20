@@ -7,7 +7,10 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import { ethers } from "ethers";
-import { CONTRACT_ADDRESS } from "../constants";
+import {
+  CONTRACT_ADDRESS,
+  CAMPAIGN_CREATION_FEE,
+} from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
 import { toast } from "react-hot-toast";
 
@@ -28,7 +31,9 @@ export const useContract = () => {
       args: title
         ? [title, description, metadataHash, targetAmount, duration]
         : undefined,
-      value: title ? ethers.utils.parseEther("1") : undefined,
+      value: title
+  ? ethers.utils.parseEther(CAMPAIGN_CREATION_FEE)
+  : undefined,
       enabled: Boolean(address && CONTRACT_ADDRESS && title),
     });
 

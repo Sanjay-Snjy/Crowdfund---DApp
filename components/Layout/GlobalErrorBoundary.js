@@ -22,56 +22,12 @@ class GlobalErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Global Error Boundary caught an error:", error, errorInfo);
-
-    // Enhanced error patterns that should trigger auto-reload
-    const autoReloadErrors = [
-      // Your specific error
-      "Cannot read properties of undefined (reading 'length')",
-      "Cannot read property 'length' of undefined",
-
-      // Related data access errors
-      "pendingUsers is undefined",
-      "userDataHooks is not iterable",
-      "Cannot read properties of undefined (reading 'map')",
-      "Cannot read properties of undefined (reading 'filter')",
-      "Cannot read properties of undefined (reading 'slice')",
-
-      // React hydration errors that need reload
-      "Hydration failed because the initial UI does not match",
-      "Text content does not match server-rendered HTML",
-      "Expected server HTML to contain",
-
-      // Wagmi/Web3 connection errors
-      "ChainMismatchError",
-      "UserRejectedRequestError",
-      "Contract call reverted",
-
-      // Add more error patterns as needed
-    ];
-
-    // Check if it's an error we want to auto-reload for
-    const shouldAutoReload = autoReloadErrors.some(
-      (errorPattern) => error.message && error.message.includes(errorPattern)
-    );
-
-    if (shouldAutoReload && !this.state.isReloading) {
-      console.log(
-        "Detected critical error, auto-reloading page...",
-        error.message
-      );
-      this.setState({ isReloading: true });
-
-      // Add a small delay to show the reloading message
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    }
-
+    
     // Log error for debugging (you can send to analytics service here)
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "exception", {
         description: error.message,
-        fatal: shouldAutoReload,
+        fatal: true,
       });
     }
   }
@@ -85,132 +41,6 @@ class GlobalErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // Auto-reload errors
-      const autoReloadErrors = [
-        "Cannot read properties of undefined (reading 'length')",
-        "Cannot read property 'length' of undefined",
-        "pendingUsers is undefined",
-        "userDataHooks is not iterable",
-        "Cannot read properties of undefined (reading 'map')",
-        "Cannot read properties of undefined (reading 'filter')",
-        "Cannot read properties of undefined (reading 'slice')",
-        "Hydration failed because the initial UI does not match",
-        "Text content does not match server-rendered HTML",
-        "Expected server HTML to contain",
-      ];
-
-      const shouldAutoReload = autoReloadErrors.some((errorPattern) =>
-        this.state.error?.message?.includes(errorPattern)
-      );
-
-      if (shouldAutoReload || this.state.isReloading) {
-        return (
-          <div
-            className="hydration-safe"
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#0f0f0f",
-              color: "#ffffff",
-              fontSize: "16px",
-              fontFamily: "system-ui, -apple-system, sans-serif",
-              zIndex: 10000,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "20px",
-                maxWidth: "400px",
-                padding: "40px",
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "16px",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-              }}
-            >
-              <div
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  border: "4px solid #333",
-                  borderTop: "4px solid #007bff",
-                  borderRadius: "50%",
-                  animation: "spin 1s linear infinite",
-                }}
-              ></div>
-
-              <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Refreshing Application
-                </div>
-                <div
-                  style={{ fontSize: "14px", color: "#888", lineHeight: "1.5" }}
-                >
-                  Detected a data synchronization issue.
-                  <br />
-                  The page will reload automatically to fix this.
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "12px",
-                  color: "#666",
-                }}
-              >
-                <div
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    backgroundColor: "#007bff",
-                    borderRadius: "50%",
-                    animation: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-                  }}
-                ></div>
-                Please wait...
-              </div>
-            </div>
-
-            <style jsx>{`
-              @keyframes spin {
-                0% {
-                  transform: rotate(0deg);
-                }
-                100% {
-                  transform: rotate(360deg);
-                }
-              }
-              @keyframes ping {
-                75%,
-                100% {
-                  transform: scale(2);
-                  opacity: 0;
-                }
-              }
-            `}</style>
-          </div>
-        );
-      }
-
-      // For other errors, show manual recovery options with your app's styling
       return (
         <div
           className="hydration-safe"
@@ -249,15 +79,21 @@ class GlobalErrorBoundary extends React.Component {
               style={{
                 width: "60px",
                 height: "60px",
-                backgroundColor: "#EF4444",
+                backgroundColor: "rgba(239, 68, 68, 0.2)",
                 borderRadius: "16px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 32px rgba(239, 68, 68, 0.3)",
               }}
             >
-              <span style={{ fontSize: "24px" }}>⚠️</span>
+              <FiAlertTriangle
+                style={{
+                  fontSize: "32px",
+                  color: "#EF4444",
+                  width: "32px",
+                  height: "32px",
+                }}
+              />
             </div>
 
             <div>
@@ -273,9 +109,8 @@ class GlobalErrorBoundary extends React.Component {
               <div
                 style={{ fontSize: "14px", color: "#888", lineHeight: "1.6" }}
               >
-                An unexpected error occurred in the Supply Chain DApp.
-                <br />
-                Please try refreshing the page to continue.
+                An unexpected error occurred. Please try refreshing the page to
+                continue.
               </div>
             </div>
 
@@ -316,16 +151,15 @@ class GlobalErrorBoundary extends React.Component {
                   }
                 }}
               >
-                <span
+                <FiRefreshCw
                   style={{
+                    width: "16px",
+                    height: "16px",
                     animation: this.state.isReloading
                       ? "spin 1s linear infinite"
                       : "none",
-                    display: "inline-block",
                   }}
-                >
-                  🔄
-                </span>
+                />
                 {this.state.isReloading ? "Refreshing..." : "Refresh Page"}
               </button>
 
@@ -351,38 +185,42 @@ class GlobalErrorBoundary extends React.Component {
                   e.target.style.borderColor = "#333";
                 }}
               >
-                Try Again
+                Dismiss
               </button>
             </div>
 
             {/* Error details for development */}
             {process.env.NODE_ENV === "development" && this.state.error && (
-              <details style={{ width: "100%", marginTop: "16px" }}>
+              <details
+                style={{
+                  width: "100%",
+                  marginTop: "16px",
+                  textAlign: "left",
+                  color: "#888",
+                  fontSize: "12px",
+                }}
+              >
                 <summary
                   style={{
-                    fontSize: "12px",
-                    color: "#666",
                     cursor: "pointer",
-                    marginBottom: "8px",
+                    padding: "8px",
+                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                    borderRadius: "4px",
                   }}
                 >
-                  Error Details (Development Only)
+                  Error details
                 </summary>
                 <pre
                   style={{
-                    fontSize: "10px",
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    padding: "12px",
-                    borderRadius: "8px",
+                    marginTop: "8px",
+                    padding: "8px",
+                    backgroundColor: "rgba(0, 0, 0, 0.3)",
+                    borderRadius: "4px",
                     overflow: "auto",
-                    color: "#ff6b6b",
-                    textAlign: "left",
                     maxHeight: "200px",
-                    border: "1px solid rgba(255, 107, 107, 0.2)",
                   }}
                 >
-                  {this.state.error.message}
-                  {this.state.error.stack && `\n\n${this.state.error.stack}`}
+                  {this.state.error.toString()}
                 </pre>
               </details>
             )}

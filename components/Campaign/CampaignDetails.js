@@ -217,8 +217,8 @@ export default function CampaignDetails({ campaignId }) {
   const canGetRefund =
     !isCreator && timeLeft.expired && !isSuccessful && userContribution > 0;
 
-  // Process contributions data
-  const processedContributions = contributions
+  // Process contributions data - only if contributions data is loaded
+  const processedContributions = contributions && !loadingContributions
     ? contributions
         .map((contribution) => ({
           contributor: contribution.contributor,
@@ -230,34 +230,38 @@ export default function CampaignDetails({ campaignId }) {
         .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
     : [];
 
-  // Group contributions by contributor
-  const contributorSummary = processedContributions.reduce(
-    (acc, contribution) => {
-      const contributor = contribution.contributor;
-      if (!acc[contributor]) {
-        acc[contributor] = {
-          address: contributor,
-          totalAmount: 0n,
-          contributionCount: 0,
-          lastContribution: contribution.timestamp,
-        };
-      }
-      acc[contributor].totalAmount += BigInt(contribution.amount.toString());
-      acc[contributor].contributionCount += 1;
-      if (
-        contribution.timestamp &&
-        contribution.timestamp > acc[contributor].lastContribution
-      ) {
-        acc[contributor].lastContribution = contribution.timestamp;
-      }
-      return acc;
-    },
-    {}
-  );
+  // Group contributions by contributor - only if data is ready
+  const contributorSummary = processedContributions.length > 0
+    ? processedContributions.reduce(
+        (acc, contribution) => {
+          const contributor = contribution.contributor;
+          if (!acc[contributor]) {
+            acc[contributor] = {
+              address: contributor,
+              totalAmount: 0n,
+              contributionCount: 0,
+              lastContribution: contribution.timestamp,
+            };
+          }
+          acc[contributor].totalAmount += BigInt(contribution.amount.toString());
+          acc[contributor].contributionCount += 1;
+          if (
+            contribution.timestamp &&
+            contribution.timestamp > acc[contributor].lastContribution
+          ) {
+            acc[contributor].lastContribution = contribution.timestamp;
+          }
+          return acc;
+        },
+        {}
+      )
+    : {};
 
-  const uniqueContributors = Object.values(contributorSummary).sort((a, b) =>
-    Number(b.totalAmount - a.totalAmount)
-  );
+  const uniqueContributors = processedContributions.length > 0
+    ? Object.values(contributorSummary).sort((a, b) =>
+        Number(b.totalAmount - a.totalAmount)
+      )
+    : [];
 
   const handleContribute = async () => {
     if (!contributionAmount || parseFloat(contributionAmount) <= 0) {
