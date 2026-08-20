@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
@@ -1057,5 +1055,3 @@ export default function Home() {
     </div>
   );
 }
-
->>>>>>> 37b2dbf (Fixed navigation)

@@ -4,11 +4,7 @@ import { useAccount } from "wagmi";
 import { useUser } from "@clerk/nextjs";
 import Layout from "../../components/Layout/Layout";
 import CampaignCard from "../../components/Campaign/CampaignCard";
-<<<<<<< HEAD
-import { useCachedCampaignList } from "../../utils/reactQuery";
-=======
 import { useContract } from "../../hooks/useContract";
->>>>>>> 374b56cba16025b1bcb101eb5056d5b7dd36860f
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
 
 export default function CampaignsPage() {
@@ -19,10 +15,7 @@ export default function CampaignsPage() {
 
   const router = useRouter();
   const { address } = useAccount();
-<<<<<<< HEAD
-=======
   const { useActiveCampaigns } = useContract();
->>>>>>> 374b56cba16025b1bcb101eb5056d5b7dd36860f
   const { user } = useUser();
   const currentUserName =
     user?.fullName ||
@@ -31,11 +24,7 @@ export default function CampaignsPage() {
     user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
     "";
 
-<<<<<<< HEAD
-  const { data: campaigns, isLoading } = useCachedCampaignList(0, 50);
-=======
   const { data: campaigns, isLoading } = useActiveCampaigns(0, 50);
->>>>>>> 374b56cba16025b1bcb101eb5056d5b7dd36860f
 
   const totalCampaigns = campaigns?.length || 0;
   const activeCampaigns =
