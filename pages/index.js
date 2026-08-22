@@ -540,8 +540,8 @@ export default function Home() {
 
     ${
       scrolled
-        ? "top-0 left-0 right-0 rounded-none border-b-2 border-gray-500 bg-gray-900/50 backdrop-blur-2xl"
-        : "top-1 left-1 right-1 mt-1 rounded-4xl border-2 border-gray-500 bg-gray-900/20"
+        ? "top-0 left-0 right-0 rounded-none border-b border-gray-500 bg-gray-900/50 backdrop-blur-2xl"
+        : "top-1 left-1 right-1 mt-1 rounded-4xl border border-gray-500 bg-gray-900/20"
     }
   `}
 >
@@ -833,60 +833,64 @@ export default function Home() {
       {/* Explore Fundraising Categories Section */}
       <section className="relative z-10 px-6 py-10 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <div className="space-y-6  pb-10">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-              Explore fundraising categories
-            </p>
-            <h2 className="text-4xl font-semibold text-white sm:text-5xl">
-              Minimal categories for modern campaigns
-            </h2>
-            <p className="max-w-4xl text-lg leading-8 text-slate-300">
-              Clear category sections help supporters quickly identify the campaign type that matches their interests.
-            </p>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-3">
-            {categoryOverviewStats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <div key={index} className="rounded-3xl border border-slate-700/70 bg-slate-950/60 p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-[45px] items-center justify-center rounded-2xl bg-slate-800 text-slate-200">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Overview</p>
-                      <p className="text-lg font-semibold text-white">{stat.label}</p>
-                    </div>
+          {/* Header row: text left, overview stats right */}
+           <div className="space-y-6 ">
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
+                Explore fundraising categories
+              </p>
+              <h2 className="text-4xl font-semibold text-white sm:text-5xl">
+                Minimal categories for modern campaigns
+              </h2>
+              <p className="max-w-4xl text-lg leading-8 text-slate-300">
+                Clear category sections help supporters quickly identify the campaign type that matches their interests.
+              </p>
+            </div>
+          <div className="flex mt-6 ml-[300px] flex-col gap-8 pb-10 lg:flex-row lg:items-end lg:justify-between">
+           
+            <div className="flex flex-wrap gap-3 lg:flex-shrink-0">
+              {categoryOverviewStats.map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={index}
+                    className="group flex items-center gap-2.5 rounded-full border border-cyan-700/50 bg-cyan-800/30 backdrop-blur-md px-5 py-3 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/[0.04]"
+                  >
+                    <Icon className="h-4 w-4 text-cyan-400 transition-colors group-hover:text-cyan-300" />
+                    <span className="text-sm font-medium text-slate-300">{stat.label}</span>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {campaignCategories.map((category, index) => {
               const Icon = category.icon;
               return (
-                <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-[80px] items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
-                      <Icon className="h-6 w-6" />
+                <div
+                  key={index}
+                  className="group relative rounded-3xl border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 pl-7 transition-all duration-300 hover:border-l-cyan-400/50 hover:bg-cyan-950/60 hover:shadow-lg hover:shadow-cyan-500/[0.03]"
+                >
+                  {/* Left accent line on hover */}
+                  <div className="absolute left-0 top-6 bottom-6 w-[2px] rounded-full bg-transparent transition-colors duration-300 group-hover:bg-cyan-400/50" />
+
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-slate-800 text-slate-300 transition-colors duration-300 group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">{category.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-400">{category.description}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+                      <p className="mt-1.5 text-sm leading-5 text-slate-400 line-clamp-2">{category.description}</p>
                     </div>
                   </div>
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
-                      <p className="font-semibold text-white">{category.campaigns}</p>
-                      <p className="mt-1 uppercase tracking-[0.24em] text-slate-500">Campaigns</p>
-                    </div>
-                    <div className="rounded-2xl bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
-                      <p className="font-semibold text-white">{category.ethRaised.toFixed(1)} ETH</p>
-                      <p className="mt-1 uppercase tracking-[0.24em] text-slate-500">Raised</p>
-                    </div>
+
+                  {/* Inline stat chips */}
+                  <div className="mt-5 flex items-center gap-3 text-xs">
+                    <span className="font-semibold text-white">{category.campaigns}</span>
+                    <span className="text-slate-600">campaigns</span>
+                    <span className="h-3 w-px bg-slate-700" />
+                    <span className="font-semibold text-cyan-300">{category.ethRaised.toFixed(1)} ETH</span>
+                    <span className="text-slate-600">raised</span>
                   </div>
                 </div>
               );
@@ -900,7 +904,7 @@ export default function Home() {
       {/* Features Section */}
       <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <div className="space-y-6  pb-10">
+          <div className="space-y-6 pb-10">
             <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
               Built for modern crowdfunding
             </p>
@@ -912,15 +916,25 @@ export default function Home() {
             </p>
           </div>
 
-          <div className=" grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {features.map((feature, index) => (
-              <div key={index} className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6">
-                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-800 text-slate-200">
-                  <feature.icon className="h-6 w-6" />
+              <div
+                key={index}
+                className="group relative flex items-start gap-5 rounded-3xl border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/[0.04] hover:bg-cyan-950/60"
+              >
+                {/* Numbered ring icon */}
+                <div className="relative flex-shrink-0">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-3xl border border-slate-700/50 bg-slate-800 text-slate-200 transition-all duration-300 group-hover:border-cyan-400/30 group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
+                    <feature.icon className="h-6 w-6" />
+                  </div>
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 border border-slate-700/50 text-[10px] font-semibold text-slate-500 transition-colors duration-300 group-hover:border-cyan-500/30 group-hover:text-cyan-400">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                 </div>
-                <div className="mt-5">
-                  <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-400">{feature.description}</p>
+                {/* Text content */}
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-5 text-slate-400">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -949,7 +963,7 @@ export default function Home() {
           </div>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
-            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 text-center">
               <p className="text-4xl font-semibold text-white">
                 {loading ? "..." : stats.campaignsLaunched}
               </p>
@@ -958,7 +972,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 text-center">
               <p className="text-4xl font-semibold text-white">
                 {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
               </p>
@@ -967,7 +981,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-700/70 bg-slate-950/70 p-6 text-center">
+            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/20 backdrop-blur-md p-6 text-center">
               <p className="text-4xl font-semibold text-white">
                 {loading ? "..." : stats.contributors}
               </p>
@@ -981,7 +995,7 @@ export default function Home() {
       <hr className="my-12 border-0 h-px bg-slate-800/70" />
 
       {/* Footer */}
-      <footer className="relative z-10 bg-slate-950 text-slate-200">
+      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/10 backdrop-blur-md text-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-3">
             <div>
