@@ -526,7 +526,7 @@ export default function Home() {
   {/* Mobile Extra Visible Dots */}
   <div
     className="absolute inset-0 md:hidden z-[3]
-    [background-image:radial-gradient(rgba(255,255,255,0.28)_1px,transparent_1.2px)]
+    [background-image:radial-gradient(rgba(255, 255, 255, 0)_1px,transparent_1.2px)]
     [background-size:10px_10px]"
   />
 
