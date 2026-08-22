@@ -104,7 +104,7 @@ export default function Sidebar({
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
   const sidebarWidthClass = isOpen
-    ? `w-56 ${isCollapsed ? "md:w-16" : "md:w-56"}`
+    ? `w-64 ${isCollapsed ? "md:w-16" : "md:w-56"}`
     : `w-16 ${isCollapsed ? "md:w-16" : "md:w-56"}`;
 
   const handleCopyAddress = async () => {
@@ -137,7 +137,7 @@ export default function Sidebar({
     "No email";
 
   const walletPanel = (
-    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
+    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Wallet</p>
         <button
@@ -215,7 +215,7 @@ export default function Sidebar({
   );
 
   const profilePanel = (
-    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
+    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Profile</p>
         <button
@@ -260,7 +260,7 @@ export default function Sidebar({
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
           onClick={onToggle}
         />
       )}
@@ -268,10 +268,10 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-[86px] bottom-6 left-3 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-navy-100 border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
+        fixed top-0 bottom-0 left-0 md:top-[86px] md:bottom-6 md:left-3 bg-[#e6e6e6]/95 backdrop-blur-md dark:bg-navy-100 border-0 md:border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
-        rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
+        rounded-none md:rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
       `}
       >
         {/* Header */}
@@ -312,7 +312,7 @@ export default function Sidebar({
           })}
         </nav>
 
-        <div className="px-2 py-2">
+        <div className="px-2 py-2 hidden md:block">
           <button
             type="button"
             onClick={onToggleCollapse}
@@ -327,7 +327,7 @@ export default function Sidebar({
 
         {/* Connection Status */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-gray-200 dark:border-navy-600">
+          <div className="p-4 border-t border-gray-200 dark:border-navy-600 hidden md:block">
             <div
               className={`
               flex items-center space-x-2 px-3 py-2 rounded-2xl

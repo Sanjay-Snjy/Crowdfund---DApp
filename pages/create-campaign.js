@@ -36,8 +36,8 @@ export default function CreateCampaignPage() {
 
   return (
     <Layout>
-      <main className="max-w-9xl ml-1 -mt-[18px] mx-auto px-0 py-0 lg:py-0">
-       <section className="mb-6 rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white">
+      <main className="max-w-9xl -mt-[18px] mx-auto px-0 py-0 lg:py-0">
+       <section className="mb-6 rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">

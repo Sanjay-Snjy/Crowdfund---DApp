@@ -369,7 +369,7 @@ export default function TopPage() {
   return (
     <Layout>
       <div className="space-y-6 -mt-[18px] ml-1">
-        <section className="relative overflow-hidden h-[328px] rounded-[32px] border border-slate-200/20 bg-slate-900 p-0 text-white ">
+        <section className="relative overflow-hidden h-[220px] sm:h-[280px] md:h-[328px] rounded-[20px] md:rounded-[32px] border border-slate-200/20 bg-slate-900 p-0 text-white">
       <div className="absolute inset-0">
   {HERO_SLIDES.map((slide, index) => (
     <div
@@ -383,7 +383,7 @@ export default function TopPage() {
       <img
         src={slide.image}
         alt={slide.title}
-        className="ml-[148px] mt-[0px] h-[100%] w-[100%] object-contain"
+        className="ml-0 mt-0 h-full w-full object-cover md:ml-[148px] md:object-contain"
         style={{ objectPosition: slide.position }}
       />
 
@@ -392,7 +392,7 @@ export default function TopPage() {
   ))}
 </div>
 
-          <div className="relative z-10 flex flex-col gap-6 p-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="relative z-10 flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full  bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur">
                 <FiGrid className="h-4 w-4" />
@@ -400,7 +400,7 @@ export default function TopPage() {
               </div>
 
               <div className="mt-4 ml-auto">
-              <h1 className="mt-8 text-5xl font-semibold tracking-tight">
+              <h1 className="mt-4 sm:mt-8 text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
                 {HERO_SLIDES[currentSlide].title}
               </h1>
               <p className="mt-6 max-w-xl text-md text-slate-200">
@@ -418,7 +418,7 @@ export default function TopPage() {
            
           </div>
 
-        <div className="absolute bottom-8 left-8 z-20 flex items-center gap-2">
+        <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 z-20 flex items-center gap-2">
   {HERO_SLIDES.map((slide, index) => (
     <button
       key={slide.title}
@@ -439,7 +439,7 @@ export default function TopPage() {
 
         <section className="rounded-[32px] ">
             <div className="rounded-[32px]  bg-[#e6e6e6]/40 backdrop-blur-md border border-secondary px-6 py-6 dark:border-navy-600 dark:bg-navy-400">
-                      <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
+                      <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
                         <div className="relative">
                           <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                           <input
@@ -451,7 +451,7 @@ export default function TopPage() {
                           />
                         </div>
             
-                        <div className="flex flex-wrap items-center justify-end gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <FiFilter className="mr-2 h-6 w-6 text-slate-500" />
                           <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-navy-600 dark:bg-navy-500">
                             <select
@@ -480,7 +480,7 @@ export default function TopPage() {
                       </div>
             
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="ml-[0px] grid max-w-xl gap-4 md:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 max-w-xl">
               <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-navy-600 dark:bg-navy-400">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Total campaigns</p>
                 <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">{totalCampaigns}</p>
@@ -527,7 +527,7 @@ export default function TopPage() {
                       
                     </div>
          
-          <div className="flex items-center justify-between gap-4 ml-[20px] mt-6 flex-wrap">
+          <div className="flex items-center justify-between gap-4 mt-6 flex-wrap">
             <div className="flex overflow-x-auto no-scrollbar gap-2 py-2">
               {CATEGORIES.map((category) => {
                 const isActive = category === activeCategory;
@@ -568,7 +568,7 @@ export default function TopPage() {
               ))}
             </div>
           ) : displayedCampaigns.length > 0 ? (
-            <div className={viewMode === "list" ? "flex flex-col gap-4 px-28" : "grid gap-5  grid-cols-4"}>
+            <div className={viewMode === "list" ? "flex flex-col gap-4 px-4 sm:px-8 md:px-28" : "grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"}>
               {displayedCampaigns.map((campaign) => (
                 <TopCampaignCard
                   key={campaign.id}

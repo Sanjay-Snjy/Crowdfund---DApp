@@ -1,4 +1,4 @@
-import { IncomingForm } from "formidable";
+import formidable from "formidable";
 import fs from "fs";
 
 export const config = {
@@ -9,11 +9,16 @@ export const config = {
 
 function getAuthHeader() {
   const jwt = process.env.PINATA_JWT;
-  if (jwt) return { Authorization: `Bearer ${jwt}` };
+  if (jwt && jwt.trim()) {
+    return { Authorization: `Bearer ${jwt.trim()}` };
+  }
   const apiKey = process.env.PINATA_API_KEY;
   const secretKey = process.env.PINATA_SECRET_KEY;
-  if (apiKey && secretKey) {
-    return { pinata_api_key: apiKey, pinata_secret_api_key: secretKey };
+  if (apiKey && secretKey && apiKey.trim() && secretKey.trim()) {
+    return {
+      pinata_api_key: apiKey.trim(),
+      pinata_secret_api_key: secretKey.trim(),
+    };
   }
   return null;
 }
@@ -25,8 +30,11 @@ export default async function handler(req, res) {
 
   const authHeaders = getAuthHeader();
   if (!authHeaders) {
+    console.error("IPFS proxy: No Pinata credentials configured");
     return res.status(500).json({
-      error: "Pinata IPFS credentials are not configured on the server.",
+      error: "IPFS credentials not configured on server",
+      details:
+        "Set PINATA_JWT or PINATA_API_KEY + PINATA_SECRET_KEY in your Vercel environment variables. These should NOT have the NEXT_PUBLIC_ prefix.",
     });
   }
 
@@ -34,29 +42,30 @@ export default async function handler(req, res) {
 
   try {
     if (type === "file") {
-      // Multipart file upload
-      const form = new IncomingForm({
+      // Multipart file upload using formidable v3 API
+      const form = formidable({
         maxFileSize: 10 * 1024 * 1024, // 10MB
         keepExtensions: true,
       });
 
-      const { files } = await new Promise((resolve, reject) => {
-        form.parse(req, (err, fields, files) => {
-          if (err) reject(err);
-          else resolve({ files });
-        });
-      });
+      const [fields, files] = await form.parse(req);
 
-      const file = files.file?.[0] || files.file;
-      if (!file) {
+      const uploadedFile =
+        (files.file && files.file[0]) || null;
+
+      if (!uploadedFile) {
         return res.status(400).json({ error: "No file provided" });
       }
 
-      const filePath = file.filepath || file.newFilename;
+      // Read file into buffer and create a Blob
+      const filePath = uploadedFile.filepath || uploadedFile.newFilename;
       const fileBuffer = fs.readFileSync(filePath);
-      const fileBlob = new Blob([fileBuffer], { type: file.mimetype || "application/octet-stream" });
+      const fileBlob = new Blob([fileBuffer], {
+        type: uploadedFile.mimetype || "application/octet-stream",
+      });
+
       const formData = new FormData();
-      formData.append("file", fileBlob, file.originalFilename || "upload");
+      formData.append("file", fileBlob, uploadedFile.originalFilename || "upload");
 
       const response = await fetch(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -69,15 +78,19 @@ export default async function handler(req, res) {
 
       // Clean up temp file
       try {
-        fs.unlinkSync(file.filepath || file.newFilename);
-      } catch {}
+        fs.unlinkSync(filePath);
+      } catch (cleanupErr) {
+        console.warn("IPFS proxy: Failed to clean up temp file:", cleanupErr.message);
+      }
 
       if (!response.ok) {
         const errText = await response.text();
         console.error("Pinata file upload failed:", response.status, errText);
-        return res
-          .status(502)
-          .json({ error: "Failed to upload to IPFS", details: errText });
+        return res.status(502).json({
+          error: "Failed to upload to IPFS",
+          details: errText,
+          status: response.status,
+        });
       }
 
       const data = await response.json();
@@ -107,9 +120,11 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const errText = await response.text();
         console.error("Pinata JSON upload failed:", response.status, errText);
-        return res
-          .status(502)
-          .json({ error: "Failed to upload JSON to IPFS", details: errText });
+        return res.status(502).json({
+          error: "Failed to upload JSON to IPFS",
+          details: errText,
+          status: response.status,
+        });
       }
 
       const data = await response.json();
@@ -122,7 +137,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing ?type=file or ?type=json" });
     }
   } catch (error) {
-    console.error("IPFS proxy error:", error);
-    return res.status(500).json({ error: error.message || "Internal server error" });
+    console.error("IPFS proxy error:", error.message, error.stack);
+    return res.status(500).json({
+      error: error.message || "Internal server error",
+      type: "server_error",
+    });
   }
 }

@@ -191,20 +191,20 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       fixed top-2 left-2 right-2 z-50 bg-[#e6e6e6]/60 dark:bg-navy-100 border border-secondary dark:border-navy-600
-       transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
+       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/80 dark:bg-navy-100 border-b md:border border-secondary dark:border-navy-600
+       transition-all duration-300 rounded-none md:rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
     >
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
           {/* Mobile Menu Button */}
-          <buttona
+          <button
             onClick={onMenuToggle}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-500 transition-colors"
           >
             <FiMenu className="w-5 h-5 text-gray-600 dark:text-[#94A3B8]" />
-          </buttona>
+          </button>
 
           {/* Logo + App Name (replaces search) */}
           <button
@@ -215,11 +215,11 @@ export default function Header({ onMenuToggle, isCollapsed }) {
             <div className="w-10 h-10 rounded-4xl flex items-center justify-center">
               <img src="/logo3.gif" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC]">CrowdFund</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] hidden sm:inline">CrowdFund</span>
           </button>
         </div>
  {walletUserName && (
-            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-navy-600 dark:bg-navy-300/70 dark:text-[#CBD5E1]">
+            <div className="hidden lg:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-navy-600 dark:bg-navy-300/70 dark:text-[#CBD5E1]">
              <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-[#94A3B8]" /> &nbsp; {walletUserName}
             </div>
           )}
@@ -234,7 +234,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           )}*/}
 
           {/* Theme Toggle */}
-          <buttona
+          <button
             onClick={toggleTheme}
             className="p-2 rounded-4xl hover:bg-white dark:hover:bg-navy-500 transition-colors"
           >
@@ -243,7 +243,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
             ) : (
               <FiMoon className="w-5 h-5 text-gray-600" />
             )}
-          </buttona>
+          </button>
 
           {/* Notifications 
           {isConnected && (

@@ -108,7 +108,7 @@ return (
         >
           <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
 
-          <main className="flex-1 pt-20 p-4 md:p-6 mt-20">
+          <main className="flex-1 pt-24 px-3 pb-4 md:pt-20 md:px-6 md:pb-6">
             <ErrorBoundary>
               <div>{children}</div>
             </ErrorBoundary>
@@ -117,7 +117,7 @@ return (
       </div>
 
       {/* Footer - Solid background to hide the dotted pattern below */}
-      <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-navy-600 dark:bg-navy-200 border-t border-secondary dark:border-navy-200 text-slate-300">
+      <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-navy-600 dark:bg-navy-200 border-t border-secondary dark:border-navy-200 text-slate-300 mt-auto">
         <div
           className={`transition-all duration-300 ease-out ${
             sidebarCollapsed ? "md:ml-[4.25rem]" : "md:ml-[14.5rem]"

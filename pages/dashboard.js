@@ -167,7 +167,7 @@ function Dashboard() {
   return (
     <Layout>
       <div className="mx-auto px-5 ml-1 py-8 sm:px-6 lg:px-0 lg:py-0 -mt-[18px]">
-       <section className="mb-4 rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white">
+       <section className="mb-4 rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white">
   <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
     <div>
       <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
@@ -175,7 +175,7 @@ function Dashboard() {
         Dashboard Overview
       </div>
 
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight">
+      <h1 className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
         Ideas backed. Progress visible.
       </h1>
 
@@ -186,7 +186,7 @@ function Dashboard() {
   </div>
 </section>
         <div className="grid gap-4 xl:grid-cols-[1.45fr_0.75fr]">
-          <section className="rounded-[32px] mt-2 bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-8 dark:text-slate-50">
+          <section className="rounded-[24px] md:rounded-[32px] mt-2 bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-4 sm:p-6 md:p-8 dark:text-slate-50">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-indigo-400 dark:text-slate-400">
@@ -202,7 +202,7 @@ function Dashboard() {
              
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-6 grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-navy-600 dark:bg-navy-400">
                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Created campaigns</p>
                 <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-50">{userCampaigns?.length || 0}</p>
@@ -224,7 +224,7 @@ function Dashboard() {
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Share of your campaigns that met the goal.</p>
               </div>
             </div>
-             <div className="mt-[50px] ml-[200px] flex flex-wrap gap-3">
+             <div className="mt-6 flex flex-wrap gap-3 justify-start sm:justify-center">
                 <button
                   onClick={() => router.push("/create-campaign")}
                   className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600"

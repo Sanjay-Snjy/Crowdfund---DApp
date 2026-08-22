@@ -415,7 +415,7 @@ export default function CampaignDetails({ campaignId }) {
         </div>
 
         {/* Campaign Info */}
-        <div className="p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-col lg:flex-row lg:space-x-8">
             {/* Left Column */}
             <div className="flex-1 space-y-6">
@@ -582,7 +582,7 @@ export default function CampaignDetails({ campaignId }) {
       <div className="bg-white border border-secondary dark:bg-navy-300 rounded-2xl shadow-sm p-6">
         {/* Tabs */}
         <div className="border-b border-gray-200 dark:border-navy-600 mb-6">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar">
             {["overview", "milestones", "updates", "contributors"].map((tab) => (
               <button
                 key={tab}

@@ -754,7 +754,7 @@ export default function Home() {
             <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
       {/* Recent Campaigns Section */}
-      <section className="relative z-10 px-[140px] py-10 ml-[0px]">
+      <section className="relative z-10 px-4 sm:px-8 lg:px-12 py-10">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
             <div>
@@ -946,7 +946,7 @@ export default function Home() {
 
 
       {/* Stats Section */}
-      <section className="relative z-10 py-0 px-[10px]">
+      <section className="relative z-10 py-0 px-4 sm:px-6">
         <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-0">
           <div className="space-y-6  pb-10">
             <div className="max-w-3xl space-y-3">

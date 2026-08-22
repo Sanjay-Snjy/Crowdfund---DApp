@@ -242,14 +242,14 @@ export default function AdminPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-2xl shadow-slate-900/20">
+        <div className="rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white shadow-2xl shadow-slate-900/20">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
                 <FiShield className="h-4 w-4" />
                 Administration Command Center
               </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight">
+              <h1 className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
                 Admin Panel
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-slate-200">
