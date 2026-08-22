@@ -60,7 +60,7 @@ export default function Home() {
     address: CONTRACT_ADDRESS,
     abi: CROWDFUNDING_ABI,
     functionName: "campaignCounter",
-    watch: true,
+    staleTime: 30_000,
   });
 
   // Trigger popup and blink animation only when user explicitly connects wallet (not on page refresh)
@@ -414,19 +414,10 @@ export default function Home() {
     };
   }, []);
 
-  const applyLightTheme = () => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem("theme", "light");
-    document.documentElement.classList.remove("dark");
-    document.documentElement.style.colorScheme = "light";
-  };
   const handleGoToCampaigns = () => {
-    applyLightTheme();
-    console.log("Navigating to all campaigns");
     router.push("/all-campaigns");
   };
   const handleGoToDashboard = () => {
-    applyLightTheme();
     router.push("/dashboard");
   };
 

@@ -1,9 +1,8 @@
 import { defineConfig, configVariable } from "hardhat/config";
-import dotenv from "dotenv";
 import hardhatEthers from "@nomicfoundation/hardhat-ethers";
 import hardhatVerify from "@nomicfoundation/hardhat-verify";
 
-dotenv.config();
+import "dotenv/config.js";
 
 export default defineConfig({
   plugins: [hardhatEthers, hardhatVerify],
