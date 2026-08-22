@@ -143,12 +143,6 @@ function Dashboard() {
 
   const liveActiveCampaignsCount = liveActiveCampaigns.length;
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
-
   if (!isConnected) {
     return (
       <Layout>
