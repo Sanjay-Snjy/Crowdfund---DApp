@@ -1,7 +1,4 @@
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-export const PINATA_API_KEY = process.env.NEXT_PUBLIC_PINATA_API_KEY;
-export const PINATA_SECRET_KEY = process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY;
-export const PINATA_JWT = process.env.NEXT_PUBLIC_PINATA_JWT;
 
 export const CAMPAIGN_CREATION_FEE = "0"; // no upfront creation fee
 
@@ -12,18 +9,7 @@ if (typeof window !== "undefined") {
       "NEXT_PUBLIC_CONTRACT_ADDRESS is not set in environment variables"
     );
   }
-  if (!PINATA_JWT && !PINATA_API_KEY) {
-    console.warn(
-      "Pinata IPFS credentials are not set. Image uploads will not work."
-    );
-  }
 }
-
-export const PINATA_CONFIG = {
-  pinataApiKey: PINATA_API_KEY,
-  pinataSecretApiKey: PINATA_SECRET_KEY,
-  pinataJWT: PINATA_JWT,
-};
 
 export const NETWORK_CONFIGS = {
   localhost: {

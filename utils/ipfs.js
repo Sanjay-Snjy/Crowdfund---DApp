@@ -1,30 +1,23 @@
-import { PINATA_JWT } from "../constants";
-
 export const uploadToIPFS = async (file) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(
-      "https://api.pinata.cloud/pinning/pinFileToIPFS",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${PINATA_JWT}`,
-        },
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to upload to IPFS");
-    }
+    const response = await fetch("/api/ipfs?type=file", {
+      method: "POST",
+      body: formData,
+    });
 
     const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Failed to upload to IPFS");
+    }
+
     return {
       success: true,
-      hash: data.IpfsHash,
-      url: `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`,
+      hash: data.hash,
+      url: data.url,
     };
   } catch (error) {
     console.error("IPFS Upload Error:", error);
@@ -37,27 +30,22 @@ export const uploadToIPFS = async (file) => {
 
 export const uploadJSONToIPFS = async (jsonData) => {
   try {
-    const response = await fetch(
-      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${PINATA_JWT}`,
-        },
-        body: JSON.stringify(jsonData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to upload JSON to IPFS");
-    }
+    const response = await fetch("/api/ipfs?type=json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    });
 
     const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Failed to upload JSON to IPFS");
+    }
+
     return {
       success: true,
-      hash: data.IpfsHash,
-      url: `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`,
+      hash: data.hash,
+      url: data.url,
     };
   } catch (error) {
     console.error("IPFS JSON Upload Error:", error);

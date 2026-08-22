@@ -1,0 +1,16 @@
+{
+  "name": "CrowdFund DApp",
+  "short_name": "CrowdFund",
+  "description": "Decentralized crowdfunding on the blockchain. Create campaigns, contribute ETH, and track milestones transparently.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080D1A",
+  "theme_color": "#080D1A",
+  "icons": [
+    {
+      "src": "/logo2.gif",
+      "sizes": "any",
+      "type": "image/gif"
+    }
+  ]
+}
