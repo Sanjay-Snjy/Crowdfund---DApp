@@ -52,9 +52,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "No file provided" });
       }
 
-      const fileStream = fs.createReadStream(file.filepath || file.newFilename);
+      const filePath = file.filepath || file.newFilename;
+      const fileBuffer = fs.readFileSync(filePath);
+      const fileBlob = new Blob([fileBuffer], { type: file.mimetype || "application/octet-stream" });
       const formData = new FormData();
-      formData.append("file", fileStream, file.originalFilename || "upload");
+      formData.append("file", fileBlob, file.originalFilename || "upload");
 
       const response = await fetch(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
