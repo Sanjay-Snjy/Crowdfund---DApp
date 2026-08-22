@@ -59,7 +59,7 @@ return (
       >
         {/* Base Dots Background */}
         <div
-          className="fixed inset-0 pointer-events-none z-[1]"
+          className="hidden md:block fixed inset-0 pointer-events-none z-[1]"
           style={{
             backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.04)"} 1px,transparent 1.2px)`,
             backgroundSize: "8px 8px",
@@ -85,14 +85,7 @@ return (
           }}
         />
 
-        {/* Mobile Extra Visible Dots */}
-        <div
-          className="md:hidden fixed inset-0 pointer-events-none z-[1]"
-          style={{
-            backgroundImage: `radial-gradient(${isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.2)"} 1px,transparent 1.2px)`,
-            backgroundSize: "10px 10px",
-          }}
-        />
+
         <Sidebar
           isOpen={sidebarOpen}
           onToggle={toggleSidebar}
