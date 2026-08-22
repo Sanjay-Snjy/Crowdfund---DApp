@@ -38,7 +38,7 @@ export default function AdminPage() {
     abi: CROWDFUNDING_ABI,
     functionName: "paused",
     enabled: Boolean(CONTRACT_ADDRESS && isAdmin),
-    watch: true,
+    staleTime: 5000,
   });
 
   const { data: contractOwner } = useContractRead({
@@ -46,7 +46,7 @@ export default function AdminPage() {
     abi: CROWDFUNDING_ABI,
     functionName: "owner",
     enabled: Boolean(CONTRACT_ADDRESS),
-    watch: true,
+    staleTime: 30000,
   });
 
   const { write: withdrawFees, isLoading: isWithdrawing } = useContractWrite({
@@ -136,7 +136,7 @@ export default function AdminPage() {
         <div className="flex min-h-96 items-center justify-center">
           <div className="text-center">
             <FiShield className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-slate-50">
               Access Restricted
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
@@ -242,7 +242,7 @@ export default function AdminPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-2xl shadow-slate-900/20">
+        <div className="rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-8 text-white shadow-2xl shadow-slate-900/20">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
@@ -277,19 +277,19 @@ export default function AdminPage() {
               label: "Total campaigns",
               value: totalCampaigns,
               icon: FiActivity,
-              accent: "bg-blue-100",
+              accent: "bg-indigo-500/10",
             },
             {
               label: "Platform fees",
               value: `${availableFees} ETH`,
               icon: FiDollarSign,
-              accent: "bg-blue-100",
+              accent: "bg-indigo-500/10",
             },
             {
               label: "Contract balance",
               value: `${contractBalance} ETH`,
               icon: FiShield,
-              accent: "bg-blue-100",
+              accent: "bg-indigo-500/10",
             },
             {
               label: "Status",
@@ -300,38 +300,38 @@ export default function AdminPage() {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <div className={`inline-flex rounded-2xl bg-gradient-to-br ${stat.accent} p-3 text-blue-600`}>
+              <div key={stat.label} className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm dark:border-navy-600 dark:bg-navy-400">
+                <div className={`inline-flex rounded-2xl bg-gradient-to-br ${stat.accent} p-3 text-indigo-400`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">{stat.value}</p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-50">{stat.value}</p>
               </div>
             );
           })}
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
-          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
                   Operational controls
                 </h2>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   Execute platform governance actions from one place.
                 </p>
               </div>
-              <div className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              <div className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600 dark:bg-navy-500 dark:text-slate-300">
                 Secure mode
               </div>
             </div>
 
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
+              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-navy-600 dark:bg-navy-500">
                 <div className="flex items-center gap-2">
-                  <FiDollarSign className="h-5 w-5 text-blue-500" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">Treasury</h3>
+                  <FiDollarSign className="h-5 w-5 text-indigo-400" />
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-50">Treasury</h3>
                 </div>
                 <div className="mt-4 space-y-4">
                   <div>
@@ -346,7 +346,7 @@ export default function AdminPage() {
                       placeholder="0.00"
                       value={withdrawAmount}
                       onChange={(e) => setWithdrawAmount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-navy-600 dark:text-slate-50"
                     />
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       Available: {availableFees} ETH
@@ -362,19 +362,19 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
+              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-navy-600 dark:bg-navy-500">
                 <div className="flex items-center gap-2">
-                  <FiShield className="h-5 w-5 text-blue-500" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">Platform controls</h3>
+                  <FiShield className="h-5 w-5 text-indigo-400" />
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-50">Platform controls</h3>
                 </div>
                 <div className="mt-4 space-y-3">
                   <button
                     onClick={handlePauseContract}
                     disabled={isPausing || isUnpausing}
-                    className={`flex w-full items-center justify-center rounded-xl px-4 py-3 font-medium text-black transition ${
+                    className={`flex w-full items-center justify-center rounded-xl px-4 py-3 font-medium text-black dark:text-slate-50 transition ${
                       isPaused
-                        ? "bg-emerald-100 hover:bg-emerald-400"
-                        : "bg-blue-100 hover:bg-blue-400"
+                        ? "bg-emerald-100 hover:bg-emerald-400 dark:bg-emerald-900/30 dark:hover:bg-emerald-800/50"
+                        : "bg-indigo-500/10 hover:bg-indigo-400 dark:bg-indigo-950/30 dark:hover:bg-indigo-800/50"
                     }`}
                   >
                     {isPausing || isUnpausing ? (
@@ -403,10 +403,10 @@ export default function AdminPage() {
             </div>
 
             <div className="mt-6">
-              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
+              <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-5 dark:border-navy-600 dark:bg-navy-500">
                 <div className="flex items-center gap-2">
                   <FiActivity className="h-5 w-5 text-sky-500" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">Campaign governance</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-50">Campaign governance</h3>
                 </div>
                 <div className="mt-4 space-y-4">
                   <div>
@@ -419,7 +419,7 @@ export default function AdminPage() {
                       placeholder="Enter campaign ID"
                       value={campaignToToggle}
                       onChange={(e) => setCampaignToToggle(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-navy-600 dark:text-slate-50"
                     />
                   </div>
                   <button
@@ -435,10 +435,10 @@ export default function AdminPage() {
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
               <div className="flex items-center gap-2">
-                <FiZap className="h-5 w-5 text-blue-500" />
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Quick actions</h2>
+                <FiZap className="h-5 w-5 text-indigo-400" />
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Quick actions</h2>
               </div>
               <div className="mt-4 space-y-3">
                 {quickActions.map((action) => {
@@ -447,13 +447,13 @@ export default function AdminPage() {
                     <button
                       key={action.title}
                       onClick={action.action}
-                      className="flex w-full items-start rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-blue-500 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                      className="flex w-full items-start rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-indigo-500 hover:bg-indigo-500/10 dark:border-navy-600 dark:bg-navy-500 dark:hover:bg-navy-500"
                     >
-                      <div className="mt-0.5 rounded-xl bg-white p-2 text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200">
+                      <div className="mt-0.5 rounded-xl bg-white p-2 text-slate-700 shadow-sm dark:bg-navy-600 dark:text-slate-200">
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="ml-3">
-                        <p className="font-medium text-slate-900 dark:text-white">{action.title}</p>
+                        <p className="font-medium text-slate-900 dark:text-slate-50">{action.title}</p>
                         <p className="text-sm text-slate-500 dark:text-slate-400">{action.description}</p>
                       </div>
                     </button>
@@ -462,14 +462,14 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
               <div className="flex items-center gap-2">
                 <FiTrendingUp className="h-5 w-5 text-sky-500" />
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Platform health</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Platform health</h2>
               </div>
               <div className="mt-4 space-y-4">
                 {healthItems.map((item) => (
-                  <div key={item.label} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
+                  <div key={item.label} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-navy-500">
                     <span className="text-sm text-slate-600 dark:text-slate-300">{item.label}</span>
                     <span className={`text-sm font-semibold ${item.tone}`}>{item.value}</span>
                   </div>
@@ -480,20 +480,20 @@ export default function AdminPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
             <div className="flex items-center gap-2">
               <FiShield className="h-5 w-5 text-violet-500" />
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Smart contract overview</h2>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Smart contract overview</h2>
             </div>
 
           <div className="mt-5 grid grid-cols-1 gap-4">
   {/* Row 1 - Contract Address */}
-  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-500">
     <p className="text-sm text-slate-500 dark:text-slate-400">
       Contract address
     </p>
 
-    <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-white">
+    <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-slate-50">
       {CONTRACT_ADDRESS}
     </p>
 
@@ -501,7 +501,7 @@ export default function AdminPage() {
       onClick={() =>
         copyToClipboard(CONTRACT_ADDRESS, "Contract address")
       }
-      className="mt-3 inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+      className="mt-3 inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-navy-500"
     >
       {copiedField === "Contract address" ? (
         <FiCheckCircle className="mr-2 h-4 w-4" />
@@ -514,12 +514,12 @@ export default function AdminPage() {
   </div>
 
   {/* Row 2 - Owner Address */}
-  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-500">
     <p className="text-sm text-slate-500 dark:text-slate-400">
       Owner address
     </p>
 
-    <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-white">
+    <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-slate-50">
       {contractOwner || "Loading..."}
     </p>
 
@@ -527,7 +527,7 @@ export default function AdminPage() {
       onClick={() =>
         copyToClipboard(contractOwner, "Owner address")
       }
-      className="mt-3 inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+      className="mt-3 inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-navy-500"
     >
       {copiedField === "Owner address" ? (
         <FiCheckCircle className="mr-2 h-4 w-4" />
@@ -541,10 +541,10 @@ export default function AdminPage() {
 </div>
           </section>
 
-          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <section className="rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
             <div className="flex items-center gap-2">
               <FiClock className="h-5 w-5 text-slate-500" />
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">System activity</h2>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">System activity</h2>
             </div>
 
             <div className="mt-5 space-y-4">
@@ -553,7 +553,7 @@ export default function AdminPage() {
                 {label: "Campaign activity", value: `${totalCampaigns} campaigns recorded on-chain`},
                 {label: "Withdrawable fees", value: `${availableFees} ETH available for admin withdrawal`},
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+                <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-500">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{item.label}</p>
                     <span className="text-sm text-slate-500 dark:text-slate-400">Live</span>

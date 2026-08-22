@@ -43,7 +43,7 @@ class ErrorBoundary extends React.Component {
               </div>
             </details>
             <div className="mt-4 flex justify-center gap-3">
-              <button onClick={() => window.location.reload()} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white">Refresh Page</button>
+              <button onClick={() => window.location.reload()} className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-medium text-white">Refresh Page</button>
             </div>
           </div>
         </div>

@@ -1,1190 +1,1512 @@
 export const CROWDFUNDING_ABI = [
   {
-    inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "campaignId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "creator",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "targetAmount",
-        type: "uint256",
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "targetAmount",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "string",
-        name: "metadataHash",
-        type: "string",
-      },
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataHash",
+        "type": "string"
+      }
     ],
-    name: "CampaignCreated",
-    type: "event",
+    "name": "CampaignCreated",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "campaignId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "totalRaised",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalRaised",
+        "type": "uint256"
+      }
     ],
-    name: "CampaignFunded",
-    type: "event",
+    "name": "CampaignFunded",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "campaignId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "creator",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "CampaignWithdrawn",
-    type: "event",
+    "name": "CampaignWithdrawn",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "oldCommission",
-        type: "uint256",
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldCommission",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "newCommission",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newCommission",
+        "type": "uint256"
+      }
     ],
-    name: "CommissionUpdated",
-    type: "event",
+    "name": "CommissionUpdated",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "campaignId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "contributor",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "contributor",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "ContributionMade",
-    type: "event",
+    "name": "ContributionMade",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "admin",
-        type: "address",
+        "indexed": true,
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "FeesWithdrawn",
-    type: "event",
+    "name": "FeesWithdrawn",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "milestoneIndex",
+        "type": "uint256"
       },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "OwnershipTransferred",
-    type: "event",
+    "name": "MilestoneAdded",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "milestoneIndex",
+        "type": "uint256"
+      }
     ],
-    name: "Paused",
-    type: "event",
+    "name": "MilestoneCompleted",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "campaignId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "address",
-        name: "contributor",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "milestoneIndex",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "RefundIssued",
-    type: "event",
+    "name": "MilestoneFundsReleased",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "milestoneIndex",
+        "type": "uint256"
+      }
     ],
-    name: "Unpaused",
-    type: "event",
+    "name": "MilestoneVoteRequested",
+    "type": "event"
   },
   {
-    inputs: [],
-    name: "CAMPAIGN_CREATION_FEE",
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "milestoneIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contributor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "MilestoneVoted",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
       },
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
-    name: "campaignContributions",
-    outputs: [
-      {
-        internalType: "address",
-        name: "contributor",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
-    inputs: [],
-    name: "campaignCounter",
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "Paused",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
       },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contributor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
-    name: "campaigns",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "id",
-        type: "uint256",
-      },
-      {
-        internalType: "address payable",
-        name: "creator",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "description",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "metadataHash",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "targetAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "raisedAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "withdrawn",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "active",
-        type: "bool",
-      },
-      {
-        internalType: "uint256",
-        name: "createdAt",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "contributorsCount",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "RefundIssued",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    name: "contributeToCampaign",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
+    "name": "Unpaused",
+    "type": "event"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "CAMPAIGN_CREATION_FEE",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "contributions",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "string",
-        name: "_title",
-        type: "string",
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
       },
       {
-        internalType: "string",
-        name: "_description",
-        type: "string",
+        "internalType": "string",
+        "name": "_title",
+        "type": "string"
       },
       {
-        internalType: "string",
-        name: "_metadataHash",
-        type: "string",
+        "internalType": "string",
+        "name": "_description",
+        "type": "string"
       },
       {
-        internalType: "uint256",
-        name: "_targetAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_duration",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
-    name: "createCampaign",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
+    "name": "addCampaignMilestone",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "deactivateCampaign",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "campaignContributions",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "contributor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "campaignCounter",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_contributor",
-        type: "address",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "emergencyRefund",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "emergencyWithdraw",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "campaignMilestones",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "completed",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "voteRequested",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "fundsReleased",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "approvals",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rejections",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_offset",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_limit",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "getActiveCampaigns",
-    outputs: [
+    "name": "campaigns",
+    "outputs": [
       {
-        components: [
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataHash",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "targetAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "raisedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "withdrawn",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "contributorsCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
+    ],
+    "name": "contributeToCampaign",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "contributions",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_description",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_metadataHash",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_targetAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_duration",
+        "type": "uint256"
+      }
+    ],
+    "name": "createCampaign",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
+    ],
+    "name": "deactivateCampaign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_contributor",
+        "type": "address"
+      }
+    ],
+    "name": "emergencyRefund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "emergencyWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_offset",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_limit",
+        "type": "uint256"
+      }
+    ],
+    "name": "getActiveCampaigns",
+    "outputs": [
+      {
+        "components": [
           {
-            internalType: "uint256",
-            name: "id",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
           },
           {
-            internalType: "address payable",
-            name: "creator",
-            type: "address",
+            "internalType": "address payable",
+            "name": "creator",
+            "type": "address"
           },
           {
-            internalType: "string",
-            name: "title",
-            type: "string",
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "description",
-            type: "string",
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "metadataHash",
-            type: "string",
+            "internalType": "string",
+            "name": "metadataHash",
+            "type": "string"
           },
           {
-            internalType: "uint256",
-            name: "targetAmount",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "targetAmount",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "raisedAmount",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "raisedAmount",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "deadline",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "deadline",
+            "type": "uint256"
           },
           {
-            internalType: "bool",
-            name: "withdrawn",
-            type: "bool",
+            "internalType": "bool",
+            "name": "withdrawn",
+            "type": "bool"
           },
           {
-            internalType: "bool",
-            name: "active",
-            type: "bool",
+            "internalType": "bool",
+            "name": "active",
+            "type": "bool"
           },
           {
-            internalType: "uint256",
-            name: "createdAt",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "contributorsCount",
-            type: "uint256",
-          },
+            "internalType": "uint256",
+            "name": "contributorsCount",
+            "type": "uint256"
+          }
         ],
-        internalType: "struct CrowdfundingMarketplace.Campaign[]",
-        name: "",
-        type: "tuple[]",
-      },
+        "internalType": "struct CrowdfundingMarketplace.Campaign[]",
+        "name": "",
+        "type": "tuple[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "getCampaign",
-    outputs: [
+    "name": "getCampaign",
+    "outputs": [
       {
-        components: [
+        "components": [
           {
-            internalType: "uint256",
-            name: "id",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
           },
           {
-            internalType: "address payable",
-            name: "creator",
-            type: "address",
+            "internalType": "address payable",
+            "name": "creator",
+            "type": "address"
           },
           {
-            internalType: "string",
-            name: "title",
-            type: "string",
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "description",
-            type: "string",
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "metadataHash",
-            type: "string",
+            "internalType": "string",
+            "name": "metadataHash",
+            "type": "string"
           },
           {
-            internalType: "uint256",
-            name: "targetAmount",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "targetAmount",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "raisedAmount",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "raisedAmount",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "deadline",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "deadline",
+            "type": "uint256"
           },
           {
-            internalType: "bool",
-            name: "withdrawn",
-            type: "bool",
+            "internalType": "bool",
+            "name": "withdrawn",
+            "type": "bool"
           },
           {
-            internalType: "bool",
-            name: "active",
-            type: "bool",
+            "internalType": "bool",
+            "name": "active",
+            "type": "bool"
           },
           {
-            internalType: "uint256",
-            name: "createdAt",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "contributorsCount",
-            type: "uint256",
-          },
+            "internalType": "uint256",
+            "name": "contributorsCount",
+            "type": "uint256"
+          }
         ],
-        internalType: "struct CrowdfundingMarketplace.Campaign",
-        name: "",
-        type: "tuple",
-      },
+        "internalType": "struct CrowdfundingMarketplace.Campaign",
+        "name": "",
+        "type": "tuple"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "getCampaignContributions",
-    outputs: [
+    "name": "getCampaignContributions",
+    "outputs": [
       {
-        components: [
+        "components": [
           {
-            internalType: "address",
-            name: "contributor",
-            type: "address",
+            "internalType": "address",
+            "name": "contributor",
+            "type": "address"
           },
           {
-            internalType: "uint256",
-            name: "amount",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
           },
           {
-            internalType: "uint256",
-            name: "timestamp",
-            type: "uint256",
-          },
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
         ],
-        internalType: "struct CrowdfundingMarketplace.Contribution[]",
-        name: "",
-        type: "tuple[]",
-      },
+        "internalType": "struct CrowdfundingMarketplace.Contribution[]",
+        "name": "",
+        "type": "tuple[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "getCampaignStats",
-    outputs: [
+    "name": "getCampaignStats",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "raisedAmount",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "raisedAmount",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "targetAmount",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "targetAmount",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "contributorsCount",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "contributorsCount",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "timeLeft",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "timeLeft",
+        "type": "uint256"
       },
       {
-        internalType: "bool",
-        name: "isActive",
-        type: "bool",
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
       },
       {
-        internalType: "bool",
-        name: "isSuccessful",
-        type: "bool",
-      },
+        "internalType": "bool",
+        "name": "isSuccessful",
+        "type": "bool"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "getContractStats",
-    outputs: [
+    "inputs": [],
+    "name": "getContractStats",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "totalCampaigns",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "totalCampaigns",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "totalFees",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "totalFees",
+        "type": "uint256"
       },
       {
-        internalType: "uint256",
-        name: "contractBalance",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "contractBalance",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
       },
       {
-        internalType: "address",
-        name: "_contributor",
-        type: "address",
-      },
+        "internalType": "address",
+        "name": "_contributor",
+        "type": "address"
+      }
     ],
-    name: "getContribution",
-    outputs: [
+    "name": "getContribution",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
       },
       {
-        internalType: "string",
-        name: "_title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_description",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_milestoneIndex",
+        "type": "uint256"
+      }
     ],
-    name: "addCampaignMilestone",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "getMilestone",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "completed",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "voteRequested",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "fundsReleased",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "approvals",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rejections",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "createdAt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_milestoneIndex",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "requestMilestoneVote",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "getMilestoneCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_milestoneIndex",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "_approve",
-        type: "bool",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "voteOnMilestone",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "getMilestones",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "completed",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "voteRequested",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "fundsReleased",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "approvals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rejections",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct CrowdfundingMarketplace.Milestone[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_milestoneIndex",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "releaseMilestoneFunds",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "getRefund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "getMilestoneCount",
-    outputs: [
+    "name": "getReleasedAmount",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_milestoneIndex",
-        type: "uint256",
-      },
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
-    name: "getMilestone",
-    outputs: [
+    "name": "getUserCampaigns",
+    "outputs": [
       {
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "description",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "completed",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "voteRequested",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "fundsReleased",
-        type: "bool",
-      },
-      {
-        internalType: "uint256",
-        name: "approvals",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "rejections",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "createdAt",
-        type: "uint256",
-      },
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_milestoneIndex",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_contributor",
-        type: "address",
-      },
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
     ],
-    name: "hasVotedOnMilestone",
-    outputs: [
+    "name": "getUserContributions",
+    "outputs": [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "_milestoneIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_contributor",
+        "type": "address"
+      }
     ],
-    name: "getRefund",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "hasVotedOnMilestone",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_user",
-        type: "address",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    name: "getUserCampaigns",
-    outputs: [
+    "name": "isCampaignSuccessful",
+    "outputs": [
       {
-        internalType: "uint256[]",
-        name: "",
-        type: "uint256[]",
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_user",
-        type: "address",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       },
-    ],
-    name: "getUserContributions",
-    outputs: [
       {
-        internalType: "uint256[]",
-        name: "",
-        type: "uint256[]",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "milestoneVoted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
     ],
-    name: "isCampaignSuccessful",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "owner",
-    outputs: [
+    "inputs": [],
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "pause",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "paused",
-    outputs: [
+    "inputs": [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "reactivateCampaign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "_milestoneIndex",
+        "type": "uint256"
+      }
     ],
-    name: "reactivateCampaign",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "releaseMilestoneFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "renounceOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "totalFeesCollected",
-    outputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "releasedAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "unpause",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_milestoneIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "requestMilestoneVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "totalFeesCollected",
+    "outputs": [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "userCampaigns",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
-    name: "userContributions",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_campaignId",
-        type: "uint256",
-      },
-    ],
-    name: "withdrawCampaignFunds",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "inputs": [],
+    "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: "withdrawFees",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "userCampaigns",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    stateMutability: "payable",
-    type: "receive",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "userContributions",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_milestoneIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_approve",
+        "type": "bool"
+      }
+    ],
+    "name": "voteOnMilestone",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_campaignId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawCampaignFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
 ];

@@ -104,8 +104,8 @@ export default function Sidebar({
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
   const sidebarWidthClass = isOpen
-    ? `w-64 ${isCollapsed ? "md:w-16" : "md:w-64"}`
-    : `w-16 ${isCollapsed ? "md:w-16" : "md:w-64"}`;
+    ? `w-56 ${isCollapsed ? "md:w-16" : "md:w-56"}`
+    : `w-16 ${isCollapsed ? "md:w-16" : "md:w-56"}`;
 
   const handleCopyAddress = async () => {
     if (!address) return;
@@ -137,13 +137,13 @@ export default function Sidebar({
     "No email";
 
   const walletPanel = (
-    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900/95">
+    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white">Wallet</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Wallet</p>
         <button
           type="button"
           onClick={() => setIsWalletOpen(false)}
-          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
         >
           ✕
         </button>
@@ -151,40 +151,40 @@ export default function Sidebar({
 
         {!isConnected ? (
           <div className="mt-4 space-y-3">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Wallet not connected</p>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
+            <p className="text-sm text-slate-500 dark:text-[#94A3B8]">Wallet not connected</p>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-navy-600 dark:bg-navy-500">
               {openConnectModal ? (
                 <button
                   type="button"
                   onClick={() => openConnectModal()}
-                  className="w-full rounded-2xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  className="w-full rounded-2xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600"
                 >
                   Connect Wallet
                 </button>
               ) : (
-                <div className="text-sm text-slate-500 dark:text-slate-400">Connect wallet unavailable</div>
+                <div className="text-sm text-slate-500 dark:text-[#94A3B8]">Connect wallet unavailable</div>
               )}
             </div>
           </div>
         ) : (
           <div className="mt-4 space-y-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Balance</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Balance</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-[#F8FAFC]">
                 {formattedBalance || "0 ETH"}
               </p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Address</p>
-              <div className="mt-1 flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 dark:bg-slate-800">
-                <span className="truncate text-sm text-slate-700 dark:text-slate-200">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Address</p>
+              <div className="mt-1 flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 dark:bg-navy-500">
+                <span className="truncate text-sm text-slate-700 dark:text-[#CBD5E1]">
                   {shortenedAddress || "No address"}
                 </span>
                 <button
                   type="button"
                   onClick={handleCopyAddress}
-                  className="ml-auto rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                  className="ml-auto rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
                   title="Copy address"
                 >
                   {copied ? <FiCheck className="h-4 w-4" /> : <FiCopy className="h-4 w-4" />}
@@ -193,19 +193,19 @@ export default function Sidebar({
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Network</p>
-              <p className="mt-1 text-sm font-medium text-slate-900 dark:text-white">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Network</p>
+              <p className="mt-1 text-sm font-medium text-slate-900 dark:text-[#F8FAFC]">
                 {networkLabel}
               </p>
               {networkDetail && (
-                <p className="text-xs text-slate-500 dark:text-slate-400">{networkDetail}</p>
+                <p className="text-xs text-slate-500 dark:text-[#94A3B8]">{networkDetail}</p>
               )}
             </div>
 
             <button
               type="button"
               onClick={() => disconnect()}
-              className="w-full rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400"
+              className="w-full rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-[rgba(239,68,68,0.10)] dark:text-[#EF4444]"
             >
               Disconnect Wallet
             </button>
@@ -215,19 +215,19 @@ export default function Sidebar({
   );
 
   const profilePanel = (
-    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900/95">
+    <div className="fixed bottom-6 left-20 z-[90] w-full max-w-sm rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white">Profile</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Profile</p>
         <button
           type="button"
           onClick={() => setIsProfileOpen(false)}
-          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
         >
           ✕
         </button>
       </div>
       <div className="mt-4 space-y-4">
-        <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-3 dark:bg-slate-800">
+        <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-3 dark:bg-navy-500">
           {user?.imageUrl ? (
             <img
               src={user.imageUrl}
@@ -235,19 +235,19 @@ export default function Sidebar({
               className="h-12 w-12 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-navy-600 dark:text-[#CBD5E1]">
               <FiUser className="h-6 w-6" />
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-slate-900 dark:text-white">{userFullName}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{userEmail}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">{userFullName}</p>
+            <p className="text-xs text-slate-500 dark:text-[#94A3B8]">{userEmail}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => openUserProfile?.()}
-          className="w-full rounded-2xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="w-full rounded-2xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600"
         >
           Manage profile
         </button>
@@ -268,10 +268,10 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-[86px] bottom-6 left-3 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-darkb border border-secondary dark:border-gray-450 z-40 transition-all duration-300 ease-out
+        fixed top-[86px] bottom-6 left-3 bg-[#e6e6e6]/60 backdrop-blur-md dark:bg-navy-100 border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
-        rounded-3xl overflow-y-auto flex flex-col
+        rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
       `}
       >
         {/* Header */}
@@ -285,22 +285,23 @@ export default function Sidebar({
             const isActive = router.pathname === item.path;
 
             return (
-              <div key={item.id} className="relative flex items-center justify-center overflow-visible group">
+              <div key={item.id} className={`relative flex items-center overflow-visible group ${isCollapsed ? "justify-center" : "justify-start"}`}>
                 <Link
                   href={item.path}
                 className={`
-                  flex items-center justify-center px-3 py-3 rounded-4xl transition-all duration-300
+                  flex items-center px-3 py-3 rounded-4xl transition-all duration-300 w-full
+                  ${isCollapsed ? "justify-center" : "justify-start gap-3"}
                   ${
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-600"
-                      : "text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      ? "bg-indigo-500/10 dark:bg-[rgba(99,102,241,0.14)] text-indigo-500 dark:text-[#A5B4FC] border border-indigo-500 dark:border-indigo-500"
+                      : "text-gray-700 dark:text-[#CBD5E1] hover:bg-gray-50 dark:hover:bg-navy-500"
                   }
                 `}
                 title={item.label}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!isCollapsed && (
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium text-sm">{item.label}</span>
                 )}
               </Link>
                 <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1 dark:bg-slate-200 dark:text-slate-950">
@@ -315,7 +316,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="flex w-full items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+            className="flex w-full items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-navy-600 dark:bg-navy-500 dark:text-slate-100 dark:hover:bg-navy-500"
           >
             <FiChevronLeft
               className={`h-4 w-4 transition-transform ${isCollapsed ? "-rotate-180" : "rotate-0"}`}
@@ -326,14 +327,14 @@ export default function Sidebar({
 
         {/* Connection Status */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-t border-gray-200 dark:border-navy-600">
             <div
               className={`
               flex items-center space-x-2 px-3 py-2 rounded-2xl
               ${
                 isConnected
                   ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                  : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                  : "bg-red-50 dark:bg-[rgba(239,68,68,0.10)] text-red-700 dark:text-[#EF4444]"
               }
             `}
             >
@@ -348,65 +349,74 @@ export default function Sidebar({
             </div>
 
             {isConnected && address && (
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 px-3">
+              <div className="mt-2 text-xs text-gray-500 dark:text-[#94A3B8] px-3">
                 {address.slice(0, 6)}...{address.slice(-4)}
               </div>
             )}
           </div>
         )}
 
-        <div className="mt-auto border-t border-gray-200/80 p-2 dark:border-gray-700/80">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-center">
-              <div className="group relative overflow-visible">
+        <div className="mt-auto border-t border-gray-200/80 p-2 dark:border-navy-600/80">
+          <div className="flex flex-col gap-1">
+            {/* Wallet button */}
+            <div className="relative overflow-visible">
+              <button
+                type="button"
+                onClick={openWalletPanel}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                  isCollapsed ? "justify-center" : "justify-start ml-2"
+                } ${
+                  isWalletOpen
+                    ? "bg-indigo-500/10 text-indigo-500 dark:bg-[rgba(99,102,241,0.14)] dark:text-[#A5B4FC]"
+                    : "text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500 "
+                }`}
+                title="Your Wallet"
+              >
+                <FiCreditCard className="h-5 w-5 flex-shrink-0" />
+                {!isCollapsed && <span className="truncate">Your Wallet</span>}
+              </button>
+              {isCollapsed && (
+                <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1 dark:bg-slate-200 dark:text-slate-950">
+                  Your Wallet
+                </span>
+              )}
+              {mounted && isWalletOpen && createPortal(walletPanel, document.body)}
+            </div>
+
+            {/* Profile button */}
+            <div className="relative overflow-visible">
+              {isSignedIn ? (
                 <button
                   type="button"
-                  onClick={openWalletPanel}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition ${
-                    isWalletOpen
-                      ? "border-blue-600 bg-blue-50 text-blue-600 dark:border-blue-400 dark:bg-blue-900/20 dark:text-blue-400"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 dark:hover:border-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                  }`}
-                  title="Wallet"
+                  onClick={openProfilePanel}
+                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                    isCollapsed ? "justify-center" : "justify-start"
+                  } text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500`}
+                  title={userFullName || "User Profile"}
                 >
-                  <FiCreditCard className="h-5 w-5" />
-                </button>
-                <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1 dark:bg-slate-200 dark:text-slate-950">
-                  Wallet
-                </span>
-                {mounted && isWalletOpen && createPortal(walletPanel, document.body)}
-              </div>
-            </div>
-              <div className="flex items-center justify-center">
-              <div className="group relative flex items-center justify-center overflow-visible">
-                {isSignedIn ? (
-                  <button
-                    type="button"
-                    onClick={openProfilePanel}
-                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 dark:hover:border-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                    title="Profile"
-                  >
+                  <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
                     {user?.imageUrl ? (
                       <img src={user.imageUrl} alt="Profile" className="h-full w-full object-cover" />
                     ) : (
                       <FiUser className="h-5 w-5" />
                     )}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => window.location.assign("/sign-in")}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-100 dark:hover:border-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                    title="Profile"
-                  >
-                    <FiUser className="h-5 w-5" />
-                  </button>
-                )}
-                <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1 dark:bg-slate-200 dark:text-slate-950">
-                  Profile
-                </span>
-                {mounted && isProfileOpen && createPortal(profilePanel, document.body)}
-              </div>
+                  </div>
+                  {!isCollapsed && <span className="truncate">{userFullName || "User Profile"}</span>}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => window.location.assign("/sign-in")}
+                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                    isCollapsed ? "justify-center" : "justify-start"
+                  } text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500`}
+                  title="User Profile"
+                >
+                  <FiUser className="h-5 w-5 flex-shrink-0" />
+                  {!isCollapsed && <span className="truncate">User Profile</span>}
+                </button>
+              )}
+              {mounted && isProfileOpen && createPortal(profilePanel, document.body)}
             </div>
           </div>
         </div>

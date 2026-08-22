@@ -4,8 +4,8 @@ const nextConfig = {
   swcMinify: true,
 
   images: {
-    domains: ["gateway.pinata.cloud", "ipfs.io", "cloudflare-ipfs.com"],
-    unoptimized: true, // For static export
+    domains: ["gateway.pinata.cloud", "ipfs.io", "cloudflare-ipfs.com", "cloudflare-ipfs.com"],
+    unoptimized: true, // Required for static export compatibility
   },
 
   // Enable static export
@@ -19,60 +19,6 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-      };
-    }
-
-    // Global hydration error suppression
-    if (!isServer) {
-      const originalEntry = config.entry;
-      config.entry = async () => {
-        const entries = await originalEntry();
-
-        // Add hydration error suppression to all entries
-        const hydrationSuppressor = `
-          if (typeof window !== 'undefined') {
-            const originalError = console.error;
-            const originalWarn = console.warn;
-            
-            console.error = function(...args) {
-              const message = args[0];
-              if (typeof message === 'string' && (
-                message.includes('Hydration failed') ||
-                message.includes('Text content did not match') ||
-                message.includes('Server HTML') ||
-                message.includes('client-side rendered') ||
-                message.includes('Expected server HTML to contain') ||
-                message.includes('react-hydration-error')
-              )) {
-                return;
-              }
-              return originalError.apply(console, args);
-            };
-            
-            console.warn = function(...args) {
-              const message = args[0];
-              if (typeof message === 'string' && (
-                message.includes('Expected server HTML') ||
-                message.includes('hydration') ||
-                message.includes('useLayoutEffect does nothing on the server')
-              )) {
-                return;
-              }
-              return originalWarn.apply(console, args);
-            };
-          }
-        `;
-
-        // Inject suppression code into main entries
-        Object.keys(entries).forEach((key) => {
-          if (Array.isArray(entries[key])) {
-            entries[key].unshift(
-              `data:text/javascript,${encodeURIComponent(hydrationSuppressor)}`
-            );
-          }
-        });
-
-        return entries;
       };
     }
 

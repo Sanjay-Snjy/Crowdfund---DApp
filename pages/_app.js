@@ -72,7 +72,7 @@ function MyApp({ Component, pageProps }) {
             }}
           ></div>
           <div style={{ fontSize: "18px", fontWeight: "500" }}>
-            Initializing Supply Chain DApp...
+            Initializing CrowdFund DApp...
           </div>
         </div>
         <style jsx>{`

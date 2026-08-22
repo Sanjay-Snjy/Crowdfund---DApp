@@ -107,7 +107,7 @@ function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddres
 
   return (
     <div
-      className={`overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950 ${
+      className={`overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-navy-600 dark:bg-navy-300 ${
         isListView ? "flex flex-col md:flex-row" : "flex flex-col"
       }`}
     >
@@ -120,7 +120,7 @@ function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddres
             className="h-full w-full object-cover transition duration-500 ease-out hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-slate-100 text-5xl font-bold text-slate-300 dark:bg-slate-900 dark:text-slate-600">
+          <div className="flex h-full items-center justify-center bg-slate-100 text-5xl font-bold text-slate-300 dark:bg-navy-400 dark:text-slate-600">
             {campaign.title?.charAt(0) || "C"}
           </div>
         )}
@@ -136,7 +136,7 @@ function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddres
       <div className={`flex flex-1 flex-col justify-between ${isListView ? "p-5 md:p-6" : "p-5"}`}>
         <div className="space-y-2">
           <div>
-            <h3 className="text-3d font-semibold text-slate-950 dark:text-white -mt-2">
+            <h3 className="text-3d font-semibold text-slate-950 dark:text-slate-50 -mt-2">
               {campaign.title}
             </h3>
             {isListView && campaign.description && (
@@ -150,26 +150,26 @@ function TopCampaignCard({ campaign, creatorProfile, metadata, currentUserAddres
           </div>
 
           <div className="grid gap-2 sm:grid-cols-3 -mt-6">
-            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-navy-400">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Raised</p>
-              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{raised} ETH</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-slate-50">{raised} ETH</p>
             </div>
-            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-navy-400">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Target</p>
-              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{target} ETH</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-slate-50">{target} ETH</p>
             </div>
-            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-slate-900">
+            <div className="rounded-3xl bg-slate-50 p-3 dark:bg-navy-400">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Progress</p>
-              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-white">{Math.round(progress)}%</p>
+              <p className="mt-2 text-base font-semibold text-slate-950 dark:text-slate-50">{Math.round(progress)}%</p>
             </div>
           </div>
 
-          <div className="rounded-3xl bg-slate-100 py-1 px-2 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+          <div className="rounded-3xl bg-slate-100 py-1 px-2 text-xs text-slate-500 dark:bg-navy-400 dark:text-slate-400">
             {timeLeft.text} left · {campaign.contributorsCount || 0} backers
           </div>
         </div>
 
-        <Link href={`/campaign/${campaign.id}`} className="mt-4 block rounded-3xl bg-blue-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
+        <Link href={`/campaign/${campaign.id}`} className="mt-4 block rounded-3xl bg-indigo-500 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-indigo-600">
           View campaign
         </Link>
       </div>
@@ -206,6 +206,7 @@ export default function TopPage() {
   const [creatorProfiles, setCreatorProfiles] = useState({});
   const loadedCreatorAddresses = useRef(new Set());
   const [campaignMetadataMap, setCampaignMetadataMap] = useState({});
+  const fetchedMetadataIdsRef = useRef(new Set());
 
   const displayedCampaigns = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -279,7 +280,6 @@ export default function TopPage() {
 
   useEffect(() => {
     if (!campaigns?.length) {
-      setCampaignMetadataMap({});
       return;
     }
 
@@ -287,9 +287,10 @@ export default function TopPage() {
       const entries = await Promise.all(
         campaigns.map(async (campaign) => {
           const id = campaign.id?.toString?.();
-          if (!id || campaignMetadataMap[id] || !campaign.metadataHash) {
+          if (!id || fetchedMetadataIdsRef.current.has(id) || !campaign.metadataHash) {
             return null;
           }
+          fetchedMetadataIdsRef.current.add(id);
 
           const result = await getFromIPFS(campaign.metadataHash);
           return result.success
@@ -312,7 +313,7 @@ export default function TopPage() {
     };
 
     fetchMetadataForCampaigns();
-  }, [campaigns, campaignMetadataMap]);
+  }, [campaigns]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -368,7 +369,7 @@ export default function TopPage() {
   return (
     <Layout>
       <div className="space-y-6 -mt-[18px] ml-1">
-        <section className="relative overflow-hidden h-[328px] rounded-[32px] border border-slate-200/70 bg-slate-900 p-0 text-white ">
+        <section className="relative overflow-hidden h-[328px] rounded-[32px] border border-slate-200/20 bg-slate-900 p-0 text-white ">
       <div className="absolute inset-0">
   {HERO_SLIDES.map((slide, index) => (
     <div
@@ -393,7 +394,7 @@ export default function TopPage() {
 
           <div className="relative z-10 flex flex-col gap-6 p-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur">
+              <div className="inline-flex items-center gap-2 rounded-full  bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur">
                 <FiGrid className="h-4 w-4" />
                 Campaign marketplace
               </div>
@@ -437,7 +438,7 @@ export default function TopPage() {
 
 
         <section className="rounded-[32px] ">
-            <div className="rounded-[32px]  bg-[#e6e6e6]/0 border border-transparent px-6 py-4 dark:border-slate-700 dark:bg-slate-900">
+            <div className="rounded-[32px]  bg-[#e6e6e6]/40 backdrop-blur-md border border-secondary px-6 py-6 dark:border-navy-600 dark:bg-navy-400">
                       <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
                         <div className="relative">
                           <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
@@ -446,28 +447,28 @@ export default function TopPage() {
                             placeholder="Search campaigns"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-500 dark:text-slate-50"
                           />
                         </div>
             
                         <div className="flex flex-wrap items-center justify-end gap-3">
                           <FiFilter className="mr-2 h-6 w-6 text-slate-500" />
-                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-navy-600 dark:bg-navy-500">
                             <select
                               value={filterStatus}
                               onChange={(e) => setFilterStatus(e.target.value)}
-                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-white"
+                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-slate-50"
                             >
                               <option value="all">All statuses</option>
                               <option value="active">Active</option>
                               <option value="funded">Funded</option>
                             </select>
                           </div>
-                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-navy-600 dark:bg-navy-500">
                             <select
                               value={sortBy}
                               onChange={(e) => setSortBy(e.target.value)}
-                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-white"
+                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-slate-50"
                             >
                               <option value="newest">Newest first</option>
                               <option value="ending">Ending soon</option>
@@ -480,22 +481,22 @@ export default function TopPage() {
             
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="ml-[0px] grid max-w-xl gap-4 md:grid-cols-3">
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-navy-600 dark:bg-navy-400">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Total campaigns</p>
-                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{totalCampaigns}</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">{totalCampaigns}</p>
               </div>
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-navy-600 dark:bg-navy-400">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
-                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{activeCampaigns}</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">{activeCampaigns}</p>
               </div>
-              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-[24px] border border-slate-200/70 bg-white p-2 text-center shadow-sm dark:border-navy-600 dark:bg-navy-400">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Funded campaigns</p>
-                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{fundedCampaigns}</p>
+                <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50">{fundedCampaigns}</p>
               </div>
             </div>
             <div className="ml-2">
                 <p className="text-sm text-slate-500 dark:text-slate-400">Showing</p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
+                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-50">
                   {sortedCampaigns.length} campaigns
                 </p>
             </div>
@@ -504,8 +505,8 @@ export default function TopPage() {
                             onClick={() => setViewMode("grid")}
                             className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
                               viewMode === "grid"
-                                ? "bg-blue-600 text-white"
-                                : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                                ? "bg-indigo-500 text-white"
+                                : "bg-slate-100 shadow-sm dark:bg-navy-500 dark:text-slate-300"
                             }`}
                           >
                             <FiGrid className="h-5 w-5" />
@@ -514,8 +515,8 @@ export default function TopPage() {
                             onClick={() => setViewMode("list")}
                             className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
                               viewMode === "list"
-                                ? "bg-blue-600 text-white"
-                                : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                                ? "bg-indigo-500 text-white"
+                                : "bg-slate-100 shadow-sm dark:bg-navy-500 dark:text-slate-300"
                             }`}
                           >
                             <FiList className="h-5 w-5" />
@@ -526,7 +527,7 @@ export default function TopPage() {
                       
                     </div>
          
-          <div className="flex items-center justify-between gap-4 ml-[50px] flex-wrap">
+          <div className="flex items-center justify-between gap-4 ml-[20px] mt-6 flex-wrap">
             <div className="flex overflow-x-auto no-scrollbar gap-2 py-2">
               {CATEGORIES.map((category) => {
                 const isActive = category === activeCategory;
@@ -537,8 +538,8 @@ export default function TopPage() {
                     onClick={() => setActiveCategory(category)}
                     className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                       isActive
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                        ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-navy-500 dark:text-slate-200 dark:hover:bg-navy-500"
                     }`}
                   >
                     {category}
@@ -550,10 +551,10 @@ export default function TopPage() {
           </div>
         </section>
 
-        <section className="rounded-[32px] bg-transparent  px-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <section className="rounded-[32px] bg-transparent px-4">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="mt-0 ml-2 text-2xl font-semibold text-slate-900 dark:text-white">
+              <h2 className="mt-0 ml-2 text-2xl font-semibold text-slate-900 dark:text-slate-50">
                 {activeCategory} campaigns
               </h2>
             </div>
@@ -563,7 +564,7 @@ export default function TopPage() {
           {isLoading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="h-96 animate-pulse rounded-[32px] bg-slate-200 dark:bg-slate-800" />
+                <div key={index} className="h-96 animate-pulse rounded-[32px] bg-slate-200 dark:bg-navy-500" />
               ))}
             </div>
           ) : displayedCampaigns.length > 0 ? (
@@ -581,8 +582,8 @@ export default function TopPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-700 dark:bg-slate-900">
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+            <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-navy-600 dark:bg-navy-400">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
                 No campaigns found in this category
               </h3>
               <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">

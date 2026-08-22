@@ -103,14 +103,6 @@ export const useContract = () => {
       }
     );
 
-    console.log("Hook returns:", {
-      write,
-      writeAsync,
-      isLoading,
-      isSuccess,
-      error,
-    });
-
     return {
       contribute: write,
       contributeAsync: writeAsync,
@@ -269,8 +261,8 @@ export const useContract = () => {
       functionName: "getMilestoneCount",
       args: campaignId ? [campaignId] : undefined,
       enabled: Boolean(campaignId && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -285,8 +277,8 @@ export const useContract = () => {
           : undefined,
       enabled:
         Boolean(campaignId !== undefined && milestoneIndex !== undefined && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -301,79 +293,49 @@ export const useContract = () => {
           : undefined,
       enabled:
         Boolean(campaignId !== undefined && milestoneIndex !== undefined && contributor && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
   const useCampaignMilestones = (campaignId) => {
-    const { data: milestoneCount, isLoading: loadingCount } = useMilestoneCount(
-      campaignId
-    );
-
-    const count = milestoneCount
-      ? Number(milestoneCount.toString())
-      : 0;
-
-    const milestoneCalls = useMemo(() => {
-      if (!campaignId || count === 0) return [];
-      return Array.from({ length: count }, (_, index) => ({
-        address: CONTRACT_ADDRESS,
-        abi: CROWDFUNDING_ABI,
-        functionName: "getMilestone",
-        args: [campaignId, index],
-      }));
-    }, [campaignId, count]);
-
     const {
-      data: milestoneData,
+      data: milestones,
       isLoading: loadingMilestones,
       error: milestoneError,
-    } = useContractReads({
-      contracts: milestoneCalls,
-      enabled: milestoneCalls.length > 0,
-      watch: true,
+    } = useContractRead({
+      address: CONTRACT_ADDRESS,
+      abi: CROWDFUNDING_ABI,
+      functionName: "getMilestones",
+      args: campaignId ? [campaignId] : undefined,
+      enabled: Boolean(campaignId && CONTRACT_ADDRESS),
+      cacheTime: 30000,
+      staleTime: 5000,
     });
 
-    const milestones = useMemo(() => {
-      if (!milestoneData) return [];
-      return milestoneData
-        .map((result, index) => {
-          if (result.status === "success") {
-            const [
-              title,
-              description,
-              amount,
-              completed,
-              voteRequested,
-              fundsReleased,
-              approvals,
-              rejections,
-              createdAt,
-            ] = result.result;
-            return {
-              campaignId,
-              index,
-              title,
-              description,
-              amount,
-              completed,
-              voteRequested,
-              fundsReleased,
-              approvals,
-              rejections,
-              createdAt,
-            };
-          }
-          return null;
-        })
-        .filter(Boolean);
-    }, [milestoneData, campaignId]);
+    const count = milestones ? milestones.length : 0;
+
+    const processedMilestones = useMemo(() => {
+      if (!milestones) return [];
+      return milestones.map((m, index) => ({
+        campaignId,
+        index,
+        title: m.title,
+        description: m.description,
+        amount: m.amount,
+        completed: m.completed,
+        voteRequested: m.voteRequested,
+        fundsReleased: m.fundsReleased,
+        approvals: m.approvals,
+        rejections: m.rejections,
+        createdAt: m.createdAt,
+      }));
+    }, [milestones, campaignId]);
 
     return {
-      data: milestones,
+      data: processedMilestones,
       count,
-      isLoading: loadingCount || loadingMilestones,
+      isLoading: loadingMilestones,
       error: milestoneError,
     };
   };
@@ -386,8 +348,8 @@ export const useContract = () => {
       functionName: "getCampaign",
       args: [campaignId],
       enabled: Boolean(campaignId && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -398,8 +360,8 @@ export const useContract = () => {
       functionName: "getActiveCampaigns",
       args: [offset, limit],
       enabled: Boolean(CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 10000,
     });
   };
 
@@ -410,8 +372,8 @@ export const useContract = () => {
       functionName: "getUserCampaigns",
       args: [userAddress],
       enabled: Boolean(userAddress && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -422,8 +384,8 @@ export const useContract = () => {
       functionName: "getUserContributions",
       args: [userAddress],
       enabled: Boolean(userAddress && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -434,8 +396,8 @@ export const useContract = () => {
       functionName: "getCampaignStats",
       args: [campaignId],
       enabled: Boolean(campaignId && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -445,11 +407,10 @@ export const useContract = () => {
       abi: CROWDFUNDING_ABI,
       functionName: "getContractStats",
       enabled: Boolean(CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 10000,
     });
 
-    // Transform the array response to an object for easier use
     const processedData = rawStats
       ? {
           totalCampaigns: rawStats[0],
@@ -460,7 +421,7 @@ export const useContract = () => {
 
     return {
       data: processedData,
-      rawData: rawStats, // Keep raw data available if needed
+      rawData: rawStats,
       ...rest,
     };
   };
@@ -472,8 +433,8 @@ export const useContract = () => {
       functionName: "getContribution",
       args: [campaignId, contributorAddress],
       enabled: Boolean(campaignId && contributorAddress && CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -502,7 +463,7 @@ export const useContract = () => {
     } = useContractReads({
       contracts: campaignContracts,
       enabled: campaignContracts.length > 0,
-      watch: true,
+      staleTime: 5000,
     });
 
     useEffect(() => {
@@ -631,7 +592,7 @@ export const useContract = () => {
     } = useContractReads({
       contracts: contractCalls,
       enabled: contractCalls.length > 0,
-      watch: true,
+      staleTime: 5000,
     });
 
     useEffect(() => {
@@ -870,8 +831,8 @@ export const useContract = () => {
       abi: CROWDFUNDING_ABI,
       functionName: "paused",
       enabled: Boolean(CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 30000,
+      staleTime: 5000,
     });
   };
 
@@ -881,8 +842,8 @@ export const useContract = () => {
       abi: CROWDFUNDING_ABI,
       functionName: "owner",
       enabled: Boolean(CONTRACT_ADDRESS),
-      watch: true,
       cacheTime: 60000,
+      staleTime: 30000,
     });
   };
 

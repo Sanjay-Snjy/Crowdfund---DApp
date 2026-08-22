@@ -78,7 +78,7 @@ export default function CampaignsPage() {
     <Layout>
       <div className="space-y-6">
     
-        <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
           <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr] xl:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="relative">
               <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
@@ -87,27 +87,27 @@ export default function CampaignsPage() {
                 placeholder="Search campaigns"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                className="w-full rounded-3xl border border-slate-300 bg-slate-50 px-12 py-3 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-500 dark:text-slate-50"
               />
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
-              <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-navy-600 dark:bg-navy-500">
                             <select
                               value={filterStatus}
                               onChange={(e) => setFilterStatus(e.target.value)}
-                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-white"
+                              className="w-full bg-transparent text-sm text-slate-900 rounded-2xl outline-none border border-transparent dark:text-slate-50"
                             >
                               <option value="all">All statuses</option>
                               <option value="active">Active</option>
                               <option value="funded">Funded</option>
                             </select>
                           </div>
-                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-slate-700 dark:bg-slate-800">
+                          <div className="flex min-w-[160px] flex-1 rounded-3xl border border-slate-300 bg-slate-50 px-2 py-[5px] dark:border-navy-600 dark:bg-navy-500">
                             <select
                               value={sortBy}
                               onChange={(e) => setSortBy(e.target.value)}
-                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-white"
+                              className="w-full bg-transparent text-sm text-slate-90 border border-transparent rounded-2xl outline-none dark:text-slate-50"
                             >
                               <option value="newest">Newest first</option>
                               <option value="ending">Ending soon</option>
@@ -120,8 +120,8 @@ export default function CampaignsPage() {
                 onClick={() => setViewMode("grid")}
                 className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
                   viewMode === "grid"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                    ? "bg-indigo-500 text-white"
+                    : "bg-slate-100 shadow-sm dark:bg-navy-500 dark:text-slate-300"
                 }`}
               >
                 <FiGrid className="h-5 w-5" />
@@ -130,8 +130,8 @@ export default function CampaignsPage() {
                 onClick={() => setViewMode("list")}
                 className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-slate-600 transition ${
                   viewMode === "list"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 shadow-sm dark:bg-slate-800 dark:text-slate-300"
+                    ? "bg-indigo-500 text-white"
+                    : "bg-slate-100 shadow-sm dark:bg-navy-500 dark:text-slate-300"
                 }`}
               >
                 <FiList className="h-5 w-5" />
@@ -145,11 +145,11 @@ export default function CampaignsPage() {
          
         </div>
 
-        <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="rounded-[32px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
           {isLoading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="h-96 animate-pulse rounded-[32px] bg-slate-200 dark:bg-slate-800" />
+                <div key={index} className="h-96 animate-pulse rounded-[32px] bg-slate-200 dark:bg-navy-500" />
               ))}
             </div>
           ) : sortedCampaigns.length > 0 ? (
@@ -166,8 +166,8 @@ export default function CampaignsPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-700 dark:bg-slate-900">
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+            <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-navy-600 dark:bg-navy-400">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
                 No campaigns match your filters
               </h3>
               <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">

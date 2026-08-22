@@ -391,25 +391,25 @@ export default function CreateCampaignForm() {
     <div className=" -mt-2 mx-auto -ml-[0.4px]  px-0 py-0">
       <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-0">
-          <div className=" rounded-[32px] border border-secondary bg-white/90 dark:bg-[#111827] dark:border-neutral-800 shadow-xl shadow-slate-200/40 px-8 py-2 sm:px-8 py-6">
+          <div className=" rounded-[32px] border border-secondary bg-white/90 dark:bg-navy-300 dark:border-neutral-800 px-8 py-2 sm:px-8 py-6">
             <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-600 dark:text-blue-300">
+              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-indigo-400 dark:text-indigo-300">
                 New campaign
               </p>
              
-              <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-slate-400">
+              <p className="mt-2 max-w-2xl text-sm sm:text-base text-slate-600 dark:text-[#94A3B8]">
                 Complete the form below to define your goal, story, and funding timeline.
               </p>
             </div>
 
-            <div className="rounded-3xl -mt-2 border border-blue-100 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/40 px-5 py-2 mb-4">
+            <div className="rounded-3xl -mt-2 border border-blue-100 dark:border-indigo-500/20 bg-indigo-500/10/80 dark:bg-[rgba(99,102,241,0.08)] px-5 py-2 mb-4">
               <div className="flex items-start gap-3">
-                <FiInfo className="mt-1 h-5 w-5 text-blue-600" />
+                <FiInfo className="mt-1 h-5 w-5 text-indigo-400" />
                 <div>
-                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-200">
+                  <p className="text-sm font-semibold text-indigo-400 dark:text-indigo-200">
                     Creation fee notice
                   </p>
-                  <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
+                  <p className="mt-1 text-sm text-slate-700 dark:text-[#CBD5E1]">
                     A fee of {formatEther(CAMPAIGN_CREATION_FEE)} ETH is required to create your campaign.
                   </p>
                 </div>
@@ -419,7 +419,7 @@ export default function CreateCampaignForm() {
             <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-2">
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                     Campaign Title
                   </label>
                   <input
@@ -428,12 +428,12 @@ export default function CreateCampaignForm() {
                     value={formData.title}
                     onChange={handleInputChange}
                     placeholder="Enter a compelling title"
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                     Campaign Description
                   </label>
                   <textarea
@@ -442,20 +442,20 @@ export default function CreateCampaignForm() {
                     onChange={handleInputChange}
                     rows={4}
                     placeholder="Describe your campaign, goals, and how funds will be used"
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
+                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100 resize-none"
                   />
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
                   <div>
-                    <label className="-mt-2  block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    <label className="-mt-2  block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                       Category
                     </label>
                     <select
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100"
                     >
                       {categories.map((category) => (
                         <option key={category} value={category}>
@@ -466,7 +466,7 @@ export default function CreateCampaignForm() {
                   </div>
 
                   <div>
-                    <label className="-mt-2 block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    <label className="-mt-2 block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                       Duration (Days)
                     </label>
                     <input
@@ -477,13 +477,13 @@ export default function CreateCampaignForm() {
                       min="1"
                       max="365"
                       placeholder="30"
-                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                      className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100"
                     />
                   </div>
                 </div>
                <div>
 <div>
-  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+  <label className="block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
     Target Amount (ETH)
   </label>
 
@@ -498,15 +498,15 @@ export default function CreateCampaignForm() {
         step="0.01"
         min="0.01"
         placeholder="0.00"
-        className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+        className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100"
       />
     </div>
 
     {/* Conversion Cards */}
     {rates && (
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-slate-700 dark:bg-slate-800">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-navy-600 dark:bg-navy-500">
+          <p className="text-xs font-medium text-slate-500 dark:text-[#94A3B8]">
             USD
           </p>
           <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
@@ -514,8 +514,8 @@ export default function CreateCampaignForm() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-slate-700 dark:bg-slate-800">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-1 dark:border-navy-600 dark:bg-navy-500">
+          <p className="text-xs font-medium text-slate-500 dark:text-[#94A3B8]">
             INR
           </p>
           <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
@@ -533,11 +533,11 @@ export default function CreateCampaignForm() {
                 
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                     Campaign Image
                   </label>
                   {imagePreview ? (
-                    <div className="relative overflow-hidden rounded-[28px] border border-slate-200 dark:border-slate-700">
+                    <div className="relative overflow-hidden rounded-[28px] border border-slate-200 dark:border-navy-600">
                       <img
                         src={imagePreview}
                         alt="Campaign preview"
@@ -552,13 +552,13 @@ export default function CreateCampaignForm() {
                       </button>
                     </div>
                   ) : (
-                    <label className="flex min-h-[140px] flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-blue-500 dark:border-slate-700 dark:bg-slate-950">
+                    <label className="flex min-h-[140px] flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-indigo-500 dark:border-navy-600 dark:bg-navy-300">
                       <FiUpload className="h-12 w-12 text-slate-400 dark:text-slate-500 mb-4" />
                       <div>
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                           Upload a campaign image
                         </p>
-                        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-2 text-sm text-slate-500 dark:text-[#94A3B8]">
                           PNG, JPG, GIF up to 10MB.
                         </p>
                       </div>
@@ -573,7 +573,7 @@ export default function CreateCampaignForm() {
                 </div>
 
                 <div>
-                  <label className="-mt-0 block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="-mt-0 block text-sm font-semibold text-slate-700 dark:text-[#CBD5E1] mb-2">
                     Additional Information
                   </label>
                   <textarea
@@ -582,18 +582,18 @@ export default function CreateCampaignForm() {
                     onChange={handleInputChange}
                     rows={3}
                     placeholder="Share extra context, milestones, or team details"
-                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 resize-none"
+                    className="w-full rounded-3xl border border-slate-300 bg-white px-5 py-4 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100 resize-none"
                   />
                 </div>
 
                 <div className="-mt-[40px] flex flex-col items-center justify-center gap-4">
-                  <p className="text-[12px] text-slate-500 dark:text-slate-400">
+                  <p className="text-[12px] text-slate-500 dark:text-[#94A3B8]">
                     Ensure your campaign is clear and achievable.
                   </p>
                   <button
                     type="submit"
                     disabled={isLoading || uploading}
-                    className="w-full -mt-1 rounded-3xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-[16px] text-md font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full -mt-1 rounded-3xl bg-gradient-to-r from-indigo-500 to-blue-500 px-8 py-[16px] text-md font-semibold text-white transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {uploading
                       ? "Uploading to IPFS..."
@@ -609,7 +609,7 @@ export default function CreateCampaignForm() {
 
         <aside className="space-y-6 w-[502px]">
           <div className="sticky top-24 rounded-[32px] border border-slate-800/80 bg-slate-950/90 p-6 text-white shadow-xl shadow-slate-900/20">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.32em] text-white dark:text-blue-300">Milestone Planner</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.32em] text-white dark:text-indigo-300">Milestone Planner</h3>
             <p className="mt-1 text-[15px] leading-6 text-slate-300">
               Define project milestones and allocate fund percentages.
             </p>

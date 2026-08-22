@@ -8,7 +8,7 @@ dotenv.config();
 export default defineConfig({
   plugins: [hardhatEthers, hardhatVerify],
   solidity: {
-    version: "0.8.19",
+    version: "0.8.26",
     settings: {
       optimizer: {
         enabled: true,

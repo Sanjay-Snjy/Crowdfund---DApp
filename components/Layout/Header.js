@@ -191,7 +191,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       fixed top-2 left-2 right-2 z-50 bg-[#e6e6e6]/60 dark:bg-darkb border border-secondary dark:border-gray-450
+       fixed top-2 left-2 right-2 z-50 bg-[#e6e6e6]/60 dark:bg-navy-100 border border-secondary dark:border-navy-600
        transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
     >
@@ -201,9 +201,9 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           {/* Mobile Menu Button */}
           <buttona
             onClick={onMenuToggle}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-500 transition-colors"
           >
-            <FiMenu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <FiMenu className="w-5 h-5 text-gray-600 dark:text-[#94A3B8]" />
           </buttona>
 
           {/* Logo + App Name (replaces search) */}
@@ -215,12 +215,12 @@ export default function Header({ onMenuToggle, isCollapsed }) {
             <div className="w-10 h-10 rounded-4xl flex items-center justify-center">
               <img src="/logo3.gif" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">CrowdFund</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC]">CrowdFund</span>
           </button>
         </div>
  {walletUserName && (
-            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-darkb/70 dark:text-gray-200">
-             <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-gray-400" /> &nbsp; {walletUserName}
+            <div className="hidden sm:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-navy-600 dark:bg-navy-300/70 dark:text-[#CBD5E1]">
+             <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-[#94A3B8]" /> &nbsp; {walletUserName}
             </div>
           )}
         {/* Right Section */}
@@ -236,7 +236,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           {/* Theme Toggle */}
           <buttona
             onClick={toggleTheme}
-            className="p-2 rounded-4xl hover:bg-white dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-4xl hover:bg-white dark:hover:bg-navy-500 transition-colors"
           >
             {isDark ? (
               <FiSun className="w-5 h-5 text-gray-500" />
@@ -247,16 +247,16 @@ export default function Header({ onMenuToggle, isCollapsed }) {
 
           {/* Notifications 
           {isConnected && (
-            <buttona className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <FiBell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <buttona className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-500 transition-colors">
+              <FiBell className="w-5 h-5 text-gray-600 dark:text-[#94A3B8]" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
             </buttona>
           )}*/}
 
           {/* Network Status 
-          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-100 border border-gray-400 dark:bg-darkb rounded-4xl">
+          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-100 border border-gray-400 dark:bg-navy-300 rounded-4xl">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+            <span className="text-sm text-gray-600 dark:text-[#94A3B8] capitalize">
               {process.env.NEXT_PUBLIC_NETWORK || "Unknown"}
             </span>
           </div>*/}

@@ -20,13 +20,13 @@ export function StatsCard({
   };
 
   return (
-    <div className="bg-slate-50 backdrop-blur-sm dark:bg-darkb rounded-3xl p-6 border border-secondary dark:border-gray-450">
+    <div className="bg-slate-50 backdrop-blur-sm dark:bg-navy-300 rounded-3xl p-6 border border-secondary dark:border-navy-600">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-600 dark:text-gray-200 text-sm font-medium">
+          <p className="text-gray-600 dark:text-[#CBD5E1] text-sm font-medium">
             {title}
           </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          <p className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC] mt-1">
             {value}
           </p>
 
@@ -44,7 +44,7 @@ export function StatsCard({
               >
                 {trendValue}
               </span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">
+              <span className="text-gray-500 dark:text-[#94A3B8] text-sm ml-1">
                 vs last month
               </span>
             </div>
@@ -54,7 +54,7 @@ export function StatsCard({
         <div
           className={`w-12 h-12 bg-gradient-to-r ${colorClasses[color]} rounded-2xl flex items-center justify-center`}
         >
-          <Icon className="w-8 h-8 text-blue-900 dark:text-white" />
+          <Icon className="w-8 h-8 text-blue-900 dark:text-[#F8FAFC]" />
         </div>
       </div>
     </div>

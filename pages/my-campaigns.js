@@ -27,45 +27,23 @@ export default function MyCampaignsPage() {
   const { data: campaignIds, isLoading: loadingIds } =
     useUserCampaigns(address);
 
-  // Debug: Log the campaignIds
-  useEffect(() => {
-    console.log("🔍 Campaign IDs from contract:", campaignIds);
-    console.log("🔍 Campaign IDs type:", typeof campaignIds);
-    console.log("🔍 Campaign IDs length:", campaignIds?.length);
-  }, [campaignIds]);
-
-  // Convert BigNumber to regular numbers and prepare contract calls
   const campaignContracts = useMemo(() => {
     if (!campaignIds || campaignIds.length === 0) {
-      console.log("❌ No campaign IDs available");
       return [];
     }
 
-    // Convert BigNumbers to regular numbers - handle different BigNumber types
     const convertedIds = campaignIds.map((id) => {
-      let numberId;
-      if (typeof id === "bigint") {
-        numberId = Number(id);
-      } else if (id && typeof id.toString === "function") {
-        numberId = Number(id.toString());
-      } else {
-        numberId = Number(id);
-      }
-      console.log(`🔄 Converting campaign ID: ${id} -> ${numberId}`);
-      return numberId;
+      if (typeof id === "bigint") return Number(id);
+      if (id && typeof id.toString === "function") return Number(id.toString());
+      return Number(id);
     });
 
-    console.log("✅ Converted campaign IDs:", convertedIds);
-
-    const contracts = convertedIds.map((campaignId) => ({
+    return convertedIds.map((campaignId) => ({
       address: CONTRACT_ADDRESS,
       abi: CROWDFUNDING_ABI,
       functionName: "getCampaign",
       args: [campaignId],
     }));
-
-    console.log("📋 Contract calls prepared:", contracts);
-    return contracts;
   }, [campaignIds]);
 
   // Fetch all campaigns data
@@ -76,33 +54,19 @@ export default function MyCampaignsPage() {
   } = useContractReads({
     contracts: campaignContracts,
     enabled: campaignContracts.length > 0,
-    watch: true,
+    staleTime: 5000,
   });
-
-  // Debug: Log the campaigns data
-  useEffect(() => {
-    console.log("📊 Campaigns data from contract:", campaignsData);
-    console.log("⏳ Loading campaigns:", loadingCampaigns);
-    console.log("❗ Contract error:", contractError);
-  }, [campaignsData, loadingCampaigns, contractError]);
 
   // Overall loading state
   const loading = loadingIds || loadingCampaigns;
 
   // Process campaigns data when it changes
   useEffect(() => {
-    console.log("🔄 Processing campaigns data...");
-
     if (campaignsData && campaignIds) {
-      console.log("✅ Both campaignsData and campaignIds available");
-
       const formattedCampaigns = campaignsData
         .map((result, index) => {
-          console.log(`📝 Processing campaign ${index}:`, result);
-
           if (result.status === "success" && result.result) {
             const campaignData = result.result;
-            console.log("✅ Campaign data:", campaignData);
 
             // Helper function to safely convert BigNumbers
             const safeBigNumberToNumber = (value) => {
@@ -180,7 +144,7 @@ export default function MyCampaignsPage() {
       <Layout>
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-4">
               Connect Your Wallet
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
@@ -216,7 +180,7 @@ export default function MyCampaignsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-50">
               My Campaigns
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
@@ -226,7 +190,7 @@ export default function MyCampaignsPage() {
 
           <button
             onClick={() => router.push("/create-campaign")}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-3xl font-medium transition-all duration-200 inline-flex items-center"
+            className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-600 text-white px-6 py-3 rounded-3xl font-medium transition-all duration-200 inline-flex items-center"
           >
             <FiPlus className="w-5 h-5 mr-2" />
             Create Campaign
@@ -264,7 +228,7 @@ export default function MyCampaignsPage() {
         ) : (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
             <FiTarget className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-50 mb-2">
               No campaigns yet
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -272,7 +236,7 @@ export default function MyCampaignsPage() {
             </p>
             <button
               onClick={() => router.push("/create-campaign")}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
+              className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
             >
               <FiPlus className="w-5 h-5 mr-2" />
               Create Your First Campaign

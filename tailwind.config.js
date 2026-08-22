@@ -82,8 +82,39 @@ module.exports = {
           800: "#1f2937",
           900: "#111827",
         },
-        darkc: "#0d1318",
-        darkb: "#181d23",
+        // Legacy dark tokens (kept for backward compat, mapped to navy)
+        darkc: "#080D1A",
+        darkb: "#111A2E",
+        // ===== Dark Navy + Indigo Theme =====
+        navy: {
+          DEFAULT: "#080D1A",
+          50: "#080D1A",
+          100: "#0B1120",
+          200: "#0D1424",
+          300: "#111A2E",
+          400: "#17213A",
+          500: "#1C2945",
+          600: "#263451",
+          700: "#334155",
+          800: "#3B4F7A",
+          900: "#4F5F83",
+          950: "#060A14",
+        },
+        // Indigo accent palette
+        indigo: {
+          DEFAULT: "#6366F1",
+          50: "#EEF2FF",
+          100: "#E0E7FF",
+          200: "#C7D2FE",
+          300: "#A5B4FC",
+          400: "#818CF8",
+          500: "#6366F1",
+          600: "#4F46E5",
+          700: "#4338CA",
+          800: "#3730A3",
+          900: "#312E81",
+          950: "#1E1B4B",
+        },
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui"],
@@ -104,6 +135,7 @@ module.exports = {
           "0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         large: "0 10px 50px -12px rgba(0, 0, 0, 0.25)",
         "inner-lg": "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+        "navy-glow": "0 8px 24px rgba(99, 102, 241, 0.20)",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
@@ -163,8 +195,8 @@ module.exports = {
           "50%": { transform: "translateY(-10px)" },
         },
         glow: {
-          "0%": { boxShadow: "0 0 5px rgba(59, 130, 246, 0.5)" },
-          "100%": { boxShadow: "0 0 20px rgba(59, 130, 246, 0.8)" },
+          "0%": { boxShadow: "0 0 5px rgba(99, 102, 241, 0.5)" },
+          "100%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.8)" },
         },
       },
       backdropBlur: {
