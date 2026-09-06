@@ -1,157 +1,82 @@
 import { useAccount, useContractReads } from "wagmi";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import Layout from "../components/Layout/Layout";
 import DashboardStats from "../components/Dashboard/DashboardStats";
-import CampaignCard from "../components/Campaign/CampaignCard";
+import FundingProgress from "../components/Dashboard/FundingProgress";
+
+import NotificationCenter from "../components/Dashboard/NotificationCenter";
+import DeadlineCountdown from "../components/Dashboard/DeadlineCountdown";
+
+import MilestoneTracker from "../components/Dashboard/MilestoneTracker";
+import QuickActions from "../components/Dashboard/QuickActions";
+import WithdrawFundsButton from "../components/Dashboard/WithdrawFundsButton";
+import BookmarkedCampaigns from "../components/Dashboard/BookmarkedCampaigns";
 import { useContract } from "../hooks/useContract";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
-import { FiGrid, FiTrendingUp, FiUsers, FiTarget, FiActivity } from "react-icons/fi";
+import { FiGrid, FiTrendingUp, FiTarget, FiActivity } from "react-icons/fi";
 import { formatDate, formatEther } from "../utils/helpers";
+import Link from "next/link";
 
 function Dashboard() {
   const { address, isConnected } = useAccount();
   const { user } = useUser();
   const router = useRouter();
-  const {
-    useActiveCampaigns,
-    useUserCampaignsWithDetails,
-    useUserContributions,
-  } = useContract();
-  const currentUserName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    user?.username ||
-    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
-    "";
+  const { useActiveCampaigns, useUserCampaignsWithDetails, useUserContributions } = useContract();
 
-  const { data: activeCampaigns, isLoading: loadingActive } =
-    useActiveCampaigns(0, 8);
-  const { campaigns: userCampaigns, isLoading: loadingUserCampaignIds } =
-    useUserCampaignsWithDetails(address);
-  const { data: userContributions, isLoading: loadingContributionIds } =
-    useUserContributions(address);
+  const currentUserName = user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "";
+
+  const { data: activeCampaigns, refetch: refetchActive } = useActiveCampaigns(0, 100);
+  const { campaigns: userCampaigns, isLoading: loadingUserCampaigns, campaignIds: userCampaignIds } = useUserCampaignsWithDetails(address);
+  const { data: userContributions } = useUserContributions(address);
+
+  // Transaction feed
   const [transactionFeed, setTransactionFeed] = useState([]);
-
   const transactionCalls = useMemo(() => {
     if (!userContributions?.length || !address) return [];
-
-    return userContributions.flatMap((campaignId) => {
-      const numericId =
-        typeof campaignId === "bigint"
-          ? Number(campaignId)
-          : Number(campaignId.toString());
-
+    return userContributions.flatMap((id) => {
+      const num = typeof id === "bigint" ? Number(id) : Number(id.toString());
       return [
-        {
-          address: CONTRACT_ADDRESS,
-          abi: CROWDFUNDING_ABI,
-          functionName: "getCampaign",
-          args: [numericId],
-        },
-        {
-          address: CONTRACT_ADDRESS,
-          abi: CROWDFUNDING_ABI,
-          functionName: "getCampaignContributions",
-          args: [numericId],
-        },
+        { address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI, functionName: "getCampaign", args: [num] },
+        { address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI, functionName: "getCampaignContributions", args: [num] },
       ];
     });
   }, [userContributions, address]);
 
-  const {
-    data: transactionData,
-    isLoading: loadingTransactionData,
-  } = useContractReads({
-    contracts: transactionCalls,
-    enabled: transactionCalls.length > 0,
-    staleTime: 5000,
-  });
-
-  const transactionLoading = loadingContributionIds || loadingTransactionData;
+  const { data: txData, isLoading: loadingTx } = useContractReads({ contracts: transactionCalls, enabled: transactionCalls.length > 0 });
 
   useEffect(() => {
-    if (!transactionData || !userContributions?.length || !address) {
-      setTransactionFeed([]);
-      return;
-    }
-
-    const normalizedAddress = address.toLowerCase();
+    if (!txData || !userContributions?.length || !address) { setTransactionFeed([]); return; }
+    const norm = address.toLowerCase();
     const feed = [];
-
-    for (let i = 0; i < transactionData.length; i += 2) {
-      const campaignResult = transactionData[i];
-      const contributionsResult = transactionData[i + 1];
-
-      if (
-        campaignResult?.status === "success" &&
-        contributionsResult?.status === "success"
-      ) {
-        const campaign = campaignResult.result;
-        const contributions = contributionsResult.result || [];
-
-        contributions.forEach((entry) => {
-          if (
-            entry?.contributor?.toString?.()?.toLowerCase?.() ===
-            normalizedAddress
-          ) {
-            feed.push({
-              campaignId: Number(campaign.id?.toString?.() || 0),
-              campaignTitle: campaign.title || "Unknown campaign",
-              action: "Contribution",
-              amount: entry.amount,
-              timestamp: Number(entry.timestamp?.toString?.() || 0),
-            });
+    for (let i = 0; i < txData.length; i += 2) {
+      const camp = txData[i]; const contribs = txData[i + 1];
+      if (camp?.status === "success" && contribs?.status === "success") {
+        contribs.result?.forEach((e) => {
+          if (e?.contributor?.toString?.()?.toLowerCase() === norm) {
+            feed.push({ campaignId: Number(camp.result.id?.toString?.()), campaignTitle: camp.result.title, action: "Contribution", amount: e.amount, timestamp: Number(e.timestamp?.toString?.() || 0) });
           }
         });
       }
     }
+    setTransactionFeed(feed.sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+  }, [txData, userContributions, address]);
 
-    setTransactionFeed(
-      feed
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 6)
-    );
-  }, [transactionData, userContributions, address]);
+  const liveActive = useMemo(() => (activeCampaigns || []).filter((c) => c?.active && Number(c.deadline?.toString?.() || 0) * 1000 > Date.now()), [activeCampaigns]);
 
-  const successRate = userCampaigns?.length
-    ? Math.round(
-        (userCampaigns.filter((campaign) => {
-          try {
-            const raised = parseFloat(campaign.raisedAmount?.toString?.() || "0");
-            const target = parseFloat(campaign.targetAmount?.toString?.() || "0");
-            return target > 0 && raised >= target;
-          } catch {
-            return false;
-          }
-        }).length /
-          userCampaigns.length) *
-          100
-      )
-    : 0;
-
-  const liveActiveCampaigns = useMemo(() => {
-    if (!activeCampaigns?.length) return [];
-
-    return activeCampaigns.filter((campaign) => {
-      const deadline = Number(campaign?.deadline?.toString?.() || 0);
-      return campaign?.active && deadline * 1000 > Date.now();
-    });
-  }, [activeCampaigns]);
-
-  const liveActiveCampaignsCount = liveActiveCampaigns.length;
+  const refreshData = useCallback(() => {
+    refetchActive?.();
+  }, [refetchActive]);
 
   if (!isConnected) {
     return (
       <Layout>
-        <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-          <div className="rounded-[32px] border border-slate-200 bg-white/90 p-10 text-center dark:border-navy-600 dark:bg-navy-300 dark:text-slate-50">
-            <h2 className="text-3xl font-semibold mb-3">Connect Your Wallet</h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Please connect your wallet to access your Crowdfunding dashboard.
-            </p>
+        <div className="flex min-h-[60vh] items-center justify-center px-4">
+          <div className="card p-8 text-center max-w-sm">
+            <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text)" }}>Connect Your Wallet</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Connect your wallet to access your dashboard.</p>
           </div>
         </div>
       </Layout>
@@ -160,212 +85,131 @@ function Dashboard() {
 
   return (
     <Layout>
-      <div className="mx-auto px-5 ml-1 py-8 sm:px-6 lg:px-0 lg:py-0 -mt-[18px]">
-       <section className="mb-4 rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white">
-  <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-    <div>
-      <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
-        <FiGrid className="h-4 w-4" />
-        Dashboard Overview
-      </div>
-
-      <h1 className="mt-4 text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
-        Ideas backed. Progress visible.
-      </h1>
-
-      <p className="mt-2 max-w-2xl text-sm text-slate-200">
-        Everything you’re building and backing, in one place.
-      </p>
-    </div>
-  </div>
-</section>
-        <div className="grid gap-4 xl:grid-cols-[1.45fr_0.75fr]">
-          <section className="rounded-[24px] md:rounded-[32px] mt-2 bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-4 sm:p-6 md:p-8 dark:text-slate-50">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-indigo-400 dark:text-slate-400">
-                  Your Space
-                </p>
-                <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-50">
-                  Your crowdfunding insights
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
-                  Monitor your campaign metrics, recent activity, and featured projects from one elegant workspace.
-                </p>
-              </div>
-             
-            </div>
-
-            <div className="mt-6 grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-navy-600 dark:bg-navy-400">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Created campaigns</p>
-                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-50">{userCampaigns?.length || 0}</p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Campaigns you have launched.</p>
-              </div>
-              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-navy-600 dark:bg-navy-400">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total contributions</p>
-                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-50">{userContributions?.length || 0}</p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Your active backers on the platform.</p>
-              </div>
-              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-navy-600 dark:bg-navy-400">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Active campaigns</p>
-                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-50">{liveActiveCampaignsCount || 0}</p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Live campaigns on the marketplace.</p>
-              </div>
-              <div className="rounded-[28px] border border-secondary bg-slate-50 p-6 dark:border-navy-600 dark:bg-navy-400">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Success rate</p>
-                <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-50">{successRate}%</p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Share of your campaigns that met the goal.</p>
-              </div>
-            </div>
-             <div className="mt-6 flex flex-wrap gap-3 justify-start sm:justify-center">
-                <button
-                  onClick={() => router.push("/create-campaign")}
-                  className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600"
-                >
-                  Launch campaign
-                </button>
-                <button
-                  onClick={() => router.push("/campaigns")}
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-300 dark:border-navy-600 dark:bg-navy-400 dark:text-slate-100"
-                >
-                  Browse projects
-                </button>
-              </div>
-          </section>
-
-          <aside className="space-y-4">
-            <div className="rounded-[32px] bg-[#F5F5F5] mt-2 backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-6">
-              <p className="text-sm uppercase tracking-[0.24em] text-indigo-400 dark:text-slate-400">Recent transactions</p>
-              <div className="mt-5 space-y-4">
-                {transactionLoading ? (
-                  [...Array(3)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-400"
-                    >
-                      <div className="h-4 w-3/4 rounded bg-slate-200 dark:bg-navy-600" />
-                      <div className="mt-3 h-3 w-1/2 rounded bg-slate-200 dark:bg-navy-600" />
-                    </div>
-                  ))
-                ) : transactionFeed.length > 0 ? (
-                  transactionFeed.map((tx, index) => (
-                    <div
-                      key={index}
-                      className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-400"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{tx.action} to {tx.campaignTitle}</p>
-                          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{formatDate(tx.timestamp)}</p>
-                        </div>
-                        <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">{formatEther(tx.amount)} ETH</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-center dark:border-navy-600 dark:bg-navy-400">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">No recent transactions yet</p>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Your latest contributions will appear here once you participate in a campaign.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        <div className="mt-6 grid gap-4 xl:grid-cols-2">
-          <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-6">
-            <p className="text-sm uppercase tracking-[0.24em] text-indigo-400 dark:text-slate-400">Quick insights</p>
-            <div className="mt-4 space-y-4">
-              <div className="rounded-3xl bg-slate-50 p-5 dark:bg-navy-400">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Active campaigns</p>
-                    <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-slate-50">{liveActiveCampaignsCount || 0}</p>
-                  </div>
-                  <span className="inline-flex rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-400 dark:bg-indigo-950 dark:text-indigo-200">
-                    {liveActiveCampaignsCount ? liveActiveCampaigns[0]?.title || "—" : "None"}
-                  </span>
-                </div>
-               
-              </div>
-              <div className="rounded-3xl bg-slate-50 p-5 dark:bg-navy-400">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Created campaigns</p>
-                    <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-slate-50">{userCampaigns?.length || 0}</p>
-                  </div>
-                  <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 dark:bg-navy-500 dark:text-slate-300">
-                    {userCampaigns?.length ? "View list" : "None"}
-                  </span>
-                </div>
-                <div className="mt-4 max-h-36 overflow-y-auto pr-1">
-                  {userCampaigns && userCampaigns.length > 0 ? (
-                    userCampaigns.map((campaign, idx) => (
-                      <p
-                        key={campaign?.id ?? idx}
-                        className="truncate text-sm text-slate-600 dark:text-slate-400"
-                      >
-                        {campaign?.title || campaign?.description || `Campaign ${campaign?.id ?? idx + 1}`}
-                      </p>
-                    ))
-                  ) : (
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      No created campaigns yet.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>Dashboard</h1>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
+              {currentUserName ? `Welcome back, ${currentUserName}` : "Your crowdfunding overview"}
+            </p>
           </div>
-
-          <div className="rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary dark:border-navy-600 p-6 dark:text-slate-50">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Activity snapshot</p>
-            <div className="mt-5 space-y-4">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-navy-600 dark:bg-navy-400">
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">No activity yet</p>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Your campaign events will appear here once funding begins.</p>
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Feature #8: Notification Center */}
+            <NotificationCenter
+              userCampaigns={userCampaigns}
+              userContributions={userContributions}
+              transactionFeed={transactionFeed}
+            />
+            <Link href="/create-campaign" className="btn btn-sm rounded-3xl px-4">New Campaign</Link>
+            <Link href="/all-campaigns" className="btn btn-secondary btn-sm rounded-3xl px-4">Browse</Link>
           </div>
         </div>
 
-        <section className="mt-6 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 p-6 border border-secondary dark:border-navy-600 dark:text-slate-50">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold">Platform statistics</h2>
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Marketplace performance metrics across all campaigns.</p>
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: "Created", value: userCampaigns?.length || 0 },
+            { label: "Contributions", value: userContributions?.length || 0 },
+            { label: "Active Campaigns", value: liveActive.length },
+          ].map((s) => (
+            <div key={s.label} className="card p-4 rounded-3xl">
+              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{s.label}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "var(--color-text)" }}>{s.value}</p>
             </div>
+          ))}
+          <div className="card p-4 rounded-3xl">
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Connected</p>
+            <p className="text-sm font-medium mt-1" style={{ color: "var(--color-success)" }}>{address?.slice(0, 6)}...{address?.slice(-4)}</p>
           </div>
-          <div className="mt-6">
-            <DashboardStats />
-          </div>
-        </section>
+        </div>
 
-        <section className="mt-6 rounded-[32px] bg-[#F5F5F5] backdrop-blur-sm dark:bg-navy-300 border border-secondary p-8 dark:bg-navy-300 dark:text-slate-50">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold">Recent activity</h2>
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Track approvals, contributions, and campaign updates.</p>
-            </div>
-            <span className="inline-flex rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 dark:bg-navy-400 dark:text-slate-300">
-              Live feed
-            </span>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-navy-600 dark:bg-navy-400">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">No activity yet</p>
-                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Once you launch a campaign, your progress and contributions will appear here.</p>
-                </div>
-                <span className="rounded-full bg-indigo-500 px-3 py-1 text-xs font-semibold text-white">Pending</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent transactions */}
+          <div className="lg:col-span-2 card p-5 rounded-3xl">
+            <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Recent Transactions</h3>
+            {loadingTx ? (
+              <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-14" />)}</div>
+            ) : transactionFeed.length > 0 ? (
+              <div className="space-y-2">
+                {transactionFeed.map((tx, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg" style={{ background: "var(--color-surface-raised, var(--color-surface))" }}>
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{tx.action} → {tx.campaignTitle}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{formatDate(tx.timestamp)}</p>
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>{formatEther(tx.amount)} ETH</p>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <p className="text-sm text-center py-6" style={{ color: "var(--color-text-muted)" }}>No transactions yet</p>
+            )}
+          </div>
+
+          {/* Created campaigns with progress bars and countdown */}
+          <div className="card p-5 rounded-3xl">
+            <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Your Campaigns</h3>
+            {loadingUserCampaigns ? (
+              <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-10" />)}</div>
+            ) : userCampaigns?.length > 0 ? (
+              <div className="space-y-3">
+                {userCampaigns.slice(0, 4).map((c) => (
+                  <div key={c.id} className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Link href={`/campaign/${c.id}`} className="text-xs font-medium truncate max-w-[70%] hover:underline" style={{ color: "var(--color-text)" }}>
+                        {c.title || `Campaign #${c.id}`}
+                      </Link>
+                      {/* Feature #10: Deadline Countdown */}
+                      {c.active && <DeadlineCountdown deadline={c.deadline} />}
+                    </div>
+                    {/* Feature #1: Funding Progress Bars */}
+                    <FundingProgress campaign={c} />
+                    {/* Feature #13: Withdraw Funds Button */}
+                    <WithdrawFundsButton campaign={c} onRefresh={refreshData} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No campaigns yet</p>
+                <Link href="/create-campaign" className="btn btn-sm mt-2">Create One</Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Feature #14: Milestone Progress Tracker */}
+        {userCampaigns?.length > 0 && (
+          <div className="card p-5 rounded-3xl">
+            <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>
+              Milestone Progress
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {userCampaigns.slice(0, 6).map((c) => (
+                <div key={c.id} className="p-3 rounded-xl" style={{ background: "var(--color-surface)" }}>
+                  <Link href={`/campaign/${c.id}`} className="text-xs font-medium block truncate mb-2 hover:underline" style={{ color: "var(--color-text)" }}>
+                    {c.title || `Campaign #${c.id}`}
+                  </Link>
+                  <MilestoneTracker campaignId={c.id} campaign={c} />
+                </div>
+              ))}
             </div>
           </div>
-        </section>
+        )}
+
+
+
+        {/* Feature #18: Bookmarked Campaigns + Platform Stats */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <div className="card p-5 rounded-3xl">
+              <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Platform Statistics</h3>
+              <DashboardStats />
+            </div>
+          </div>
+          <BookmarkedCampaigns />
+        </div>
       </div>
     </Layout>
   );

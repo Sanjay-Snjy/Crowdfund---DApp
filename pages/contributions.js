@@ -3,18 +3,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
 import Layout from "../components/Layout/Layout";
 import { useContract } from "../hooks/useContract";
-import {
-  FiHeart,
-  FiExternalLink,
-  FiDollarSign,
-  FiCalendar,
-  FiTrendingUp,
-  FiActivity,
-  FiArrowRight,
-} from "react-icons/fi";
-import { formatEther, formatAddress, formatDate } from "../utils/helpers";
+import { FiHeart, FiDollarSign, FiTrendingUp, FiArrowRight } from "react-icons/fi";
+import { formatEther } from "../utils/helpers";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
+import Link from "next/link";
 
 export default function ContributionsPage() {
   const { address, isConnected } = useAccount();
@@ -22,319 +15,103 @@ export default function ContributionsPage() {
   const { useUserContributions } = useContract();
   const [contributions, setContributions] = useState([]);
 
-  const { data: contributionCampaignIds, isLoading: loadingIds } =
-    useUserContributions(address);
+  const { data: ids, isLoading: loadingIds } = useUserContributions(address);
 
-  // Prepare contract calls for both campaign details and user contributions
-  const contractCalls = useMemo(() => {
-    if (
-      !contributionCampaignIds ||
-      contributionCampaignIds.length === 0 ||
-      !address
-    )
-      return [];
-
-    const calls = [];
-
-    contributionCampaignIds.forEach((campaignId) => {
-      const numericId =
-        typeof campaignId === "bigint"
-          ? Number(campaignId)
-          : Number(campaignId.toString());
-
-      // Get campaign details
-      calls.push({
-        address: CONTRACT_ADDRESS,
-        abi: CROWDFUNDING_ABI,
-        functionName: "getCampaign",
-        args: [numericId],
-      });
-
-      // Get user's contribution amount for this campaign
-      calls.push({
-        address: CONTRACT_ADDRESS,
-        abi: CROWDFUNDING_ABI,
-        functionName: "getContribution",
-        args: [numericId, address],
-      });
+  const calls = useMemo(() => {
+    if (!ids?.length || !address) return [];
+    return ids.flatMap((id) => {
+      const num = typeof id === "bigint" ? Number(id) : Number(id.toString());
+      return [
+        { address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI, functionName: "getCampaign", args: [num] },
+        { address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI, functionName: "getContribution", args: [num, address] },
+      ];
     });
+  }, [ids, address]);
 
-    return calls;
-  }, [contributionCampaignIds, address]);
-
-  // Fetch all data
-  const { data: contractData, isLoading: loadingData } = useContractReads({
-    contracts: contractCalls,
-    enabled: contractCalls.length > 0,
-    staleTime: 5000,
-  });
-
+  const { data: contractData, isLoading: loadingData } = useContractReads({ contracts: calls, enabled: calls.length > 0 });
   const loading = loadingIds || loadingData;
 
-  // Process the data
   useEffect(() => {
-    if (contractData && contributionCampaignIds && address) {
-      const processedContributions = [];
-
-      // Process data in pairs (campaign details + contribution amount)
-      for (let i = 0; i < contractData.length; i += 2) {
-        const campaignResult = contractData[i];
-        const contributionResult = contractData[i + 1];
-
-        if (
-          campaignResult.status === "success" &&
-          contributionResult.status === "success"
-        ) {
-          const campaignData = campaignResult.result;
-          const contributionAmount = contributionResult.result;
-
-          // Only include if user actually contributed
-          if (contributionAmount && contributionAmount > 0) {
-            const safeBigNumber = (value) => {
-              if (!value) return 0n;
-              if (typeof value === "bigint") return value;
-              if (value.toString) return BigInt(value.toString());
-              return BigInt(value);
-            };
-
-            const safeBigNumberToNumber = (value) => {
-              if (!value) return 0;
-              if (typeof value === "bigint") return Number(value);
-              if (value.toString) return Number(value.toString());
-              return Number(value);
-            };
-
-            processedContributions.push({
-              campaignId: safeBigNumberToNumber(campaignData.id),
-              campaignTitle: campaignData.title,
-              campaignDescription: campaignData.description,
-              amount: safeBigNumber(contributionAmount),
-              targetAmount: safeBigNumber(campaignData.targetAmount),
-              raisedAmount: safeBigNumber(campaignData.raisedAmount),
-              deadline: safeBigNumberToNumber(campaignData.deadline),
-              active: campaignData.active,
-              // Note: We don't have timestamp from getUserContributions,
-              // you'd need to implement getCampaignContributions for that
-              timestamp: null,
-            });
-          }
-        }
+    if (!contractData || !ids || !address) return;
+    const result = [];
+    for (let i = 0; i < contractData.length; i += 2) {
+      const camp = contractData[i]; const amt = contractData[i + 1];
+      if (camp?.status === "success" && amt?.status === "success" && amt.result > 0) {
+        const c = camp.result;
+        const safe = (v) => { if (!v) return 0n; return typeof v === "bigint" ? v : BigInt(v.toString()); };
+        const safeNum = (v) => { if (!v) return 0; return typeof v === "bigint" ? Number(v) : Number(v.toString()); };
+        result.push({ campaignId: safeNum(c.id), campaignTitle: c.title, campaignDescription: c.description, amount: safe(amt.result), targetAmount: safe(c.targetAmount), raisedAmount: safe(c.raisedAmount), deadline: safeNum(c.deadline), active: c.active });
       }
-
-      setContributions(processedContributions);
-    } else if (
-      contributionCampaignIds &&
-      contributionCampaignIds.length === 0
-    ) {
-      setContributions([]);
     }
-  }, [contractData, contributionCampaignIds, address]);
+    setContributions(result);
+  }, [contractData, ids, address]);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
+  useEffect(() => { if (!isConnected) router.push("/"); }, [isConnected, router]);
 
   if (!isConnected) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-4">
-              Connect Your Wallet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please connect your wallet to view your contributions.
-            </p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="card p-8 text-center max-w-sm">
+            <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text)" }}>Connect Your Wallet</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Connect to view your contributions.</p>
           </div>
         </div>
       </Layout>
     );
   }
 
-  const totalContributed = contributions.reduce((sum, contribution) => {
-    return sum + parseFloat(formatEther(contribution.amount || 0));
-  }, 0);
+  const total = contributions.reduce((s, c) => s + parseFloat(formatEther(c.amount || 0)), 0);
 
   return (
     <Layout>
-      <div className="space-y-4 -mt-[18px]">
-        <div className="rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white shadow-2xl shadow-slate-900/20">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
-                <FiHeart className="h-4 w-4" />
-                Your supporter dashboard
-              </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-                My Contributions
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-200">
-                Review your impact, track your support, and jump back into the campaigns you care about.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
-              <p className="text-sm text-slate-300">Wallet connected</p>
-              <p className="mt-1 text-lg font-semibold">{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Connected"}</p>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>My Contributions</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Track your support history</p>
         </div>
-
-        <div className="grid gap-4 md:grid-cols-3 -mt-4">
-          <div className="rounded-[24px] border border-slate-200/70 bg-white px-6 py-4 shadow-sm dark:border-navy-600 dark:bg-navy-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Total contributed</p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-50">
-                  {totalContributed.toFixed(4)} ETH
-                </p>
-              </div>
-              <div className="rounded-3xl bg-indigo-500/10 p-4 text-indigo-400 dark:bg-emerald-900/30 dark:text-emerald-400">
-                <FiDollarSign className="h-6 w-6" />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Projects supported</p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-50">
-                  {contributions.length}
-                </p>
-              </div>
-              <div className="rounded-3xl bg-indigo-500/10 p-4 text-indigo-400 dark:bg-sky-900/30 dark:text-sky-400">
-                <FiHeart className="h-6 w-6" />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Average contribution</p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-50">
-                  {contributions.length > 0
-                    ? (totalContributed / contributions.length).toFixed(4)
-                    : "0.00"} ETH
-                </p>
-              </div>
-              <div className="rounded-3xl bg-indigo-500/10 p-4 text-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-300">
-                <FiTrendingUp className="h-6 w-6" />
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiDollarSign className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{total.toFixed(4)}</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>ETH Contributed</p></div></div></div>
+          <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiHeart className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{contributions.length}</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Projects Supported</p></div></div></div>
+          <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiTrendingUp className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{contributions.length > 0 ? (total / contributions.length).toFixed(4) : "0"}</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Avg Contribution</p></div></div></div>
         </div>
-
         {loading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="rounded-[24px] border border-slate-200/70 bg-white p-6 shadow-sm dark:border-navy-600 dark:bg-navy-400">
-                <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-200 dark:bg-navy-600" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-1/2 rounded bg-slate-200 dark:bg-navy-600" />
-                    <div className="h-4 w-2/3 rounded bg-slate-200 dark:bg-navy-600" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-20" />)}</div>
         ) : contributions.length > 0 ? (
-          <div className="rounded-[28px] border border-slate-200/70 bg-white shadow-sm dark:border-navy-600 dark:bg-navy-400">
-            <div className="border-b border-slate-200 px-6 py-5 dark:border-navy-600">
-              <div className="flex items-center gap-2">
-                <FiActivity className="h-5 w-5 text-sky-500" />
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
-                  Contribution history
-                </h2>
-              </div>
-            </div>
-            <div className="divide-y divide-slate-200 dark:divide-slate-700">
-              {contributions.map((contribution, index) => {
-                const progress =
-                  (parseFloat(formatEther(contribution.raisedAmount)) /
-                    parseFloat(formatEther(contribution.targetAmount))) *
-                  100;
-                const isActive =
-                  contribution.active &&
-                  new Date(contribution.deadline * 1000) > new Date();
-
-                return (
-                  <div
-                    key={index}
-                    className="p-6 transition hover:bg-slate-50 dark:hover:bg-navy-500"
-                  >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-400 to-indigo-600 text-white">
-                          <FiHeart className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-slate-900 dark:text-slate-50">
-                            {contribution.campaignTitle}
-                          </h3>
-                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            {contribution.campaignDescription?.slice(0, 120)}...
-                          </p>
-                          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                            <span className="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-navy-500">
-                              Progress: {progress.toFixed(1)}%
-                            </span>
-                            <span
-                              className={`rounded-full px-2.5 py-1 ${
-                                isActive
-                                  ? "bg-emerald-500/10 text-emerald-400 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                  : "bg-slate-100 text-slate-700 dark:bg-navy-500 dark:text-slate-300"
-                              }`}
-                            >
-                              {isActive ? "Active" : "Ended"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-start gap-3 text-left lg:items-end">
-                        <div>
-                          <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                            {formatEther(contribution.amount)} ETH
-                          </p>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Target: {formatEther(contribution.targetAmount)} ETH
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => router.push(`/campaign/${contribution.campaignId}`)}
-                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-indigo-500 hover:text-indigo-400 dark:border-navy-600 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-300"
-                        >
-                          View campaign
-                          <FiArrowRight className="h-3.5 w-3.5" />
-                        </button>
+          <div className="space-y-2">
+            {contributions.map((c, i) => {
+              const progress = (parseFloat(formatEther(c.raisedAmount)) / parseFloat(formatEther(c.targetAmount))) * 100;
+              const isActive = c.active && new Date(c.deadline * 1000) > new Date();
+              return (
+                <div key={i} className="card p-4 rounded-3xl flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-10 h-10 rounded-3xl flex items-center justify-center shrink-0" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiHeart className="w-4 h-4" /></div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-semibold truncate" style={{ color: "var(--color-text)" }}>{c.campaignTitle}</h3>
+                      <p className="text-xs mt-0.5 line-clamp-1" style={{ color: "var(--color-text-muted)" }}>{c.campaignDescription}</p>
+                      <div className="flex gap-2 mt-1.5">
+                        <span className={`badge ${isActive ? "badge-success" : "badge-neutral"}`}>{isActive ? "Active" : "Ended"}</span>
+                        <span className="badge badge-neutral">{progress.toFixed(1)}% funded</span>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>{formatEther(c.amount)} ETH</p>
+                      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Target: {formatEther(c.targetAmount)} ETH</p>
+                    </div>
+                    <Link href={`/campaign/${c.campaignId}`} className="btn btn-secondary btn-sm shrink-0">View <FiArrowRight className="w-3 h-3" /></Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
-          <div className="rounded-[28px] border border-slate-200/70 bg-white p-12 text-center shadow-sm dark:border-navy-600 dark:bg-navy-400">
-            <FiHeart className="mx-auto mb-6 h-16 w-16 text-slate-400" />
-            <h3 className="mb-4 text-xl font-semibold text-slate-900 dark:text-slate-50">
-              No contributions yet
-            </h3>
-            <p className="mx-auto mb-6 max-w-md text-slate-600 dark:text-slate-400">
-              Start backing projects that matter to you and build your supporter history from here.
-            </p>
-            <button
-              onClick={() => router.push("/campaigns")}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-3 font-medium text-white transition hover:from-indigo-500 hover:to-indigo-600"
-            >
-              Browse campaigns
-              <FiArrowRight className="h-4 w-4" />
-            </button>
+          <div className="card p-12 text-center rounded-3xl">
+            <FiHeart className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-text-muted)" }} />
+            <h3 className="font-semibold" style={{ color: "var(--color-text)" }}>No contributions yet</h3>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Start backing campaigns you care about.</p>
+            <Link href="/all-campaigns" className="btn btn-secondary mt-4">Browse Campaigns</Link>
           </div>
         )}
       </div>

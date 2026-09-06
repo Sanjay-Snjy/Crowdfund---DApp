@@ -5,971 +5,478 @@ import { useUser } from "@clerk/nextjs";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import {
-  FiUser,
-  FiClock,
-  FiTarget,
-  FiTrendingUp,
-  FiShare2,
-  FiExternalLink,
-  FiHeart,
-  FiUsers,
-  FiCalendar,
-  FiDollarSign,
+  FiUser, FiClock, FiTarget, FiShare2, FiHeart, FiUsers, FiCalendar, FiBookmark,
 } from "react-icons/fi";
 import { useContract } from "../../hooks/useContract";
 import { getFromIPFS } from "../../utils/ipfs";
+import { useBookmarks } from "../../hooks/useBookmarks";
 import {
-  formatEther,
-  formatAddress,
-  calculateTimeLeft,
-  calculateProgress,
-  formatDate,
-  copyToClipboard,
-  getCreatorDisplayName,
+  formatEther, calculateTimeLeft, calculateProgress, formatDate,
+  copyToClipboard, getCreatorDisplayName, formatAddress,
 } from "../../utils/helpers";
 import { CONTRACT_ADDRESS } from "../../constants";
 import { CROWDFUNDING_ABI } from "../../constants/abi";
+
+const TABS = ["Overview", "Milestones", "Contributors"];
 
 export default function CampaignDetails({ campaignId }) {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const { user } = useUser();
+  const { toggle, isBookmarked } = useBookmarks();
   const {
-    useCampaign,
-    useCampaignStats,
-    useContributeToCampaignSimple,
-    useWithdrawFunds,
-    useGetRefund,
-    useAddMilestone,
-    useRequestMilestoneVote,
-    useVoteOnMilestone,
-    useReleaseMilestoneFunds,
-    useCampaignMilestones,
-    useContribution,
+    useCampaign, useCampaignStats, useContributeToCampaignSimple, useWithdrawFunds, useGetRefund,
+    useAddMilestone, useRequestMilestoneVote, useVoteOnMilestone, useReleaseMilestoneFunds,
+    useCampaignMilestones, useContribution,
   } = useContract();
 
   const [metadata, setMetadata] = useState(null);
   const [creatorProfile, setCreatorProfile] = useState(null);
   const [contributionAmount, setContributionAmount] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("Overview");
   const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
-  const [newMilestoneDescription, setNewMilestoneDescription] = useState("");
+  const [newMilestoneDesc, setNewMilestoneDesc] = useState("");
   const [newMilestoneAmount, setNewMilestoneAmount] = useState("");
 
-  const { data: campaign, isLoading: campaignLoading } =
-    useCampaign(campaignId);
+  const { data: campaign, isLoading: campaignLoading } = useCampaign(campaignId);
   const { data: stats } = useCampaignStats(campaignId);
   const { data: userContribution } = useContribution(campaignId, address);
-  const { contribute, isLoading: contributing } =
-    useContributeToCampaignSimple();
+  const { contribute, isLoading: contributing } = useContributeToCampaignSimple();
   const { withdrawFunds, isLoading: withdrawing } = useWithdrawFunds();
   const { getRefund, isLoading: refunding } = useGetRefund();
   const { addMilestone, isLoading: addingMilestone } = useAddMilestone();
   const { requestMilestoneVote, isLoading: requestingVote } = useRequestMilestoneVote();
-  const { voteOnMilestone, isLoading: votingOnMilestone } = useVoteOnMilestone();
-  const { releaseMilestoneFunds, isLoading: releasingMilestone } = useReleaseMilestoneFunds();
-  const {
-    data: milestones,
-    count: milestonesCount,
-    isLoading: loadingMilestones,
-  } = useCampaignMilestones(campaignId);
+  const { voteOnMilestone, isLoading: voting } = useVoteOnMilestone();
+  const { releaseMilestoneFunds, isLoading: releasing } = useReleaseMilestoneFunds();
+  const { data: milestones, count: milestonesCount, isLoading: loadingMilestones } = useCampaignMilestones(campaignId);
+
+  const bookmarked = isBookmarked(campaignId);
 
   const milestoneVoteCalls = useMemo(() => {
-    if (!campaignId || !address || !milestonesCount || milestonesCount === 0)
-      return [];
-
-    return Array.from({ length: milestonesCount }, (_, index) => ({
-      address: CONTRACT_ADDRESS,
-      abi: CROWDFUNDING_ABI,
-      functionName: "hasVotedOnMilestone",
-      args: [campaignId, index, address],
+    if (!campaignId || !address || !milestonesCount || milestonesCount === 0) return [];
+    return Array.from({ length: milestonesCount }, (_, i) => ({
+      address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI,
+      functionName: "hasVotedOnMilestone", args: [campaignId, i, address],
     }));
   }, [campaignId, address, milestonesCount]);
 
-  const { data: milestoneVoteData } = useContractReads({
-    contracts: milestoneVoteCalls,
-    enabled:
-      milestoneVoteCalls.length > 0 && Boolean(CONTRACT_ADDRESS),
-    staleTime: 5000,
+  const { data: voteData } = useContractReads({ contracts: milestoneVoteCalls, enabled: milestoneVoteCalls.length > 0 });
+  const voteStatuses = useMemo(() => voteData?.map((r) => r?.status === "success" ? r.result : false) || [], [voteData]);
+
+  const { data: contributions, isLoading: loadingContributions } = useContractRead({
+    address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI,
+    functionName: "getCampaignContributions", args: [campaignId],
+    enabled: Boolean(campaignId && CONTRACT_ADDRESS),
   });
 
-  const milestoneVoteStatuses = useMemo(() => {
-    if (!milestoneVoteData) return [];
-    return milestoneVoteData.map((result) =>
-      result?.status === "success" ? result.result : false
-    );
-  }, [milestoneVoteData]);
-
-  // Fetch campaign contributions
-  const { data: contributions, isLoading: loadingContributions } =
-    useContractRead({
-      address: CONTRACT_ADDRESS,
-      abi: CROWDFUNDING_ABI,
-      functionName: "getCampaignContributions",
-      args: [campaignId],
-      enabled: Boolean(campaignId && CONTRACT_ADDRESS),
-      cacheTime: 30000,
-    });
-
+  // Fetch metadata
   useEffect(() => {
-    const fetchMetadata = async () => {
-      if (campaign?.metadataHash) {
-        const result = await getFromIPFS(campaign.metadataHash);
-        if (result.success) {
-          setMetadata(result.data);
-        }
-      }
-    };
-
-    fetchMetadata();
+    if (!campaign?.metadataHash) return;
+    let cancelled = false;
+    getFromIPFS(campaign.metadataHash).then((res) => {
+      if (!cancelled && res.success) setMetadata(res.data);
+    });
+    return () => { cancelled = true; };
   }, [campaign?.metadataHash]);
 
+  // Fetch creator profile
   useEffect(() => {
+    if (!campaign?.creator) { setCreatorProfile(null); return; }
+    const addr = campaign.creator.toString?.()?.toLowerCase();
+    if (!addr) return;
     const controller = new AbortController();
-
-    const fetchCreatorProfile = async () => {
-      if (!campaign?.creator) {
-        setCreatorProfile(null);
-        return;
-      }
-
-      const creatorAddress = campaign.creator.toString?.()?.toLowerCase();
-      if (!creatorAddress) {
-        setCreatorProfile(null);
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `/api/wallet-link?walletAddresses=${encodeURIComponent(
-            creatorAddress
-          )}`,
-          { signal: controller.signal }
-        );
-        const data = await response.json();
-
-        if (Array.isArray(data.walletProfiles) && data.walletProfiles.length > 0) {
-          setCreatorProfile(data.walletProfiles[0]);
-        }
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error("Failed to load campaign creator profile:", error);
-        }
-      }
-    };
-
-    fetchCreatorProfile();
+    fetch(`/api/wallet-link?walletAddresses=${encodeURIComponent(addr)}`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.walletProfiles) && data.walletProfiles.length > 0) setCreatorProfile(data.walletProfiles[0]);
+      })
+      .catch(() => {});
     return () => controller.abort();
   }, [campaign?.creator]);
 
   if (campaignLoading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
+      <div className="max-w-5xl mx-auto px-4 py-20 space-y-4">
+        <div className="skeleton h-64 sm:h-80" />
+        <div className="skeleton h-6 w-2/3" />
+        <div className="skeleton h-4 w-1/2" />
       </div>
     );
   }
 
   if (!campaign) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC] mb-4">
-          Campaign Not Found
-        </h2>
-        <p className="text-gray-600 dark:text-[#94A3B8] mb-6">
-          The campaign you're looking for doesn't exist or has been removed.
+      <div className="max-w-5xl mx-auto px-4 py-20 text-center">
+        <h2 className="text-xl font-bold" style={{ color: "var(--color-text)" }}>Campaign Not Found</h2>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>
+          The campaign doesn't exist or has been removed.
         </p>
-        <button
-          onClick={() => router.push("/campaigns")}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded-lg transition-colors"
-        >
+        <button onClick={() => router.push("/all-campaigns")} className="btn btn-secondary mt-4">
           Browse Campaigns
         </button>
       </div>
     );
   }
 
-  const progress = calculateProgress(
-    campaign.raisedAmount,
-    campaign.targetAmount
-  );
+  const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount);
   const timeLeft = calculateTimeLeft(campaign.deadline);
-  const raisedAmount = formatEther(campaign.raisedAmount);
-  const targetAmount = formatEther(campaign.targetAmount);
-  const currentUserName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    user?.username ||
-    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
-    "";
-  const creatorName = getCreatorDisplayName(
-    campaign.creator,
-    metadata?.creator,
-    creatorProfile,
-    address,
-    currentUserName
-  );
+  const raised = parseFloat(formatEther(campaign.raisedAmount)).toFixed(2);
+  const target = parseFloat(formatEther(campaign.targetAmount)).toFixed(2);
+  const currentUserName = user?.fullName || user?.firstName || "";
+  const creatorName = getCreatorDisplayName(campaign.creator, metadata?.creator, creatorProfile, address, currentUserName);
   const isCreator = address?.toLowerCase() === campaign.creator?.toLowerCase();
-  const isSuccessful = parseFloat(raisedAmount) >= parseFloat(targetAmount);
-  const canWithdraw =
-    isCreator && timeLeft.expired && isSuccessful && !campaign.withdrawn;
-  const canGetRefund =
-    !isCreator && timeLeft.expired && !isSuccessful && userContribution > 0;
+  const isSuccessful = parseFloat(raised) >= parseFloat(target);
+  const canWithdraw = isCreator && timeLeft.expired && isSuccessful && !campaign.withdrawn;
+  const canRefund = !isCreator && timeLeft.expired && !isSuccessful && userContribution > 0;
 
-  // Process contributions data - only if contributions data is loaded
-  const processedContributions = contributions && !loadingContributions
-    ? contributions
-        .map((contribution) => ({
-          contributor: contribution.contributor,
-          amount: contribution.amount,
-          timestamp: contribution.timestamp
-            ? Number(contribution.timestamp.toString())
-            : null,
-        }))
+  // Process contributions
+  const processed = contributions && !loadingContributions
+    ? contributions.map((c) => ({ contributor: c.contributor, amount: c.amount, timestamp: c.timestamp ? Number(c.timestamp.toString()) : null }))
         .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
     : [];
 
-  // Group contributions by contributor - only if data is ready
-  const contributorSummary = processedContributions.length > 0
-    ? processedContributions.reduce(
-        (acc, contribution) => {
-          const contributor = contribution.contributor;
-          if (!acc[contributor]) {
-            acc[contributor] = {
-              address: contributor,
-              totalAmount: 0n,
-              contributionCount: 0,
-              lastContribution: contribution.timestamp,
-            };
-          }
-          acc[contributor].totalAmount += BigInt(contribution.amount.toString());
-          acc[contributor].contributionCount += 1;
-          if (
-            contribution.timestamp &&
-            contribution.timestamp > acc[contributor].lastContribution
-          ) {
-            acc[contributor].lastContribution = contribution.timestamp;
-          }
-          return acc;
-        },
-        {}
-      )
-    : {};
+  const contributorMap = {};
+  processed.forEach((c) => {
+    if (!contributorMap[c.contributor]) contributorMap[c.contributor] = { address: c.contributor, total: 0n, count: 0 };
+    contributorMap[c.contributor].total += BigInt(c.amount.toString());
+    contributorMap[c.contributor].count += 1;
+  });
+  const uniqueContributors = Object.values(contributorMap).sort((a, b) => Number(b.total - a.total));
 
-  const uniqueContributors = processedContributions.length > 0
-    ? Object.values(contributorSummary).sort((a, b) =>
-        Number(b.totalAmount - a.totalAmount)
-      )
-    : [];
+  const QUICK_AMOUNTS = ["0.01", "0.05", "0.1", "0.5", "1"];
 
   const handleContribute = async () => {
-    if (!contributionAmount || parseFloat(contributionAmount) <= 0) {
-      toast.error("Please enter a valid contribution amount");
-      return;
-    }
-
+    if (!contributionAmount || parseFloat(contributionAmount) <= 0) { toast.error("Enter a valid amount"); return; }
     try {
-      await contribute?.({
-        args: [campaignId],
-        value: ethers.utils.parseEther(contributionAmount),
-      });
+      await contribute?.({ args: [campaignId], value: ethers.utils.parseEther(contributionAmount) });
       setContributionAmount("");
-    } catch (error) {
-      console.error("Contribution error:", error);
-    }
-  };
-
-  const handleWithdraw = async () => {
-    try {
-      await withdrawFunds?.({
-        args: [campaignId],
-      });
-    } catch (error) {
-      console.error("Withdrawal error:", error);
-    }
-  };
-
-  const handleRefund = async () => {
-    try {
-      await getRefund?.({
-        args: [campaignId],
-      });
-    } catch (error) {
-      console.error("Refund error:", error);
-    }
-  };
-
-  const handleAddMilestone = async () => {
-    if (!newMilestoneTitle || !newMilestoneDescription || !newMilestoneAmount) {
-      toast.error("Please complete all milestone fields");
-      return;
-    }
-
-    try {
-      await addMilestone?.({
-        args: [
-          campaignId,
-          newMilestoneTitle,
-          newMilestoneDescription,
-          ethers.utils.parseEther(newMilestoneAmount),
-        ],
-      });
-      setNewMilestoneTitle("");
-      setNewMilestoneDescription("");
-      setNewMilestoneAmount("");
-    } catch (error) {
-      console.error("Add milestone error:", error);
-    }
-  };
-
-  const handleRequestMilestoneVote = async (milestoneIndex) => {
-    try {
-      await requestMilestoneVote?.({
-        args: [campaignId, milestoneIndex],
-      });
-    } catch (error) {
-      console.error("Request milestone vote error:", error);
-    }
-  };
-
-  const handleVoteOnMilestone = async (milestoneIndex, approve) => {
-    try {
-      await voteOnMilestone?.({
-        args: [campaignId, milestoneIndex, approve],
-      });
-    } catch (error) {
-      console.error("Vote on milestone error:", error);
-    }
-  };
-
-  const handleReleaseMilestoneFunds = async (milestoneIndex) => {
-    try {
-      await releaseMilestoneFunds?.({
-        args: [campaignId, milestoneIndex],
-      });
-    } catch (error) {
-      console.error("Release milestone funds error:", error);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleShare = async () => {
-    const url = window.location.href;
-    const success = await copyToClipboard(url);
-    if (success) {
-      toast.success("Campaign link copied to clipboard!");
-    } else {
-      toast.error("Failed to copy link");
-    }
+    const ok = await copyToClipboard(window.location.href);
+    toast.success(ok ? "Link copied!" : "Failed to copy");
+  };
+
+  const handleBookmark = () => {
+    toggle(campaignId);
+    toast.success(bookmarked ? "Removed from saved" : "Saved to bookmarks");
   };
 
   return (
-    <div className="max-w-8xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="bg-[#e6e6e6]/40 dark:bg-navy-300 backdrop-blur-md border border-secondary rounded-2xl shadow-sm overflow-hidden">
-        {/* Campaign Image */}
-        <div className="relative h-64 md:h-96 bg-gradient-to-r from-indigo-400 to-indigo-600">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      {/* Hero image */}
+      <div className="card overflow-hidden">
+        <div className="relative h-56 sm:h-72">
           {metadata?.image ? (
-            <img
-              src={metadata.image}
-              alt={campaign.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={metadata.image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-white text-8xl font-bold opacity-20">
-                {campaign.title?.charAt(0) || "C"}
-              </div>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: "var(--color-surface-raised)" }}>
+              <span className="text-5xl font-bold" style={{ color: "var(--color-text-muted)" }}>{campaign.title?.charAt(0) || "C"}</span>
             </div>
           )}
-
-          {/* Overlay Info */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-            <div className="flex space-x-2">
-              <span
-                className={`
-                px-3 py-1 text-sm font-medium rounded-full backdrop-blur-sm
-                ${
-                  campaign.active
-                    ? "bg-green-500 bg-opacity-80 text-white"
-                    : "bg-red-500 bg-opacity-80 text-white"
-                }
-              `}
-              >
-                {campaign.active ? "Active" : "Inactive"}
-              </span>
-
-              {isSuccessful && (
-                <span className="px-3 py-1 text-sm font-medium bg-yellow-500 bg-opacity-80 text-white rounded-full backdrop-blur-sm">
-                  Funded
-                </span>
-              )}
-            </div>
-
-            <button
-              onClick={handleShare}
-              className="p-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full hover:bg-opacity-30 transition-all"
-            >
-              <FiShare2 className="w-5 h-5 text-white" />
+          <div className="absolute top-3 left-3 flex gap-2">
+            <span className={`badge ${campaign.active ? "badge-success" : "badge-error"}`}>
+              {campaign.active ? "Active" : "Ended"}
+            </span>
+            {isSuccessful && <span className="badge badge-warning">Funded</span>}
+          </div>
+          <div className="absolute top-3 right-3 flex gap-1.5">
+            <button onClick={handleBookmark}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                bookmarked ? "bg-indigo-600 text-white" : "bg-black/40 text-white hover:bg-black/60"}`}>
+              <FiBookmark className="w-4 h-4" fill={bookmarked ? "currentColor" : "none"} />
+            </button>
+            <button onClick={handleShare}
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-black/40 text-white hover:bg-black/60 transition-colors">
+              <FiShare2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Campaign Info */}
-        <div className="p-4 sm:p-6 md:p-8">
-          <div className="flex flex-col lg:flex-row lg:space-x-8">
-            {/* Left Column */}
-            <div className="flex-1 space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-[#F8FAFC] mb-4">
-                  {campaign.title}
-                </h1>
-                <p className="text-gray-600 dark:text-[#94A3B8] text-lg leading-relaxed">
-                  {campaign.description}
-                </p>
-              </div>
+        <div className="p-5 sm:p-6">
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--color-text)" }}>{campaign.title}</h1>
 
-              {/* Creator Info */}
-              <div className="flex items-center space-x-4 p-4 bg-white border border-secondary dark:bg-navy-400 rounded-2xl">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center">
-                  <FiUser className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                    Created by
-                  </p>
-                  <p className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                    {creatorName}
-                    {isCreator && (
-                      <span className="ml-2 text-indigo-400">(You)</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Stats & Actions */}
-            <div className="lg:w-96 mt-8 lg:mt-0">
-              <div className="bg-white border border-secondary dark:bg-navy-400 rounded-2xl p-6 space-y-6">
-                {/* Progress */}
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-[#CBD5E1]">
-                      Progress
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      {progress.toFixed(1)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 mb-4">
-                    <div
-                      className="bg-gradient-to-r from-indigo-400 to-indigo-600 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC]">
-                      {parseFloat(raisedAmount).toFixed(2)}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      ETH Raised
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC]">
-                      {parseFloat(targetAmount).toFixed(2)}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      ETH Target
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC]">
-                      {uniqueContributors.length}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      Contributors
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-[#F8FAFC]">
-                      {timeLeft.expired ? "0" : timeLeft.text.split(" ")[0]}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      {timeLeft.expired ? "Expired" : "Days Left"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  {!timeLeft.expired &&
-                    campaign.active &&
-                    !isCreator &&
-                    isConnected && (
-                      <div className="space-y-3">
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          placeholder="0.00 ETH"
-                          value={contributionAmount}
-                          onChange={(e) =>
-                            setContributionAmount(e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-navy-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-600 dark:text-[#F8FAFC]"
-                        />
-                        <button
-                          onClick={handleContribute}
-                          disabled={contributing || !contributionAmount}
-                          className="w-full bg-gradient-to-r from-indigo-400 to-indigo-600 hover:from-indigo-500 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
-                        >
-                          {contributing ? "Contributing..." : "Contribute Now"}
-                        </button>
-                      </div>
-                    )}
-
-                  {canWithdraw && (
-                    <button
-                      onClick={handleWithdraw}
-                      disabled={withdrawing}
-                      className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors disabled:cursor-not-allowed"
-                    >
-                      {withdrawing ? "Withdrawing..." : "Withdraw Funds"}
-                    </button>
-                  )}
-
-                  {canGetRefund && (
-                    <button
-                      onClick={handleRefund}
-                      disabled={refunding}
-                      className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors disabled:cursor-not-allowed"
-                    >
-                      {refunding ? "Processing..." : "Get Refund"}
-                    </button>
-                  )}
-
-                  {!isConnected && (
-                    <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                      <p className="text-yellow-800 dark:text-yellow-200 text-sm">
-                        Connect your wallet to contribute
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* User Contribution */}
-                {userContribution > 0 && (
-                  <div className="p-4 bg-indigo-500/10 dark:bg-[rgba(99,102,241,0.14)] rounded-lg">
-                    <p className="text-sm text-indigo-400 dark:text-indigo-200">
-                      Your contribution:{" "}
-                      <span className="font-medium">
-                        {formatEther(userContribution)} ETH
-                      </span>
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="mt-2 flex items-center gap-3 text-sm" style={{ color: "var(--color-text-muted)" }}>
+            <span className="flex items-center gap-1"><FiUser className="w-3.5 h-3.5" /> {creatorName}</span>
+            {isCreator && <span className="badge badge-neutral">(You)</span>}
           </div>
+
+          <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{campaign.description}</p>
         </div>
       </div>
 
-      {/* Additional Details */}
-      <div className="bg-white border border-secondary dark:bg-navy-300 rounded-2xl shadow-sm p-6">
-        {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-navy-600 mb-6">
-          <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar">
-            {["overview", "milestones", "updates", "contributors"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-all duration-300 ease-out ${
-                  activeTab === tab
-                    ? "border-indigo-500 text-indigo-400 dark:text-[#A5B4FC] scale-105"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-[#94A3B8] dark:hover:text-gray-300 hover:scale-102"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                {tab === "contributors" && uniqueContributors.length > 0 && (
-                  <span className="ml-1 bg-indigo-500/10 text-indigo-400 text-xs font-medium px-2 py-0.5 rounded-full">
-                    {uniqueContributors.length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </nav>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Tabs */}
+          <div className="card">
+            <div className="border-b flex gap-1 px-1 overflow-x-auto" style={{ borderColor: "var(--color-border)" }}>
+              {TABS.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab
+                      ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
+                      : "border-transparent hover:border-slate-300"
+                  }`}
+                  style={activeTab === tab ? undefined : { color: "var(--color-text-muted)" }}
+                >
+                  {tab}
+                  {tab === "Contributors" && uniqueContributors.length > 0 && (
+                    <span className="ml-1.5 text-xs bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-full">
+                      {uniqueContributors.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
 
-        {/* Tab Content */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC] mb-3">
-                Campaign Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <FiCalendar className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-600 dark:text-[#94A3B8]">
-                    Created:
-                  </span>
-                  <span className="text-gray-900 dark:text-[#F8FAFC]">
-                    {formatDate(campaign.createdAt)}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <FiClock className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-600 dark:text-[#94A3B8]">
-                    Deadline:
-                  </span>
-                  <span className="text-gray-900 dark:text-[#F8FAFC]">
-                    {formatDate(campaign.deadline)}
-                  </span>
-                </div>
-                {metadata?.category && (
-                  <div className="flex items-center space-x-2">
-                    <FiTarget className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600 dark:text-[#94A3B8]">
-                      Category:
-                    </span>
-                    <span className="text-gray-900 dark:text-[#F8FAFC]">
-                      {metadata.category}
-                    </span>
+            <div className="p-5">
+              {/* Overview tab */}
+              {activeTab === "Overview" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <FiCalendar className="w-4 h-4" style={{ color: "var(--color-text-muted)" }} />
+                      <span style={{ color: "var(--color-text-muted)" }}>Created:</span>
+                      <span style={{ color: "var(--color-text)" }}>{formatDate(campaign.createdAt)}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FiClock className="w-4 h-4" style={{ color: "var(--color-text-muted)" }} />
+                      <span style={{ color: "var(--color-text-muted)" }}>Deadline:</span>
+                      <span style={{ color: "var(--color-text)" }}>{formatDate(campaign.deadline)}</span>
+                    </div>
+                    {metadata?.category && (
+                      <div className="flex items-center gap-2">
+                        <FiTarget className="w-4 h-4" style={{ color: "var(--color-text-muted)" }} />
+                        <span style={{ color: "var(--color-text-muted)" }}>Category:</span>
+                        <span style={{ color: "var(--color-text)" }}>{metadata.category}</span>
+                      </div>
+                    )}
                   </div>
-                )}
-                {metadata?.tags?.length > 0 && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-600 dark:text-[#94A3B8]">
-                      Tags:
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {metadata.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-indigo-500/10 dark:bg-indigo-950 text-indigo-400 dark:text-indigo-200 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
+                  {metadata?.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {metadata.tags.map((tag, i) => (
+                        <span key={i} className="badge badge-neutral">{tag}</span>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
+                  {metadata?.additionalInfo && (
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1" style={{ color: "var(--color-text)" }}>Additional Info</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{metadata.additionalInfo}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Milestones tab */}
+              {activeTab === "Milestones" && (
+                <div className="space-y-4">
+                  {isCreator && (
+                    <div className="p-4 rounded-lg border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-raised)" }}>
+                      <h4 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text)" }}>Add Milestone</h4>
+                      <div className="grid gap-3">
+                        <input placeholder="Title" value={newMilestoneTitle} onChange={(e) => setNewMilestoneTitle(e.target.value)} className="input" />
+                        <textarea placeholder="Description" value={newMilestoneDesc} onChange={(e) => setNewMilestoneDesc(e.target.value)} className="input resize-none" rows={2} />
+                        <input type="number" min="0.01" step="0.01" placeholder="Amount (ETH)" value={newMilestoneAmount} onChange={(e) => setNewMilestoneAmount(e.target.value)} className="input" />
+                        <button
+                          onClick={async () => {
+                            if (!newMilestoneTitle || !newMilestoneDesc || !newMilestoneAmount) { toast.error("Fill all fields"); return; }
+                            try {
+                              await addMilestone?.({ args: [campaignId, newMilestoneTitle, newMilestoneDesc, ethers.utils.parseEther(newMilestoneAmount)] });
+                              setNewMilestoneTitle(""); setNewMilestoneDesc(""); setNewMilestoneAmount("");
+                            } catch (err) { console.error(err); }
+                          }}
+                          disabled={addingMilestone}
+                          className="btn btn-sm"
+                        >
+                          {addingMilestone ? "Adding..." : "Add Milestone"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {loadingMilestones ? (
+                    <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-20" />)}</div>
+                  ) : milestones?.length > 0 ? (
+                    milestones.map((m, i) => (
+                      <div key={i} className="card p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>{m.title}</h4>
+                            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>{m.description}</p>
+                          </div>
+                          <div className="flex gap-1.5 shrink-0">
+                            <span className={`badge ${m.completed ? "badge-success" : "badge-neutral"}`}>{m.completed ? "Done" : "Pending"}</span>
+                            <span className={`badge ${m.fundsReleased ? "badge-success" : "badge-warning"}`}>{m.fundsReleased ? "Released" : "Locked"}</span>
+                          </div>
+                        </div>
+                        <div className="mt-3 flex items-center gap-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                          <span>{formatEther(m.amount)} ETH</span>
+                          <span>{m.approvals} approvals</span>
+                          <span>{m.rejections} rejections</span>
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                          {isCreator && !m.voteRequested && !m.fundsReleased && (
+                            <button onClick={() => requestMilestoneVote?.({ args: [campaignId, i] })} disabled={requestingVote} className="btn btn-sm btn-secondary">
+                              Request Vote
+                            </button>
+                          )}
+                          {isCreator && m.voteRequested && !m.fundsReleased && (
+                            <button onClick={() => releaseMilestoneFunds?.({ args: [campaignId, i] })} disabled={releasing} className="btn btn-sm">
+                              Release Funds
+                            </button>
+                          )}
+                          {!isCreator && m.voteRequested && !m.fundsReleased && !voteStatuses[i] && (
+                            <>
+                              <button onClick={() => voteOnMilestone?.({ args: [campaignId, i, true] })} disabled={voting} className="btn btn-sm" style={{ background: "var(--color-success)", color: "#fff" }}>
+                                Approve
+                              </button>
+                              <button onClick={() => voteOnMilestone?.({ args: [campaignId, i, false] })} disabled={voting} className="btn btn-sm btn-danger">
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {!isCreator && voteStatuses[i] && (
+                            <span className="text-xs font-medium" style={{ color: "var(--color-success)" }}>You voted</span>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-center py-8" style={{ color: "var(--color-text-muted)" }}>No milestones yet</p>
+                  )}
+                </div>
+              )}
+
+              {/* Contributors tab */}
+              {activeTab === "Contributors" && (
+                <div>
+                  {loadingContributions ? (
+                    <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-14" />)}</div>
+                  ) : uniqueContributors.length > 0 ? (
+                    <div className="space-y-2">
+                      {uniqueContributors.map((c, i) => (
+                        <div key={c.address} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "var(--color-accent)" }}>
+                              #{i + 1}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                                {formatAddress(c.address)}
+                                {c.address.toLowerCase() === address?.toLowerCase() && <span className="ml-1 text-xs" style={{ color: "var(--color-accent)" }}>(You)</span>}
+                              </p>
+                              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{c.count} contribution{c.count !== 1 ? "s" : ""}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>{formatEther(c.total)} ETH</p>
+                            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{((Number(formatEther(c.total)) / parseFloat(raised || 1)) * 100).toFixed(1)}%</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FiUsers className="w-8 h-8 mx-auto mb-2" style={{ color: "var(--color-text-muted)" }} />
+                      <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No contributors yet. Be the first!</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Sidebar */}
+        <div className="space-y-4">
+          {/* Progress card */}
+          <div className="card p-5">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span style={{ color: "var(--color-text-secondary)" }}>Progress</span>
+              <span className="font-medium" style={{ color: "var(--color-accent)" }}>{progress.toFixed(1)}%</span>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--color-surface-raised)" }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%`, background: "var(--color-accent)" }} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <div>
+                <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{raised}</p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>ETH Raised</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{target}</p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>ETH Target</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{uniqueContributors.length}</p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Contributors</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>{timeLeft.expired ? "—" : timeLeft.text}</p>
+                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{timeLeft.expired ? "Expired" : "Left"}</p>
               </div>
             </div>
 
-            {metadata?.additionalInfo && (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC] mb-3">
-                  Additional Information
-                </h3>
-                <p className="text-gray-600 dark:text-[#94A3B8] leading-relaxed">
-                  {metadata.additionalInfo}
-                </p>
+            {/* User's contribution */}
+            {userContribution > 0 && (
+              <div className="mt-4 p-3 rounded-lg text-sm" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}>
+                Your contribution: <span className="font-semibold">{formatEther(userContribution)} ETH</span>
               </div>
             )}
           </div>
-        )}
 
-        {activeTab === "updates" && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-[#94A3B8]">
-              No updates available for this campaign yet.
-            </p>
-          </div>
-        )}
-
-        {activeTab === "milestones" && (
-          <div className="space-y-6">
-            {isCreator && (
-              <div className="bg-gray-50 dark:bg-navy-400 border border-secondary rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC] mb-4">
-                  Add New Milestone
-                </h3>
-                <div className="grid gap-4">
-                  <input
-                    value={newMilestoneTitle}
-                    onChange={(e) => setNewMilestoneTitle(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-[#F8FAFC]"
-                    placeholder="Milestone title"
-                  />
-                  <textarea
-                    value={newMilestoneDescription}
-                    onChange={(e) => setNewMilestoneDescription(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-[#F8FAFC]"
-                    placeholder="Milestone description"
-                    rows={4}
-                  />
-                  <input
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={newMilestoneAmount}
-                    onChange={(e) => setNewMilestoneAmount(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-[#F8FAFC]"
-                    placeholder="Amount in ETH"
-                  />
-                  <button
-                    onClick={handleAddMilestone}
-                    disabled={addingMilestone}
-                    className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors disabled:cursor-not-allowed"
-                  >
-                    {addingMilestone ? "Adding milestone..." : "Add Milestone"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {loadingMilestones ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-              </div>
-            ) : milestones && milestones.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">
-                      Campaign Milestones
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                      Track milestone approvals and release requests.
-                    </p>
-                  </div>
-                  <span className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                    {milestones.length} milestone{milestones.length !== 1 ? "s" : ""}
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {milestones.map((milestone, index) => {
-                    const hasVoted = milestoneVoteStatuses[index] ?? false;
-                    return (
-                      <div
-                        key={index}
-                        className="bg-white dark:bg-navy-400 border border-secondary rounded-2xl p-6"
-                      >
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">
-                              {milestone.title}
-                            </h4>
-                            <p className="mt-2 text-gray-600 dark:text-[#94A3B8]">
-                              {milestone.description}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 dark:bg-indigo-950 dark:text-indigo-200">
-                              {milestone.completed ? "Completed" : "Pending"}
-                            </span>
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                              {milestone.voteRequested ? "Vote Requested" : "Awaiting Request"}
-                            </span>
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              {milestone.fundsReleased ? "Released" : "Locked"}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-[#CBD5E1]">
-                          <div>
-                            <span className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                              {formatEther(milestone.amount)} ETH
-                            </span>
-                            <div>Amount</div>
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                              {milestone.approvals}
-                            </span>
-                            <div>Approvals</div>
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                              {milestone.rejections}
-                            </span>
-                            <div>Rejections</div>
-                          </div>
-                        </div>
-
-                        <div className="mt-5 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:flex-wrap gap-3">
-                          {isCreator && !milestone.voteRequested && !milestone.fundsReleased && (
-                            <button
-                              onClick={() => handleRequestMilestoneVote(index)}
-                              disabled={requestingVote}
-                              className="px-4 py-3 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                            >
-                              {requestingVote ? "Requesting..." : "Request Vote"}
-                            </button>
-                          )}
-
-                          {isCreator && milestone.voteRequested && !milestone.fundsReleased && (
-                            <button
-                              onClick={() => handleReleaseMilestoneFunds(index)}
-                              disabled={releasingMilestone}
-                              className="px-4 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                            >
-                              {releasingMilestone ? "Releasing..." : "Release Funds"}
-                            </button>
-                          )}
-
-                          {isConnected && !isCreator && milestone.voteRequested && !milestone.fundsReleased && (
-                            <div className="flex flex-wrap gap-2">
-                              <button
-                                onClick={() => handleVoteOnMilestone(index, true)}
-                                disabled={hasVoted || votingOnMilestone}
-                                className="px-4 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleVoteOnMilestone(index, false)}
-                                disabled={hasVoted || votingOnMilestone}
-                                className="px-4 py-3 bg-rose-500 hover:bg-rose-600 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          )}
-
-                          {!isCreator && hasVoted && (
-                            <span className="text-sm text-green-700 dark:text-green-300">
-                              You have already voted on this milestone.
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-[#94A3B8]">
-                  No milestones have been added for this campaign yet.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "contributors" && (
-          <div>
-            {loadingContributions ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-              </div>
-            ) : uniqueContributors.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-[#F8FAFC]">
-                    Contributors ({uniqueContributors.length})
-                  </h3>
-                  <div className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                    Total contributions: {processedContributions.length}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {uniqueContributors.map((contributor, index) => (
-                    <div
-                      key={contributor.address}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-medium">
-                          #{index + 1}
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                            {formatAddress(contributor.address)}
-                            {contributor.address.toLowerCase() ===
-                              address?.toLowerCase() && (
-                              <span className="ml-2 text-indigo-400 text-sm">
-                                (You)
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                            {contributor.contributionCount} contribution
-                            {contributor.contributionCount !== 1 ? "s" : ""}
-                            {contributor.lastContribution && (
-                              <span className="ml-2">
-                                • Last:{" "}
-                                {formatDate(contributor.lastContribution)}
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-900 dark:text-[#F8FAFC]">
-                          {formatEther(contributor.totalAmount)} ETH
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-[#94A3B8]">
-                          {(
-                            (Number(formatEther(contributor.totalAmount)) /
-                              Number(raisedAmount)) *
-                            100
-                          ).toFixed(1)}
-                          %
-                        </p>
-                      </div>
-                    </div>
+          {/* Action card */}
+          <div className="card p-5 space-y-3">
+            {!timeLeft.expired && campaign.active && !isCreator && isConnected && (
+              <>
+                <div className="flex gap-1.5 flex-wrap">
+                  {QUICK_AMOUNTS.map((amt) => (
+                    <button key={amt} onClick={() => setContributionAmount(amt)}
+                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                        contributionAmount === amt
+                          ? "bg-indigo-600 text-white"
+                          : "border hover:bg-slate-50 dark:hover:bg-slate-700/30"
+                      }`}
+                      style={contributionAmount === amt ? undefined : { borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>
+                      {amt} ETH
+                    </button>
                   ))}
                 </div>
+                <input
+                  type="number" step="0.01" min="0.01" placeholder="Amount (ETH)"
+                  value={contributionAmount}
+                  onChange={(e) => setContributionAmount(e.target.value)}
+                  className="input"
+                />
+                <button onClick={handleContribute} disabled={contributing || !contributionAmount} className="btn w-full">
+                  {contributing ? "Contributing..." : "Contribute Now"}
+                </button>
+              </>
+            )}
 
-                {/* Recent Contributions */}
-                {processedContributions.length > uniqueContributors.length && (
-                  <div className="mt-8">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-[#F8FAFC] mb-4">
-                      Recent Contributions
-                    </h4>
-                    <div className="space-y-2">
-                      {processedContributions
-                        .slice(0, 10)
-                        .map((contribution, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <FiHeart className="w-4 h-4 text-red-500" />
-                              <span className="text-gray-900 dark:text-[#F8FAFC]">
-                                {formatAddress(contribution.contributor)}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                              <span className="font-medium text-gray-900 dark:text-[#F8FAFC]">
-                                {formatEther(contribution.amount)} ETH
-                              </span>
-                              {contribution.timestamp && (
-                                <span className="text-gray-500 dark:text-[#94A3B8]">
-                                  {formatDate(contribution.timestamp)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <FiUsers className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-[#F8FAFC] mb-2">
-                  No contributors yet
-                </h3>
-                <p className="text-gray-500 dark:text-[#94A3B8]">
-                  Be the first to support this campaign!
-                </p>
-              </div>
+            {canWithdraw && (
+              <button onClick={async () => { await withdrawFunds?.({ args: [campaignId] }); }} disabled={withdrawing} className="btn w-full" style={{ background: "var(--color-success)", color: "#fff" }}>
+                {withdrawing ? "Withdrawing..." : "Withdraw Funds"}
+              </button>
+            )}
+
+            {canRefund && (
+              <button onClick={async () => { await getRefund?.({ args: [campaignId] }); }} disabled={refunding} className="btn btn-danger w-full">
+                {refunding ? "Processing..." : "Get Refund"}
+              </button>
+            )}
+
+            {!isConnected && (
+              <p className="text-sm text-center py-2" style={{ color: "var(--color-text-muted)" }}>Connect wallet to contribute</p>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -4,25 +4,17 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <meta name="description" content="CrowdFund DApp — Decentralized crowdfunding on the blockchain. Create campaigns, contribute ETH, and track milestones transparently." />
-        <meta name="theme-color" content="#080D1A" />
-        <meta name="application-name" content="CrowdFund DApp" />
-
-        {/* Open Graph */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <meta name="description" content="CrowdFund — Decentralized crowdfunding on the blockchain." />
+        <meta name="theme-color" content="#0f172a" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="CrowdFund DApp" />
-        <meta property="og:description" content="Decentralized crowdfunding on the blockchain. Create campaigns, contribute ETH, and track milestones transparently." />
-        <meta property="og:site_name" content="CrowdFund DApp" />
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="CrowdFund DApp" />
-        <meta name="twitter:description" content="Decentralized crowdfunding on the blockchain." />
-
-        {/* Manifest */}
-        <link rel="manifest" href="/manifest.json" />
-
-        {/* Favicon */}
+        <meta property="og:title" content="CrowdFund" />
+        <meta property="og:description" content="Decentralized crowdfunding on the blockchain." />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/logo2.gif" />
       </Head>

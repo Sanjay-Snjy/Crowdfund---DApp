@@ -104,8 +104,8 @@ export default function Sidebar({
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
   const sidebarWidthClass = isOpen
-    ? `w-64 ${isCollapsed ? "md:w-16" : "md:w-56"}`
-    : `w-16 ${isCollapsed ? "md:w-16" : "md:w-56"}`;
+    ? `w-64 ${isCollapsed ? "md:w-14" : "md:w-56"}`
+    : `w-12 ${isCollapsed ? "md:w-14" : "md:w-56"}`;
 
   const handleCopyAddress = async () => {
     if (!address) return;
@@ -268,10 +268,10 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-0 bottom-0 left-0 md:top-[86px] md:bottom-6 md:left-3 bg-[#e6e6e6]/95 backdrop-blur-md dark:bg-navy-100 border-0 md:border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
+        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[#e6e6e6]/40 backdrop-blur-md dark:bg-navy-100 border-0 md:border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
-        rounded-none md:rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
+        rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
       `}
       >
         {/* Header */}
@@ -289,12 +289,12 @@ export default function Sidebar({
                 <Link
                   href={item.path}
                 className={`
-                  flex items-center px-3 py-3 rounded-4xl transition-all duration-300 w-full
-                  ${isCollapsed ? "justify-center" : "justify-start gap-3"}
+                  flex items-center px-3 py-2 rounded-4xl transition-all duration-300 w-full
+                  ${isCollapsed ? "justify-center" : "justify-start gap-5"}
                   ${
                     isActive
-                      ? "bg-indigo-500/10 dark:bg-[rgba(99,102,241,0.14)] text-indigo-500 dark:text-[#A5B4FC] border border-indigo-500 dark:border-indigo-500"
-                      : "text-gray-700 dark:text-[#CBD5E1] hover:bg-gray-50 dark:hover:bg-navy-500"
+                      ? "bg-cyan-400/5 dark:bg-[rgba(99, 182, 241, 0.14)] text-cyan-800 dark:text-cyan-500 border border-cyan-500 dark:border-cyan-500"
+                      : "text-gray-700 dark:text-[#CBD5E1] hover:bg-gray-50 dark:hover:bg-cyan-500/50"
                   }
                 `}
                 title={item.label}
@@ -312,49 +312,18 @@ export default function Sidebar({
           })}
         </nav>
 
-        <div className="px-2 py-2 hidden md:block">
+        {/* Collapse Toggle */}
+        <div className="px-2 pb-1">
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="flex w-full items-center justify-center gap-2 rounded-3xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-navy-600 dark:bg-navy-500 dark:text-slate-100 dark:hover:bg-navy-500"
+            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100 dark:text-[#94A3B8] dark:hover:bg-navy-500 ${isCollapsed ? "justify-center" : "justify-start"}`}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <FiChevronLeft
-              className={`h-4 w-4 transition-transform ${isCollapsed ? "-rotate-180" : "rotate-0"}`}
-            />
-            {!isCollapsed && "Collapse"}
+            <FiChevronLeft className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
+            {!isCollapsed && <span className="text-xs">Collapse</span>}
           </button>
         </div>
-
-        {/* Connection Status */}
-        {!isCollapsed && (
-          <div className="p-4 border-t border-gray-200 dark:border-navy-600 hidden md:block">
-            <div
-              className={`
-              flex items-center space-x-2 px-3 py-2 rounded-2xl
-              ${
-                isConnected
-                  ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                  : "bg-red-50 dark:bg-[rgba(239,68,68,0.10)] text-red-700 dark:text-[#EF4444]"
-              }
-            `}
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isConnected ? "bg-green-500" : "bg-red-500"
-                }`}
-              />
-              <span className="text-sm font-medium">
-                {isConnected ? "Connected" : "Disconnected"}
-              </span>
-            </div>
-
-            {isConnected && address && (
-              <div className="mt-2 text-xs text-gray-500 dark:text-[#94A3B8] px-3">
-                {address.slice(0, 6)}...{address.slice(-4)}
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="mt-auto border-t border-gray-200/80 p-2 dark:border-navy-600/80">
           <div className="flex flex-col gap-1">

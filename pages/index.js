@@ -55,6 +55,14 @@ export default function Home() {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim().length > 0 &&
     !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("your_clerk_publishable_key_here");
 
+  // Force dark mode on landing page for correct CSS variable resolution
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, []);
+
   // Fetch campaign counter
   const { data: campaignCount } = useContractRead({
     address: CONTRACT_ADDRESS,
@@ -665,7 +673,7 @@ export default function Home() {
             <SignedOut>
               <div className="flex flex-col sm:flex-row gap-3">
                 <SignInButton mode="modal">
-                  <button className="bg-white text-cyan-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors">
+                  <button className="bg-white text-cyan-600 px-8 py-4 rounded-4xl font-medium hover:bg-cyan-50 transition-colors">
                     Login
                   </button>
                 </SignInButton>
@@ -682,13 +690,13 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleGoToCampaigns}
-                  className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
+                  className={`bg-white text-cyan-600 px-8 py-4 backdrop-blur-sm rounded-4xl font-medium hover:bg-cyan-500 hover:text-white transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
                 >
                   Explore Campaigns
                   <FiArrowRight className="ml-2 w-5 h-5" />
                 </button>
               ) : (
-                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-blue-400">
+                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-cyan-400">
                   <ConnectButton.Custom>
                     {({ openConnectModal }) => (
                       <button
@@ -709,13 +717,13 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleGoToCampaigns}
-                className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-blue-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
+                className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-cyan-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
               >
                 Explore Campaigns
                 <FiArrowRight className="ml-2 w-5 h-5" />
               </button>
             ) : (
-              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-blue-400">
+              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-cyan-400">
                 <ConnectButton.Custom>
                   {({ openConnectModal }) => (
                     <button
@@ -734,14 +742,14 @@ export default function Home() {
         <SignedIn>
           <button
             onClick={handleGoToDashboard}
-            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors"
+            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors"
           >
             Go to Dashboard
           </button>
         </SignedIn>
         <SignedOut>
           <SignInButton mode="modal">
-            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-blue-600 transition-colors">
+            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors">
               Go to Dashboard
             </button>
           </SignInButton>
@@ -753,61 +761,52 @@ export default function Home() {
 </section>
             <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
 
-      {/* Recent Campaigns Section */}
-      <section className="relative z-10 px-4 sm:px-8 lg:px-12 py-10">
-        <div className="px-4 sm:px-6 lg:px-8">
+            {/* Recent Campaigns Section */}
+      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
-            <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3">
-                Recent campaigns launched
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-cyan-400" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Recent Campaigns</span>
+              </div>
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">Discover the Latest Campaigns</h2>
+              <p className="text-base text-slate-400 max-w-lg leading-relaxed">
+                See what the community is backing right now. Transparent progress, real contributors, on-chain data.
               </p>
-              <h2 className="text-[36px] font-bold text-white">
-                Discover the latest ideas gaining traction
-              </h2>
             </div>
             <SignedIn>
-            
-          <div className="ml-[300px]">
-    <button
-  onClick={() => router.push("/all-campaigns")}
-  type="submit"
-  class="flex justify-center gap-2 items-center  shadow-xl text-lg text-white bg-transparent backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-cyan-500  before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 border-white/60 rounded-full group"
-    >
-   Explore
-    <svg
-    class="w-8 h-8 justify-end bg-white/80 group-hover:rotate-90  text-white ease-linear duration-300 rounded-full border border-white group-hover:border-none p-2 rotate-45"
-    viewBox="0 0 16 19"
-    xmlns="http://www.w3.org/2000/svg"
-   >
-    <path
-      d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
-      class="fill-gray-800 group-hover:fill-gray-800"
-    ></path>
-  </svg>
-</button></div> 
-
+              <button
+                onClick={() => router.push("/all-campaigns")}
+                className="inline-flex items-center gap-2 rounded-[40px] border-2 border-white/40 backdrop-blur-sm bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.08] hover:border-white"
+              >
+                View All Campaigns
+                <FiArrowRight className="w-4 h-4" />
+              </button>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="inline-flex items-center justify-center rounded-full border border-cyan-300/30 bg-transparent backdrop-blur-sm px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15">
-                  Explore all campaigns
-                  <FiArrowRight className="ml-2 h-4 w-4" />
+                <button className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.08] hover:border-white">
+                  View All Campaigns
+                  <FiArrowRight className="w-4 h-4" />
                 </button>
               </SignInButton>
             </SignedOut>
           </div>
 
           {recentCampaignsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
-              {[...Array(4)].map((_, index) => (
-                <div
-                  key={index}
-                  className="h-72 rounded-[1.5rem] border border-white/10 bg-transparent p-4 animate-pulse "
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02]  p-4 space-y-3 animate-pulse">
+                  <div className="h-36 rounded-lg bg-white/[0.04]" />
+                  <div className="h-4 w-3/4 rounded bg-white/[0.04]" />
+                  <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                  <div className="h-1.5 rounded-full bg-white/[0.04]" />
+                </div>
               ))}
             </div>
           ) : visibleRecentCampaigns.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {visibleRecentCampaigns.map((campaign) => (
                 <CampaignCard
                   key={campaign.id}
@@ -816,81 +815,116 @@ export default function Home() {
                   currentUserAddress={address}
                   currentUserName={currentUserName}
                   isLandingCard
-                  className="border-white/10 shadow-2xl bg-transparent"
+                  className="border-white/[0.08] bg-navy-300/70 backdrop-blur-sm"
                 />
               ))}
             </div>
           ) : (
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-8 text-center text-white/80">
-              No recent campaigns are available right now.
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center">
+              <p className="text-sm text-slate-400">No campaigns yet. Be the first to launch one.</p>
             </div>
           )}
         </div>
       </section>
-
-            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-
-      {/* Explore Fundraising Categories Section */}
-      <section className="relative z-10 px-6 py-10 sm:px-8 lg:px-12">
+ <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+{/* Stats Section */}
+      <section className="relative z-10 py-16 px-6 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          {/* Header row: text left, overview stats right */}
-           <div className="space-y-6 ">
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-                Explore fundraising categories
-              </p>
-              <h2 className="text-4xl font-semibold text-white sm:text-5xl">
-                Minimal categories for modern campaigns
-              </h2>
-              <p className="max-w-4xl text-lg leading-8 text-slate-300">
-                Clear category sections help supporters quickly identify the campaign type that matches their interests.
+          <div className="flex flex-col gap-4 mb-12">
+            <div className="flex items-center gap-3">
+              <div className="h-px w-8 bg-cyan-400" />
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Platform Metrics</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Real-Time Platform Momentum</h2>
+            <p className="text-base text-slate-400 max-w-lg leading-relaxed">
+              Live numbers from the blockchain. No inflated metrics — every stat is on-chain and verifiable.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                value: loading ? "..." : stats.campaignsLaunched,
+                label: "Campaigns Launched",
+                sub: "active on-chain",
+              },
+              {
+                value: loading ? "..." : `\u039E ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`,
+                label: "Total Raised",
+                sub: "ETH contributed",
+              },
+              {
+                value: loading ? "..." : stats.contributors,
+                label: "Contributors",
+                sub: "unique backers",
+              },
+            ].map((stat, i) => (
+              <div key={i} className="rounded-xl border border-white/0 backdrop-blur-sm bg-cyan-800/30 p-6">
+                <p className="text-3xl font-bold text-white tabular-nums">{stat.value}</p>
+                <p className="mt-2 text-sm font-medium text-slate-300">{stat.label}</p>
+                <p className="text-xs text-slate-600 mt-0.5">{stat.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+ <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+{/* Explore Fundraising Categories Section */}
+      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-cyan-400" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Categories</span>
+              </div>
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">Browse by Category</h2>
+              <p className="text-base text-slate-400 max-w-lg leading-relaxed">
+                Find campaigns that match your interests. Each category is curated for transparency and impact.
               </p>
             </div>
-          <div className="flex mt-6 ml-[300px] flex-col gap-8 pb-10 lg:flex-row lg:items-end lg:justify-between">
-           
-            <div className="flex flex-wrap gap-3 lg:flex-shrink-0">
+            <div className="flex flex-wrap gap-2">
               {categoryOverviewStats.map((stat, index) => {
                 const Icon = stat.icon;
                 return (
                   <div
                     key={index}
-                    className="group flex items-center gap-2.5 rounded-full border border-cyan-700/50 bg-cyan-800/30 backdrop-blur-md px-5 py-3 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/[0.04]"
+                    className="flex items-center gap-2 rounded-[15px] border border-white/0 backdrop-blur-sm bg-cyan-800/30  px-4 py-2.5"
                   >
-                    <Icon className="h-4 w-4 text-cyan-400 transition-colors group-hover:text-cyan-300" />
-                    <span className="text-sm font-medium text-slate-300">{stat.label}</span>
+                    <Icon className="h-4 w-4 text-cyan-400" />
+                    <span className="text-sm text-slate-300">{stat.label}</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {campaignCategories.map((category, index) => {
               const Icon = category.icon;
               return (
                 <div
                   key={index}
-                  className="group relative rounded-3xl border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 pl-7 transition-all duration-300 hover:border-l-cyan-400/50 hover:bg-cyan-950/60 hover:shadow-lg hover:shadow-cyan-500/[0.03]"
+                  className="group rounded-xl border-2 border-white/0 backdrop-blur-sm bg-cyan-800/30  p-5 transition-all duration-200  hover:border-cyan-800"
                 >
-                  {/* Left accent line on hover */}
-                  <div className="absolute left-0 top-6 bottom-6 w-[2px] rounded-full bg-transparent transition-colors duration-300 group-hover:bg-cyan-400/50" />
-
                   <div className="flex items-start gap-4">
-                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-slate-800 text-slate-300 transition-colors duration-300 group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] bg-white/10 text-white">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
-                      <p className="mt-1.5 text-sm leading-5 text-slate-400 line-clamp-2">{category.description}</p>
+                      <h3 className="text-base font-semibold text-white">{category.title}</h3>
+                      <p className="mt-1 text-sm text-slate-400 line-clamp-2 leading-relaxed">{category.description}</p>
                     </div>
                   </div>
-
-                  {/* Inline stat chips */}
-                  <div className="mt-5 flex items-center gap-3 text-xs">
-                    <span className="font-semibold text-white">{category.campaigns}</span>
-                    <span className="text-slate-600">campaigns</span>
-                    <span className="h-3 w-px bg-slate-700" />
-                    <span className="font-semibold text-cyan-300">{category.ethRaised.toFixed(1)} ETH</span>
-                    <span className="text-slate-600">raised</span>
+                  <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-semibold text-white">{category.campaigns}</span>
+                      <span className="text-xs text-slate-500">campaign{category.campaigns !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-semibold text-cyan-300">{category.ethRaised.toFixed(1)}</span>
+                      <span className="text-xs text-slate-500">ETH raised</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -898,104 +932,56 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-
-      {/* Features Section */}
+       <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
+{/* Features Section */}
       <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
-          <div className="space-y-6 pb-10">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-              Built for modern crowdfunding
-            </p>
-            <h2 className="text-4xl font-semibold text-white sm:text-5xl">
-              Professional tools made simple
-            </h2>
-            <p className="max-w-4xl text-lg leading-8 text-slate-300">
-              Clean features for founders and backers, designed to keep every campaign polished and easy to follow.
+          <div className="flex flex-col gap-4 mb-12">
+            <div className="flex items-center gap-3">
+              <div className="h-px w-8 bg-cyan-400" />
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Why CrowdFund</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Built for Modern Crowdfunding</h2>
+            <p className="text-base text-slate-400 max-w-lg leading-relaxed">
+              Everything founders and backers need — transparent, secure, and built on-chain.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group relative flex items-start gap-5 rounded-3xl border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/[0.04] hover:bg-cyan-950/60"
+                className="group rounded-xl border-2 border-white/0 backdrop-blur-sm bg-cyan-800/30  p-4 transition-all duration-200 hover:border-cyan-800"
               >
-                {/* Numbered ring icon */}
-                <div className="relative flex-shrink-0">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-3xl border border-slate-700/50 bg-slate-800 text-slate-200 transition-all duration-300 group-hover:border-cyan-400/30 group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
-                    <feature.icon className="h-6 w-6" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] bg-white/10 text-white">
+                    <feature.icon className="h-5 w-5" />
                   </div>
-                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 border border-slate-700/50 text-[10px] font-semibold text-slate-500 transition-colors duration-300 group-hover:border-cyan-500/30 group-hover:text-cyan-400">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+                  <span className="text-[11px] font-medium text-slate-600 tabular-nums">{String(index + 1).padStart(2, "0")}</span>
                 </div>
-                {/* Text content */}
-                <div className="min-w-0 flex-1 pt-0.5">
-                  <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-5 text-slate-400">{feature.description}</p>
-                </div>
+                <h3 className="text-base font-semibold text-white">{feature.title}</h3>
+                <p className="mt-2 text-sm text-slate-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-                <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-
-
-      {/* Stats Section */}
-      <section className="relative z-10 py-0 px-4 sm:px-6">
-        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-0">
-          <div className="space-y-6  pb-10">
-            <div className="max-w-3xl space-y-3">
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
-                Real-time platform momentum
-              </p>
-              <h2 className="text-4xl font-semibold text-white sm:text-5xl">
-                Impact metrics that matter
-              </h2>
-              <p className="text-lg leading-8 text-slate-300">
-                Campaign performance and supporter activity displayed in a clean, easy-to-scan format.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
-            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 text-center">
-              <p className="text-4xl font-semibold text-white">
-                {loading ? "..." : stats.campaignsLaunched}
-              </p>
-              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
-                Campaigns launched
-              </p>
-            </div>
-
-            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/15 backdrop-blur-md p-6 text-center">
-              <p className="text-4xl font-semibold text-white">
-                {loading ? "..." : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`}
-              </p>
-              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
-                Funds raised
-              </p>
-            </div>
-
-            <div className="rounded-[1.75rem] border border-cyan-700/50 bg-cyan-800/20 backdrop-blur-md p-6 text-center">
-              <p className="text-4xl font-semibold text-white">
-                {loading ? "..." : stats.contributors}
-              </p>
-              <p className="mt-3 text-sm uppercase tracking-[0.3em] text-slate-500">
-                Contributors
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <hr className="my-12 border-0 h-px bg-slate-800/70" />
+      {/* Go to Top */}
+      <div className="relative z-10  -mt-[40px] mb-6 flex justify-center py-8">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.12] hover:border-white/40 backdrop-blur-sm"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+          Go to Top
+        </button>
+      </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/10 backdrop-blur-md text-slate-200">
+      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/20 backdrop-blur-md text-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-3">
             <div>

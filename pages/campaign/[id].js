@@ -5,7 +5,6 @@ import CampaignDetails from "../../components/Campaign/CampaignDetails";
 export default function CampaignPage() {
   const router = useRouter();
   const { id } = router.query;
-
   return (
     <Layout>
       <CampaignDetails campaignId={id} />

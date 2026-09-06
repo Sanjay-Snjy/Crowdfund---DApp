@@ -1,33 +1,17 @@
 import Layout from "../components/Layout/Layout";
 import CreateCampaignForm from "../components/Campaign/CreateCampaignForm";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
-import {
-  FiPlus ,
-} from "react-icons/fi";
 
 export default function CreateCampaignPage() {
   const { isConnected } = useAccount();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
 
   if (!isConnected) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-4">
-              Connect Your Wallet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please connect your wallet to create a campaign.
-            </p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="card p-8 text-center max-w-sm">
+            <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text)" }}>Connect Your Wallet</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Connect your wallet to create a campaign.</p>
           </div>
         </div>
       </Layout>
@@ -36,28 +20,13 @@ export default function CreateCampaignPage() {
 
   return (
     <Layout>
-      <main className="max-w-9xl -mt-[18px] mx-auto px-0 py-0 lg:py-0">
-       <section className="mb-6 rounded-[20px] md:rounded-[28px] border border-slate-200/40 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 p-5 md:p-8 text-white">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium backdrop-blur">
-               <FiPlus className="h-4 w-4" />
-              Launch a campaign
-              </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-                Create your campaign with confidence
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-200">
-                Share your story, set your goal, and invite supporters to back your mission.
-              </p>
-            </div>
-          </div>
-        </section>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold " style={{ color: "var(--color-text)" }}>Create Campaign</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Define your goal, story, and funding timeline</p>
+        </div>
         <CreateCampaignForm />
-      </main>
+      </div>
     </Layout>
   );
 }
-
-
-

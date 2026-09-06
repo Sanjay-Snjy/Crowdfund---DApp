@@ -7,27 +7,24 @@ import ErrorBoundary from "./ErrorBoundary";
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-
-    const savedState = window.localStorage.getItem("sidebarCollapsed");
-    return savedState === null ? false : JSON.parse(savedState);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sidebarCollapsed");
+      return saved !== null ? saved === "true" : false;
+    }
+    return false;
   });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isDark, setIsDark] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleSidebarCollapse = () => {
-    setSidebarCollapsed((prev) => !prev);
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("sidebarCollapsed", String(next));
+      return next;
+    });
   };
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "sidebarCollapsed",
-        JSON.stringify(sidebarCollapsed)
-      );
-    }
-  }, [sidebarCollapsed]);
 
   // Check dark mode and update on theme change
   useEffect(() => {
@@ -44,7 +41,7 @@ export default function Layout({ children }) {
   }, []);
 
 return (
-    <div className="bg-gray-50 dark:bg-navy min-h-screen flex flex-col">
+    <div className="bg-gray-50 dark:bg-navy min-h-screen -mt-[20px] flex flex-col">
       {/* Fixed background for header area */}
       <div className="fixed inset-0 bg-gray-50 dark:bg-navy z-0 pointer-events-none" />
       
@@ -70,7 +67,7 @@ return (
         <div
           className="hidden md:block fixed inset-0 pointer-events-none z-[1]"
           style={{
-            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.71)" : "rgba(0, 0, 0, 0.73)"} 0.8px,transparent 1px)`,
+            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.71)" : "rgba(0, 0, 0, 0.4)"} 0.8px,transparent 1px)`,
             backgroundSize: "8px 8px",
             maskImage: `radial-gradient(
               circle 160px at ${mousePosition.x}px ${mousePosition.y}px,
@@ -96,7 +93,7 @@ return (
         <div
           className={`
           relative z-10 transition-all duration-300 ease-out flex-1 flex flex-col
-          ${sidebarCollapsed ? "md:ml-[4.25rem]" : "md:ml-[14.5rem]"}
+          ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[14.5rem]"}
         `}
         >
           <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
@@ -113,7 +110,7 @@ return (
       <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-navy-600 dark:bg-navy-200 border-t border-secondary dark:border-navy-200 text-slate-300 mt-auto">
         <div
           className={`transition-all duration-300 ease-out ${
-            sidebarCollapsed ? "md:ml-[4.25rem]" : "md:ml-[14.5rem]"
+            sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[14.5rem]"
           }`}
         >
           <div className="mx-auto flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">

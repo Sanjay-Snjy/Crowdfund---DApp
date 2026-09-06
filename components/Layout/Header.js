@@ -191,11 +191,11 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/80 dark:bg-navy-100 border-b md:border border-secondary dark:border-navy-600
-       transition-all duration-300 rounded-none md:rounded-3xl backdrop-blur-md backdrop-saturate-150
+       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/40 dark:bg-navy-100 border-b md:border border-secondary dark:border-navy-600 
+       transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
     >
-      <div className="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3">
+      <div className="flex items-center justify-between px-3 py-1.5 ">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
           {/* Mobile Menu Button */}

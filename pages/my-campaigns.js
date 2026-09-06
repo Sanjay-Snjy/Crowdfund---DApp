@@ -5,10 +5,11 @@ import { useUser } from "@clerk/nextjs";
 import Layout from "../components/Layout/Layout";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import { useContract } from "../hooks/useContract";
-import { FiPlus, FiTarget, FiTrendingUp, FiUsers } from "react-icons/fi";
+import { FiPlus, FiTarget } from "react-icons/fi";
 import { formatEther, calculateProgress } from "../utils/helpers";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
+import Link from "next/link";
 
 export default function MyCampaignsPage() {
   const { address, isConnected } = useAccount();
@@ -16,231 +17,94 @@ export default function MyCampaignsPage() {
   const router = useRouter();
   const { useUserCampaigns } = useContract();
   const [campaigns, setCampaigns] = useState([]);
+  const currentUserName = user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "";
 
-  const currentUserName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    user?.username ||
-    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
-    "";
-
-  const { data: campaignIds, isLoading: loadingIds } =
-    useUserCampaigns(address);
+  const { data: campaignIds, isLoading: loadingIds } = useUserCampaigns(address);
 
   const campaignContracts = useMemo(() => {
-    if (!campaignIds || campaignIds.length === 0) {
-      return [];
-    }
-
-    const convertedIds = campaignIds.map((id) => {
-      if (typeof id === "bigint") return Number(id);
-      if (id && typeof id.toString === "function") return Number(id.toString());
-      return Number(id);
+    if (!campaignIds?.length) return [];
+    return campaignIds.map((id) => {
+      const num = typeof id === "bigint" ? Number(id) : Number(id.toString());
+      return { address: CONTRACT_ADDRESS, abi: CROWDFUNDING_ABI, functionName: "getCampaign", args: [num] };
     });
-
-    return convertedIds.map((campaignId) => ({
-      address: CONTRACT_ADDRESS,
-      abi: CROWDFUNDING_ABI,
-      functionName: "getCampaign",
-      args: [campaignId],
-    }));
   }, [campaignIds]);
 
-  // Fetch all campaigns data
-  const {
-    data: campaignsData,
-    isLoading: loadingCampaigns,
-    error: contractError,
-  } = useContractReads({
-    contracts: campaignContracts,
-    enabled: campaignContracts.length > 0,
-    staleTime: 5000,
-  });
+  const { data: campaignsData, isLoading: loadingData } = useContractReads({ contracts: campaignContracts, enabled: campaignContracts.length > 0 });
+  const loading = loadingIds || loadingData;
 
-  // Overall loading state
-  const loading = loadingIds || loadingCampaigns;
-
-  // Process campaigns data when it changes
   useEffect(() => {
-    if (campaignsData && campaignIds) {
-      const formattedCampaigns = campaignsData
-        .map((result, index) => {
-          if (result.status === "success" && result.result) {
-            const campaignData = result.result;
-
-            // Helper function to safely convert BigNumbers
-            const safeBigNumberToNumber = (value) => {
-              if (!value) return 0;
-              if (typeof value === "bigint") return Number(value);
-              if (value.toString) return Number(value.toString());
-              return Number(value);
-            };
-
-            // Helper function to safely convert BigNumbers but keep them as BigNumbers for calculations
-            const safeBigNumber = (value) => {
-              if (!value) return 0n;
-              if (typeof value === "bigint") return value;
-              if (value.toString) return BigInt(value.toString());
-              return BigInt(value);
-            };
-
-            // Handle BigNumbers properly
-            const formattedCampaign = {
-              id: safeBigNumberToNumber(campaignData.id || campaignIds[index]),
-              creator: campaignData.creator,
-              title: campaignData.title,
-              description: campaignData.description,
-              metadataHash: campaignData.metadataHash,
-              targetAmount: safeBigNumber(campaignData.targetAmount),
-              raisedAmount: safeBigNumber(campaignData.raisedAmount),
-              deadline: safeBigNumberToNumber(campaignData.deadline),
-              withdrawn: campaignData.withdrawn,
-              active: campaignData.active,
-              createdAt: safeBigNumberToNumber(campaignData.createdAt),
-              contributorsCount: safeBigNumberToNumber(
-                campaignData.contributorsCount
-              ),
-            };
-
-            console.log("🎯 Formatted campaign:", formattedCampaign);
-            return formattedCampaign;
-          } else {
-            console.error(
-              `❌ Failed to fetch campaign ${campaignIds[index]}:`,
-              result.error
-            );
-            return null;
-          }
-        })
-        .filter(Boolean);
-
-      console.log("🎉 Final formatted campaigns:", formattedCampaigns);
-      setCampaigns(formattedCampaigns);
-    } else if (campaignIds && campaignIds.length === 0) {
-      console.log("📭 User has no campaigns");
-      setCampaigns([]);
-    } else {
-      console.log("⏸️ Waiting for data...", { campaignsData, campaignIds });
-    }
+    if (!campaignsData || !campaignIds) return;
+    const formatted = campaignsData
+      .map((r, i) => {
+        if (r.status !== "success" || !r.result) return null;
+        const c = r.result;
+        const safe = (v) => { if (!v) return 0n; if (typeof v === "bigint") return v; return BigInt(v.toString()); };
+        const safeNum = (v) => { if (!v) return 0; if (typeof v === "bigint") return Number(v); return Number(v.toString()); };
+        return { id: safeNum(c.id || campaignIds[i]), creator: c.creator, title: c.title, description: c.description, metadataHash: c.metadataHash, targetAmount: safe(c.targetAmount), raisedAmount: safe(c.raisedAmount), deadline: safeNum(c.deadline), withdrawn: c.withdrawn, active: c.active, createdAt: safeNum(c.createdAt), contributorsCount: safeNum(c.contributorsCount) };
+      })
+      .filter(Boolean);
+    setCampaigns(formatted);
   }, [campaignsData, campaignIds]);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
-
-  // Debug: Log final state
-  useEffect(() => {
-    console.log("🏁 Final state:", {
-      campaigns,
-      loading,
-      campaignsCount: campaigns.length,
-    });
-  }, [campaigns, loading]);
+  useEffect(() => { if (!isConnected) router.push("/"); }, [isConnected, router]);
 
   if (!isConnected) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-4">
-              Connect Your Wallet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please connect your wallet to view your campaigns.
-            </p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="card p-8 text-center max-w-sm">
+            <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text)" }}>Connect Your Wallet</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Connect to view your campaigns.</p>
           </div>
         </div>
       </Layout>
     );
   }
 
-  // Calculate totals
-  const totalRaised = campaigns.reduce((sum, campaign) => {
-    return sum + parseFloat(formatEther(campaign.raisedAmount || 0));
-  }, 0);
-
-  const successfulCampaigns = campaigns.filter((campaign) => {
-    const progress = calculateProgress(
-      campaign.raisedAmount,
-      campaign.targetAmount
-    );
-    return progress >= 100;
-  }).length;
-
-  const activeCampaigns = campaigns.filter(
-    (campaign) =>
-      campaign.active && new Date(campaign.deadline * 1000) > new Date()
-  ).length;
+  const totalRaised = campaigns.reduce((s, c) => s + parseFloat(formatEther(c.raisedAmount || 0)), 0);
+  const successful = campaigns.filter((c) => calculateProgress(c.raisedAmount, c.targetAmount) >= 100).length;
+  const active = campaigns.filter((c) => c.active && new Date(c.deadline * 1000) > new Date()).length;
 
   return (
     <Layout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-50">
-              My Campaigns
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Manage and track your crowdfunding campaigns
-            </p>
+            <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>My Campaigns</h1>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Manage and track your campaigns</p>
           </div>
-
-          <button
-            onClick={() => router.push("/create-campaign")}
-            className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-600 text-white px-6 py-3 rounded-3xl font-medium transition-all duration-200 inline-flex items-center"
-          >
-            <FiPlus className="w-5 h-5 mr-2" />
-            Create Campaign
-          </button>
+          <Link href="/create-campaign" className="btn"><FiPlus className="w-4 h-4" /> Create</Link>
         </div>
 
-     
-        {/* Campaigns Grid */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: "Total", value: campaigns.length },
+            { label: "Active", value: active },
+            { label: "Successful", value: successful },
+          ].map((s) => (
+            <div key={s.label} className="card p-3 text-center">
+              <p className="text-xl font-bold" style={{ color: "var(--color-text)" }}>{s.value}</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
+
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 animate-pulse"
-              >
-                <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => <div key={i} className="card p-4 space-y-3"><div className="skeleton h-36" /><div className="skeleton h-4 w-3/4" /><div className="skeleton h-1.5" /></div>)}
           </div>
         ) : campaigns.length > 0 ? (
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {campaigns.map((campaign) => (
-                <CampaignCard
-                  key={campaign.id}
-                  campaign={campaign}
-                  currentUserAddress={address}
-                  currentUserName={currentUserName}
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {campaigns.map((c) => (
+              <CampaignCard key={c.id} campaign={c} currentUserAddress={address} currentUserName={currentUserName} />
+            ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-            <FiTarget className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-50 mb-2">
-              No campaigns yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Create your first campaign to get started with crowdfunding.
-            </p>
-            <button
-              onClick={() => router.push("/create-campaign")}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
-            >
-              <FiPlus className="w-5 h-5 mr-2" />
-              Create Your First Campaign
-            </button>
+          <div className="card p-12 text-center">
+            <FiTarget className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-text-muted)" }} />
+            <h3 className="font-semibold" style={{ color: "var(--color-text)" }}>No campaigns yet</h3>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Create your first campaign to get started.</p>
+            <Link href="/create-campaign" className="btn mt-4"><FiPlus className="w-4 h-4" /> Create Campaign</Link>
           </div>
         )}
       </div>
