@@ -888,7 +888,7 @@ export default function Home() {
                 sub: "unique backers",
               },
             ].map((stat, i) => (
-              <div key={i} className="rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5 p-6">
+              <div key={i} className="rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10 p-6">
                 <p className="text-3xl font-bold text-white tabular-nums">{stat.value}</p>
                 <p className="mt-2 text-sm font-medium text-slate-300">{stat.label}</p>
                 <p className="text-xs text-slate-600 mt-0.5">{stat.sub}</p>
@@ -934,7 +934,7 @@ export default function Home() {
               return (
                 <div
                   key={index}
-                  className={`group rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5 p-5 transition-all duration-200 hover:border-cyan-800 ${
+                  className={`group rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10 p-5 transition-all duration-200 hover:border-cyan-800 ${
                     index === campaignCategories.length - 1 ? "lg:col-start-2" : ""
                   }`}
                 >
@@ -982,7 +982,7 @@ export default function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5  p-4 transition-all duration-200 hover:border-cyan-800"
+                className="group rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10  p-4 transition-all duration-200 hover:border-cyan-800"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[15px] bg-white/10 text-white">
@@ -1012,7 +1012,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/20 backdrop-blur-md text-slate-200">
+      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/10 backdrop-blur-md text-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-12 md:grid-cols-3">
             <div>
