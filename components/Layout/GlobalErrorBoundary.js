@@ -3,7 +3,7 @@ import React from "react";
 export default class GlobalErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, isReloading: false };
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -12,12 +12,6 @@ export default class GlobalErrorBoundary extends React.Component {
 
   componentDidCatch(error, info) {
     console.error("GlobalErrorBoundary:", error, info);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.state.hasError && prevProps.children !== this.props.children) {
-      this.setState({ hasError: false, error: null });
-    }
   }
 
   render() {
@@ -39,12 +33,6 @@ export default class GlobalErrorBoundary extends React.Component {
                 style={{ padding: "10px 20px", background: "#4f46e5", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: "pointer" }}
               >
                 Refresh
-              </button>
-              <button
-                onClick={() => this.setState({ hasError: false, error: null })}
-                style={{ padding: "10px 20px", background: "transparent", color: "#64748b", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 14, cursor: "pointer" }}
-              >
-                Dismiss
               </button>
             </div>
           </div>

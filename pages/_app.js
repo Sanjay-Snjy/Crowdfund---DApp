@@ -7,7 +7,6 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { config, chains } from "../config/wagmi";
 import "@rainbow-me/rainbowkit/styles.css";
-import GlobalErrorBoundary from "../components/Layout/GlobalErrorBoundary";
 import { EthAvatar } from "../components/EthAvatar";
 
 const queryClient = new QueryClient({
@@ -39,15 +38,13 @@ function MyApp({ Component, pageProps }) {
   }
 
   const appContent = (
-    <GlobalErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <WagmiConfig config={config}>
-          <RainbowKitProvider chains={chains} avatar={EthAvatar}>
-            <Component {...pageProps} />
-          </RainbowKitProvider>
-        </WagmiConfig>
-      </QueryClientProvider>
-    </GlobalErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig config={config}>
+        <RainbowKitProvider chains={chains} avatar={EthAvatar}>
+          <Component {...pageProps} />
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   );
 
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;

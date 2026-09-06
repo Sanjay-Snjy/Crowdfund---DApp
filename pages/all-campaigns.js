@@ -182,7 +182,7 @@ export default function AllCampaignsPage() {
 
   return (
     <Layout>
-      <div className="max-w-8xl  mx-auto pl-4   py-8 space-y-6">
+      <div className="max-w-8xl mx-auto pl-4 py-8 space-y-6">
         {/* Page header */}
         <div>
           <div className="flex items-center"> 
