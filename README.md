@@ -78,14 +78,26 @@ Then open http://localhost:3000 in your browser.
 
 ## Environment Variables
 
-Create a local environment file and provide your configuration values such as:
+Create a local environment file and provide your configuration values. All `NEXT_PUBLIC_*`
+values are safe to expose to the browser (they are embedded in the client bundle);
+they must be set **both** in `.env.local` for local development **and** in the
+hosting provider (e.g. Vercel) environment variables for the deployed site.
 
-- NEXT_PUBLIC_CONTRACT_ADDRESS
-- NEXT_PUBLIC_NETWORK
-- NEXT_PUBLIC_ADMIN_ADDRESS
-- NEXT_PUBLIC_PINATA_API_KEY
-- NEXT_PUBLIC_PINATA_SECRET_API_KEY
-- NEXT_PUBLIC_PINATA_JWT
+| Variable | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` | ✅ | **36-character UUID** from https://cloud.walletconnect.com (create a free project). RainbowKit's MetaMask wallet uses WalletConnect v2 as the **mobile** deep-link transport, so mobile connection hangs on "Connecting to MetaMask..." until this is a real project ID. Desktop extension connect works without it. |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | ✅ | Deployed Crowdfunding contract address (0x...) |
+| `NEXT_PUBLIC_RPC_URL` | ✅ | RPC endpoint for the configured chain |
+| `NEXT_PUBLIC_CHAIN_ID` | ✅ | Chain ID (e.g. `11155111` for Sepolia) |
+| `NEXT_PUBLIC_CHAIN_NAME` | ✅ | Chain name (e.g. `Sepolia`) |
+| `NEXT_PUBLIC_CHAIN_SYMBOL` | ✅ | Native currency symbol (e.g. `ETH`) |
+| `NEXT_PUBLIC_NETWORK` | ✅ | Network key (`sepolia`, `localhost`, ...) |
+| `NEXT_PUBLIC_BLOCK_EXPLORER` | Optional | Block explorer base URL |
+| `NEXT_PUBLIC_BLOCK_EXPLORER_NAME` | Optional | Block explorer display name |
+| `NEXT_PUBLIC_PLATFORM_NAME` | ✅ | App name shown to wallets |
+| `NEXT_PUBLIC_ADMIN_ADDRESS` | ✅ | Admin wallet address for the admin panel |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Optional | Clerk publishable key (if Clerk auth is enabled) |
+| `PINATA_API_KEY`, `PINATA_SECRET_API_KEY`, `PINATA_JWT` | ✅ (server-side) | Pinata credentials used by API routes only — **do not** give these a `NEXT_PUBLIC_` prefix |
 
 ## Notes
 
