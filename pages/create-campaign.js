@@ -20,7 +20,7 @@ export default function CreateCampaignPage() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-8xl mx-auto pl-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold " style={{ color: "var(--color-text)" }}>Create Campaign</h1>
           <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Define your goal, story, and funding timeline</p>

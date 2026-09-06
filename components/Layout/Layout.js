@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -8,6 +9,7 @@ export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -93,7 +95,9 @@ return (
           <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
 
           <main className="flex-1 pt-24 px-3 pb-4 md:pt-20 md:px-6 md:pb-6">
-            <div>{children}</div>
+            <ErrorBoundary key={router.asPath}>
+              <div>{children}</div>
+            </ErrorBoundary>
           </main>
         </div>
       </div>

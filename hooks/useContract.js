@@ -438,10 +438,26 @@ export const useContract = () => {
     });
   };
 
-  const useMultipleCampaigns = (campaignIds) => {
+  const useMultipleCampaigns = (rawCampaignIds) => {
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Depend on the *values* of the ids rather than the array reference.
+    // Callers often build this array inline (e.g. ids.map(Number)), which produces a
+    // new reference on every render. Keying the memos/effects below on a primitive
+    // signature keeps them stable and prevents a setState-per-render loop, which
+    // would otherwise starve React and block client-side route changes.
+    const idsKey = Array.isArray(rawCampaignIds)
+      ? rawCampaignIds.map((id) => String(id)).join(",")
+      : "";
+    const hasIds = Array.isArray(rawCampaignIds);
+
+    const campaignIds = useMemo(
+      () => (hasIds ? rawCampaignIds : undefined),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [hasIds, idsKey]
+    );
 
     // Prepare contract calls for all campaigns
     const campaignContracts = useMemo(() => {

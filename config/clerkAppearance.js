@@ -23,10 +23,10 @@ const clerkAppearance = {
   elements: {
     // ─── Card / Box ───
     card: {
-      background: "#111a2ea6",
+      background: "#0808080e",
       border: "1px solid #263451",
       boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-      backdropFilter: "blur(40px)",
+      backdropFilter: "blur(80px)",
     },
     rootBox: {
       backgroundColor: "transparent",
@@ -70,7 +70,7 @@ const clerkAppearance = {
 
     // ─── Primary button ───
     formButtonPrimary: {
-      backgroundColor: "#6366F1",
+      backgroundColor: "#000000",
       color: "#FFFFFF",
       borderRadius: "0.75rem",
       padding: "0.625rem 1rem",
@@ -167,7 +167,7 @@ const clerkAppearance = {
 
     // ─── Navbar (if present in multipage) ───
     navbar: {
-      backgroundColor: "#13275b9f",
+      backgroundColor: "#7d7e7e3f",
       borderBottom: "1px solid #263451",
       borderRadius: "30px",
     },
@@ -179,7 +179,7 @@ const clerkAppearance = {
       },
     },
     navbarButtonActive: {
-      color: "#818CF8",
+      color: "#0b0b0b",
       backgroundColor: "rgba(99,102,241,0.12)",
     },
 
@@ -279,18 +279,18 @@ const clerkAppearance = {
       backgroundColor: "#080d1a02",
     },
     profileSectionPrimaryButton: {
-      backgroundColor: "#6366F1",
-      color: "#FFFFFF",
+      backgroundColor: "#f5f5f7",
+      color: "#000000",
       borderRadius: "0.75rem",
       "&:hover": {
-        backgroundColor: "#4F46E5",
+        backgroundColor: "#025a78",
       },
     },
 
     // ─── Modal / Overlay ───
     modalBackdrop: {
       backgroundColor: "rgba(2, 2, 2, 0.45)",
-      backdropFilter: "blur(10px)",
+      backdropFilter: "blur(40px)",
     },
     modalContent: {
      

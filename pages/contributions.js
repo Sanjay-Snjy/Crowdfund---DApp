@@ -65,7 +65,7 @@ export default function ContributionsPage() {
 
   return (
     <Layout>
-      <div className="max-w-8xl mx-auto pl-4  sm:px-6 py-8 space-y-6">
+      <div className="max-w-8xl mx-auto pl-4 py-8 space-y-6">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>My Contributions</h1>
           <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Track your support history</p>

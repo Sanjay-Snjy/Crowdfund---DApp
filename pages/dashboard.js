@@ -10,13 +10,13 @@ import NotificationCenter from "../components/Dashboard/NotificationCenter";
 import DeadlineCountdown from "../components/Dashboard/DeadlineCountdown";
 
 import MilestoneTracker from "../components/Dashboard/MilestoneTracker";
-import QuickActions from "../components/Dashboard/QuickActions";
+
 import WithdrawFundsButton from "../components/Dashboard/WithdrawFundsButton";
 import BookmarkedCampaigns from "../components/Dashboard/BookmarkedCampaigns";
 import { useContract } from "../hooks/useContract";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
-import { FiGrid, FiTrendingUp, FiTarget, FiActivity } from "react-icons/fi";
+
 import { formatDate, formatEther } from "../utils/helpers";
 import Link from "next/link";
 
@@ -85,7 +85,7 @@ function Dashboard() {
 
   return (
     <Layout>
-      <div className="max-w-8xl mx-auto pl-4  sm:px-6 py-8 space-y-6">
+      <div className="max-w-8xl mx-auto pl-4  py-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

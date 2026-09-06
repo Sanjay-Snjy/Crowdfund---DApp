@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { FiBookmark, FiExternalLink, FiTrash2 } from "react-icons/fi";
+import { useRouter } from "next/router";
 import { useContract } from "../../hooks/useContract";
 import { formatEther } from "../../utils/helpers";
 
@@ -17,13 +18,18 @@ function readBookmarks() {
 export default function BookmarkedCampaigns() {
   const [bookmarkIds, setBookmarkIds] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const router = useRouter();
 
   const { useMultipleCampaigns } = useContract();
 
-  // Convert string IDs to numbers
-  const numericIds = bookmarkIds
-    .map((id) => Number(id))
-    .filter((n) => !isNaN(n) && n > 0);
+  // Convert string IDs to numbers.
+  // Memoized so the array keeps a stable identity across renders — passing a new
+  // array reference into useMultipleCampaigns re-triggers its internal effect on
+  // every render, which causes an endless render loop that blocks route changes.
+  const numericIds = useMemo(
+    () => bookmarkIds.map((id) => Number(id)).filter((n) => !isNaN(n) && n > 0),
+    [bookmarkIds]
+  );
 
   const { campaigns, loading } = useMultipleCampaigns(numericIds);
 
@@ -32,7 +38,16 @@ export default function BookmarkedCampaigns() {
     setBookmarkIds(readBookmarks());
     setLoaded(true);
 
-    const onChange = () => setBookmarkIds(readBookmarks());
+    // Only replace state when the stored ids actually changed, so the 2s poll
+    // below does not hand a fresh array identity to downstream hooks on every tick.
+    const onChange = () =>
+      setBookmarkIds((prev) => {
+        const next = readBookmarks();
+        const same =
+          prev.length === next.length &&
+          prev.every((v, i) => String(v) === String(next[i]));
+        return same ? prev : next;
+      });
     window.addEventListener("bookmarksChanged", onChange);
     const poll = setInterval(onChange, 2000);
     return () => {
@@ -41,11 +56,12 @@ export default function BookmarkedCampaigns() {
     };
   }, []);
 
+  // Client-side transition. window.location.href would force a full page reload.
   const goToCampaign = useCallback(
     (id) => {
-      window.location.href = `/campaign/${id}`;
+      router.push(`/campaign/${id}`);
     },
-    []
+    [router]
   );
 
   const removeBookmark = useCallback(
