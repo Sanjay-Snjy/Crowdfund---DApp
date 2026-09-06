@@ -21,6 +21,7 @@ import {
   FiBook,
   FiHeart,
   FiZap,
+  FiSun,
   FiPenTool,
 } from "react-icons/fi";
 import { CONTRACT_ADDRESS } from "../constants";
@@ -237,6 +238,26 @@ export default function Home() {
       title: "Research & Innovation",
       description: "Empower breakthrough technologies and scientific discoveries.",
     },
+    {
+      icon: FiZap,
+      title: "Technology",
+      description: "Support innovative tools and solutions for a connected future.",
+    },
+    {
+      icon: FiSun,
+      title: "Agriculture",
+      description: "Help build sustainable farms and strengthen food systems.",
+    },
+    {
+      icon: FiPenTool,
+      title: "Arts and Culture",
+      description: "Celebrate creative work, heritage, and cultural expression.",
+    },
+    {
+      icon: FiGlobe,
+      title: "Environment",
+      description: "Fund projects that protect nature and restore our planet.",
+    },
   ];
 
   const { useActiveCampaigns } = useContract();
@@ -308,6 +329,14 @@ export default function Home() {
         categoryTitle = "Social Causes";
       } else if (normalizedCategory.includes("research") || normalizedCategory.includes("innovation")) {
         categoryTitle = "Research & Innovation";
+      } else if (normalizedCategory.includes("technology")) {
+        categoryTitle = "Technology";
+      } else if (normalizedCategory.includes("agriculture")) {
+        categoryTitle = "Agriculture";
+      } else if (normalizedCategory.includes("arts") || normalizedCategory.includes("culture")) {
+        categoryTitle = "Arts and Culture";
+      } else if (normalizedCategory.includes("environment")) {
+        categoryTitle = "Environment";
       }
 
       if (!acc[categoryTitle]) {
@@ -673,12 +702,12 @@ export default function Home() {
             <SignedOut>
               <div className="flex flex-col sm:flex-row gap-3">
                 <SignInButton mode="modal">
-                  <button className="bg-white text-cyan-600 px-8 py-4 rounded-4xl font-medium hover:bg-cyan-50 transition-colors">
+                  <button className="bg-white text-cyan-600 px-6 py-3 rounded-4xl font-medium hover:bg-cyan-50 transition-colors">
                     Login
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="bg-cyan-600/40 text-white px-8 py-4 rounded-4xl font-medium hover:bg-cyan-700 transition-colors border border-cyan-400">
+                  <button className="bg-cyan-600/40 text-white px-6 py-3 rounded-4xl font-medium hover:bg-cyan-700 transition-colors border border-cyan-400">
                     Sign Up
                   </button>
                 </SignUpButton>
@@ -690,13 +719,13 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleGoToCampaigns}
-                  className={`bg-white text-cyan-600 px-8 py-4 backdrop-blur-sm rounded-4xl font-medium hover:bg-cyan-500 hover:text-white transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
+                  className={`bg-white text-cyan-600 px-6 py-3 backdrop-blur-sm rounded-4xl font-medium hover:bg-cyan-500 hover:text-white transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
                 >
                   Explore Campaigns
                   <FiArrowRight className="ml-2 w-5 h-5" />
                 </button>
               ) : (
-                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-cyan-400">
+                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-6 py-3 rounded-4xl hover:border-cyan-400">
                   <ConnectButton.Custom>
                     {({ openConnectModal }) => (
                       <button
@@ -717,13 +746,13 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleGoToCampaigns}
-                className={`bg-white text-blue-600 px-8 py-4 rounded-4xl font-medium hover:bg-cyan-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
+                className={`bg-white text-blue-600 px-6 py-3 rounded-4xl font-medium hover:bg-cyan-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
               >
                 Explore Campaigns
                 <FiArrowRight className="ml-2 w-5 h-5" />
               </button>
             ) : (
-              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-8 py-4 rounded-4xl hover:border-cyan-400">
+              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-6 py-3 rounded-4xl hover:border-cyan-400">
                 <ConnectButton.Custom>
                   {({ openConnectModal }) => (
                     <button
@@ -742,14 +771,14 @@ export default function Home() {
         <SignedIn>
           <button
             onClick={handleGoToDashboard}
-            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors"
+            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-6 py-3 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors"
           >
             Go to Dashboard
           </button>
         </SignedIn>
         <SignedOut>
           <SignInButton mode="modal">
-            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors">
+            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-6 py-3 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors">
               Go to Dashboard
             </button>
           </SignInButton>
@@ -859,7 +888,7 @@ export default function Home() {
                 sub: "unique backers",
               },
             ].map((stat, i) => (
-              <div key={i} className="rounded-xl border border-white/0 backdrop-blur-sm bg-cyan-800/30 p-6">
+              <div key={i} className="rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5 p-6">
                 <p className="text-3xl font-bold text-white tabular-nums">{stat.value}</p>
                 <p className="mt-2 text-sm font-medium text-slate-300">{stat.label}</p>
                 <p className="text-xs text-slate-600 mt-0.5">{stat.sub}</p>
@@ -905,15 +934,17 @@ export default function Home() {
               return (
                 <div
                   key={index}
-                  className="group rounded-xl border-2 border-white/0 backdrop-blur-sm bg-cyan-800/30  p-5 transition-all duration-200  hover:border-cyan-800"
+                  className={`group rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5 p-5 transition-all duration-200 hover:border-cyan-800 ${
+                    index === campaignCategories.length - 1 ? "lg:col-start-2" : ""
+                  }`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] bg-white/10 text-white">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[15px] bg-white/10 text-white">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-base font-semibold text-white">{category.title}</h3>
-                      <p className="mt-1 text-sm text-slate-400 line-clamp-2 leading-relaxed">{category.description}</p>
+                      <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">{category.description}</p>
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
@@ -951,10 +982,10 @@ export default function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group rounded-xl border-2 border-white/0 backdrop-blur-sm bg-cyan-800/30  p-4 transition-all duration-200 hover:border-cyan-800"
+                className="group rounded-3xl border-2 border-white/5 backdrop-blur-sm bg-white/5  p-4 transition-all duration-200 hover:border-cyan-800"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] bg-white/10 text-white">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[15px] bg-white/10 text-white">
                     <feature.icon className="h-5 w-5" />
                   </div>
                   <span className="text-[11px] font-medium text-slate-600 tabular-nums">{String(index + 1).padStart(2, "0")}</span>
