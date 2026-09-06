@@ -12,10 +12,15 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    // Save error info for debugging (could send to telemetry)
     this.setState({ error, info });
     if (typeof console !== "undefined") {
       console.error("ErrorBoundary caught:", error, info);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.children !== this.props.children) {
+      this.setState({ hasError: false, error: null, info: null });
     }
   }
 

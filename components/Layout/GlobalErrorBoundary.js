@@ -14,6 +14,12 @@ export default class GlobalErrorBoundary extends React.Component {
     console.error("GlobalErrorBoundary:", error, info);
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.children !== this.props.children) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return (
