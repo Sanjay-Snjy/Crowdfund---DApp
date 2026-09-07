@@ -7,7 +7,13 @@ import ErrorBoundary from "./ErrorBoundary";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("sidebarCollapsed") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const [isDark, setIsDark] = useState(false);
@@ -84,10 +90,9 @@ return (
           onToggle={toggleSidebar}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleSidebarCollapse}
-        />
-
-        <div
-          className={`
+        />      <div
+        key={sidebarCollapsed ? "collapsed" : "expanded"}
+        className={`
           relative z-10 transition-all duration-300 ease-out flex-1 flex flex-col
           ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[14.5rem]"}
         `}
