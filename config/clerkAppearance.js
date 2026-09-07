@@ -23,8 +23,8 @@ const clerkAppearance = {
   elements: {
     // ─── Card / Box ───
     card: {
-      background: "#0808080e",
-      border: "1px solid #263451",
+      background: "#817e7e29",
+      border: "1px solid #f7f8fb",
       boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
       backdropFilter: "blur(80px)",
     },
@@ -44,9 +44,9 @@ const clerkAppearance = {
 
     // ─── Form fields ───
     formFieldInput: {
-      backgroundColor: "#17213A",
+      backgroundColor: "#fafafc",
       border: "1px solid #263451",
-      color: "#F8FAFC",
+      color: "#050505",
       borderRadius: "0.75rem",
       padding: "0.625rem 0.875rem",
       fontSize: "0.9375rem",
@@ -96,27 +96,25 @@ const clerkAppearance = {
 
     // ─── Secondary / Social buttons ───
     socialButtonsBlockButton: {
-      backgroundColor: "#17213A",
+      backgroundColor: "#ededed",
       border: "1px solid #263451",
-      color: "#F8FAFC",
+      color: "#000000",
       borderRadius: "0.75rem",
       padding: "0.5rem 0.875rem",
       fontSize: "0.875rem",
       fontWeight: 500,
       transition: "background-color 150ms ease, border-color 150ms ease",
       "&:hover": {
-        backgroundColor: "#1C2945",
+        backgroundColor: "#034b7a",
         borderColor: "#3B4F7A",
+        color: "#ffffff",
       },
     },
-    socialButtonsBlockButtonText: {
-      color: "#F8FAFC",
-      fontWeight: 500,
-    },
+
     socialButtonsIconButton: {
-      backgroundColor: "#17213A",
+      backgroundColor: "#000000",
       border: "1px solid #263451",
-      color: "#CBD5E1",
+      color: "#020202",
       "&:hover": {
         backgroundColor: "#1C2945",
       },
@@ -252,10 +250,11 @@ const clerkAppearance = {
       border: "2px solid #263451",
     },
     userButtonPopoverCard: {
-      backgroundColor: "#0034485a",
+      backgroundColor: "#0394e274",
       border: "1px solid #263451",
       borderRadius: "0.75rem",
       boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+      color: "#ffffff",
     },
     userButtonPopoverActionButton: {
       color: "#ffffff",
@@ -270,8 +269,9 @@ const clerkAppearance = {
       fontSize: "0.875rem",
     },
     userButtonPopoverFooter: {
-      color: "#94a3b800",
-      borderTop: "1px solid #26345100",
+      display: "none",
+      color: "#020202f7",
+      borderTop: "1px solid #eef0f3f6",
     },
 
     // ─── Profile / Organization pages ───
@@ -289,7 +289,7 @@ const clerkAppearance = {
 
     // ─── Modal / Overlay ───
     modalBackdrop: {
-      backgroundColor: "rgba(2, 2, 2, 0.45)",
+      backgroundColor: "rgba(2, 2, 2, 0)",
       backdropFilter: "blur(40px)",
     },
     modalContent: {

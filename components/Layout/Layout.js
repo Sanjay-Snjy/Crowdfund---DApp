@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "./Sidebar";
@@ -14,6 +14,27 @@ export default function Layout({ children }) {
       return false;
     }
   });
+
+  // Ensure first paint is LIGHT theme for new visitors.
+  // The app currently only ever adds/removes "dark" — there is no separate light class —
+  // so making the default light is equivalent to starting without the "dark" class.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    let savedTheme;
+    try {
+      savedTheme = localStorage.getItem("theme");
+    } catch {
+      savedTheme = null;
+    }
+
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    document.documentElement.style.colorScheme = savedTheme === "dark" ? "dark" : "light";
+  }, []);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const [isDark, setIsDark] = useState(false);
@@ -42,8 +63,10 @@ export default function Layout({ children }) {
     return () => observer.disconnect();
   }, []);
 
-return (
-    <div className="bg-gray-50 dark:bg-navy min-h-screen -mt-[20px] flex flex-col">
+return (      <div
+        className="bg-gray-50 dark:bg-navy min-h-screen -mt-[20px] flex flex-col"
+        suppressHydrationWarning
+      >
       {/* Fixed background for header area */}
       <div className="fixed inset-0 bg-gray-50 dark:bg-navy z-0 pointer-events-none" />
       

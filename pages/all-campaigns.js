@@ -192,7 +192,7 @@ export default function AllCampaignsPage() {
             Browse and discover crowdfunding campaigns
           </p></div>
          <div className="ml-auto right-[4%] mt-5 z-20 flex items-center gap-3">
-            <div className="flex items-center text-[12px]  rounded-2xl text-black bg-black/10 backdrop-blur-sm border border-black/15 px-4 py-2 text-center">
+            <div className="flex items-center text-[12px]  rounded-2xl text-black bg-black/10 backdrop-blur-sm border border-black/15 px-4 py-2 text-center dark:text-white dark:bg-white/10 dark:border-white/20">
           <h1 className="rounded-2xl uppercase  "> Campaigns - &nbsp; </h1> 
             <div className="flex items-center ">
               <p className="uppercase tracking-wider">Total: &nbsp;</p>
