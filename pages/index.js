@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { useAccount, useContractRead } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -13,8 +12,6 @@ import {
   FiDatabase,
   FiFlag,
   FiThumbsUp,
-  FiClock,
-  FiCheckCircle,
   FiTrendingUp,
   FiBookOpen,
   FiBriefcase,
@@ -40,27 +37,28 @@ export default function Home() {
     contributors: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [showConnectedPopup, setShowConnectedPopup] = useState(false);
   const [shouldBlinkDashboard, setShouldBlinkDashboard] = useState(false);
-  const [greetingIndex, setGreetingIndex] = useState(0);
-  const [isGreetingVisible, setIsGreetingVisible] = useState(true);
-  const greetingPhrases = [
-    "Hello",
-    "Ready to Fund",
-    "Support Great Ideas",
-    "Discover New Campaigns",
-    "Let's Build Together",
-  ];
+
   const hasValidClerkKey =
     typeof process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "string" &&
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim().length > 0 &&
     !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("your_clerk_publishable_key_here");
 
-  // Force dark mode on landing page for correct CSS variable resolution
+  // Force dark mode on landing page for correct CSS variable resolution.
   useEffect(() => {
     document.documentElement.classList.add("dark");
     return () => {
-      document.documentElement.classList.remove("dark");
+      let savedTheme;
+      try {
+        savedTheme = localStorage.getItem("theme");
+      } catch {
+        savedTheme = null;
+      }
+      if (savedTheme === "light") {
+        document.documentElement.classList.remove("dark");
+      }
+      document.documentElement.style.colorScheme =
+        document.documentElement.classList.contains("dark") ? "dark" : "light";
     };
   }, []);
 
@@ -72,35 +70,23 @@ export default function Home() {
     staleTime: 30_000,
   });
 
-  // Trigger popup and blink animation only when user explicitly connects wallet (not on page refresh)
+  // Blink the explore button right after the wallet connects
   useEffect(() => {
-    // Get previously stored connection state from localStorage
     const wasWalletConnected = localStorage.getItem("walletWasConnected") === "true";
     const isNewConnection = isConnected && !wasWalletConnected;
 
     if (isNewConnection) {
-      // Show connected popup for 1 second
-      setShowConnectedPopup(true);
-      const popupTimer = setTimeout(() => setShowConnectedPopup(false), 1000);
-      
-      // Start dashboard button blink after popup closes (1 second delay)
-      const dashboardBlinkTimer = setTimeout(() => {
+      const blinkTimer = setTimeout(() => {
         setShouldBlinkDashboard(true);
-        const dashboardClearTimer = setTimeout(() => setShouldBlinkDashboard(false), 600); // Dashboard button blinks for 1.5s
-        return () => clearTimeout(dashboardClearTimer);
-      }, 1100); // Start 100ms after popup closes
-      
-      return () => {
-        clearTimeout(popupTimer);
-        clearTimeout(dashboardBlinkTimer);
-      };
+        setTimeout(() => setShouldBlinkDashboard(false), 1200);
+      }, 1000);
+      return () => clearTimeout(blinkTimer);
     }
 
-    // Update localStorage with current connection state
     localStorage.setItem("walletWasConnected", isConnected.toString());
   }, [isConnected]);
 
-  // Fetch and aggregate campaign statistics
+  // Fetch and aggregate campaign statistics from the chain
   useEffect(() => {
     const fetchStats = async () => {
       if (!campaignCount) return;
@@ -111,7 +97,6 @@ export default function Home() {
         let totalFunds = 0n;
         let totalContributors = 0;
 
-        // Fetch stats for each campaign
         const campaignId = campaignCount.toNumber ? campaignCount.toNumber() : Number(campaignCount);
 
         for (let i = 1; i <= campaignId; i++) {
@@ -124,8 +109,8 @@ export default function Home() {
             });
 
             if (result) {
-              totalFunds += BigInt(result[0]); // raisedAmount
-              totalContributors += Number(result[2]); // contributorsCount
+              totalFunds += BigInt(result[0]);
+              totalContributors += Number(result[2]);
             }
           } catch (err) {
             console.warn(`Error fetching stats for campaign ${i}:`, err);
@@ -152,112 +137,69 @@ export default function Home() {
       icon: FiTarget,
       title: "Launch Your Ideas",
       description:
-        "Create compelling campaigns and bring your innovative projects to life with blockchain transparency.",
+        "Create a campaign in minutes. Describe your goal, set your target, and go live.",
     },
     {
       icon: FiShield,
       title: "Secure & Transparent",
       description:
-        "Smart contracts ensure funds are safe and transactions are transparent on the blockchain.",
+        "Funds are handled by smart contracts. No one can move them without the rules you set.",
     },
     {
       icon: FiGlobe,
       title: "Decentralized",
       description:
-        "No intermediaries, no censorship. Pure peer-to-peer crowdfunding on Ethereum.",
+        "No middlemen. You and your backers deal directly with each other, from wallet to wallet.",
     },
     {
       icon: FiDatabase,
       title: "Immutable Records",
       description:
-        "All campaign data and transactions are permanently stored on the blockchain and cannot be altered.",
+        "Every contribution is stored on the blockchain and can be checked at any time.",
     },
     {
       icon: FiFlag,
       title: "Milestone Based Funding",
       description:
-        "Funds are released only when predefined milestones are successfully completed.",
+        "Money is released step by step, only as the work gets done.",
     },
     {
       icon: FiThumbsUp,
       title: "Voting Based Donation",
       description:
-        "Community votes determine how donations are allocated to the most promising and impactful ideas.",
+        "The community votes on how donations are used, so every decision stays fair.",
     },
   ];
 
   const howItWorks = [
     {
-      icon: FiCheckCircle,
-      title: "Publish with confidence",
+      title: "Start your campaign",
       description:
-        "Use straightforward campaign setup tools and launch with full visibility for backers.",
+        "Describe what you are building, set your goal and deadline, and publish your campaign.",
     },
     {
-      icon: FiClock,
-      title: "Track progress in real time",
+      title: "Collect funds on-chain",
       description:
-        "Monitor funding milestones, contributions, and campaign momentum from one dashboard.",
+        "People contribute straight from their wallets. Every contribution is open for anyone to see.",
     },
     {
-      icon: FiUsers,
-      title: "Connect with supporters",
+      title: "Grow with your backers",
       description:
-        "Build trust with clear updates, campaign transparency, and reliable on-chain data.",
+        "Share updates as you progress. Backers follow your work and funds stay protected by the contract.",
     },
   ];
 
   const categoryDefinitions = [
-    {
-      icon: FiBookOpen,
-      title: "Student Projects",
-      description: "Support innovative student ideas and academic research.",
-    },
-    {
-      icon: FiBriefcase,
-      title: "Startups",
-      description: "Help entrepreneurs turn ideas into successful businesses.",
-    },
-    {
-      icon: FiBook,
-      title: "Education",
-      description: "Fund scholarships, learning programs, and educational initiatives.",
-    },
-    {
-      icon: FiHeart,
-      title: "Medical",
-      description: "Support healthcare treatments and medical emergencies.",
-    },
-    {
-      icon: FiGlobe,
-      title: "Social Causes",
-      description: "Contribute to community welfare and charitable projects.",
-    },
-    {
-      icon: FiZap,
-      title: "Research & Innovation",
-      description: "Empower breakthrough technologies and scientific discoveries.",
-    },
-    {
-      icon: FiZap,
-      title: "Technology",
-      description: "Support innovative tools and solutions for a connected future.",
-    },
-    {
-      icon: FiSun,
-      title: "Agriculture",
-      description: "Help build sustainable farms and strengthen food systems.",
-    },
-    {
-      icon: FiPenTool,
-      title: "Arts and Culture",
-      description: "Celebrate creative work, heritage, and cultural expression.",
-    },
-    {
-      icon: FiGlobe,
-      title: "Environment",
-      description: "Fund projects that protect nature and restore our planet.",
-    },
+    { icon: FiBookOpen, title: "Student Projects", description: "Support student ideas and research." },
+    { icon: FiBriefcase, title: "Startups", description: "Help new businesses get off the ground." },
+    { icon: FiBook, title: "Education", description: "Fund learning programs and scholarships." },
+    { icon: FiHeart, title: "Medical", description: "Support treatment and medical needs." },
+    { icon: FiGlobe, title: "Social Causes", description: "Back community and charity projects." },
+    { icon: FiZap, title: "Research & Innovation", description: "Support new research and discovery." },
+    { icon: FiZap, title: "Technology", description: "Fund useful tools and products." },
+    { icon: FiSun, title: "Agriculture", description: "Help farms and food systems grow." },
+    { icon: FiPenTool, title: "Arts and Culture", description: "Support creative and cultural work." },
+    { icon: FiGlobe, title: "Environment", description: "Fund projects that protect nature." },
   ];
 
   const { useActiveCampaigns } = useContract();
@@ -377,18 +319,9 @@ export default function Home() {
     const liveCategoryCount = liveCampaignData.categoryCards.filter((category) => category.campaigns > 0).length;
 
     return [
-      {
-        icon: FiTarget,
-        label: `${liveCategoryCount} Categories`,
-      },
-      {
-        icon: FiTrendingUp,
-        label: `${liveCampaignData.activeCampaigns} Active Campaigns`,
-      },
-      {
-        icon: FiUsers,
-        label: `${liveCampaignData.totalContributors} Contributors`,
-      },
+      { icon: FiTarget, label: `${liveCategoryCount} Categories` },
+      { icon: FiTrendingUp, label: `${liveCampaignData.activeCampaigns} Active Campaigns` },
+      { icon: FiUsers, label: `${liveCampaignData.totalContributors} Contributors` },
     ];
   }, [liveCampaignData]);
 
@@ -458,40 +391,7 @@ export default function Home() {
     router.push("/dashboard");
   };
 
-  const [mousePosition, setMousePosition] = useState({
-    x: 0,
-    y: 0,
-  });
-
-  useEffect(() => {
-    if (!isLoaded || !user) {
-      setIsGreetingVisible(true);
-      return;
-    }
-
-    let hideTimer;
-    let advanceTimer;
-
-    setIsGreetingVisible(true);
-
-    hideTimer = window.setTimeout(() => {
-      setIsGreetingVisible(false);
-    }, 2200);
-
-    advanceTimer = window.setTimeout(() => {
-      setGreetingIndex((prevIndex) => (prevIndex + 1) % greetingPhrases.length);
-      setIsGreetingVisible(true);
-    }, 2600);
-
-    return () => {
-      if (hideTimer) {
-        window.clearTimeout(hideTimer);
-      }
-      if (advanceTimer) {
-        window.clearTimeout(advanceTimer);
-      }
-    };
-  }, [greetingIndex, isLoaded, user]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const currentUserName =
     user?.fullName ||
@@ -499,578 +399,451 @@ export default function Home() {
     user?.username ||
     user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
     "";
-  const displayName = user?.firstName || user?.username || user?.fullName || "there";
-  const displayGreeting = greetingIndex === 0 ? `Hello, ${displayName}!` : `${greetingPhrases[greetingIndex]}!`;
+
+  const heroStats = [
+    { value: loading ? "—" : String(stats.campaignsLaunched), label: "Campaigns" },
+    {
+      value: loading ? "—" : `Ξ ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`,
+      label: "Funds Raised",
+    },
+    { value: loading ? "—" : String(stats.contributors), label: "Contributors" },
+  ];
 
   return (
-<div
-  onMouseMove={(e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  }}
-  className="
-    relative
-    overflow-hidden
-    bg-cover
-    bg-no-repeat
-    bg-[8%_-40px]
-      sm:bg-[78%_-00px]
-  "
-  style={{
-    backgroundImage: "url('/qweas.png')",
-  }}
->
-  {/* Wallet Connected Popup - Full Page Blur */}
-  {showConnectedPopup && (
-    <>
-      
-    </>
-  )}
-
-  {/* Background Overlay */}
-  <div className="absolute inset-0 bg-black/55 z-[1]" />
-
-  {/* Base Dots */}
-  <div
-    className="absolute inset-0 z-[2]
-    [background-image:radial-gradient(rgba(255,255,255,0.12)_1px,transparent_1.2px)]
-    [background-size:10px_10px]"
-  />
-
-  {/* Desktop Interactive Bright Dots */}
-  <div
-    className="hidden md:block absolute inset-0 z-[3]
-    [background-image:radial-gradient(rgba(255,255,255,0.95)_0.8px,transparent_1px)]
-    [background-size:10px_10px]"
-    style={{
-      maskImage: `radial-gradient(
-        circle 180px at ${mousePosition.x}px ${mousePosition.y}px,
-        white 0%,
-        transparent 75%
-      )`,
-      WebkitMaskImage: `radial-gradient(
-        circle 180px at ${mousePosition.x}px ${mousePosition.y}px,
-        white 0%,
-        transparent 75%
-      )`,
-    }}
-  />
-
-  {/* Mobile Extra Visible Dots */}
-  <div
-    className="absolute inset-0 md:hidden z-[3]
-    [background-image:radial-gradient(rgba(255, 255, 255, 0)_1px,transparent_1.2px)]
-    [background-size:10px_10px]"
-  />
-
-      {/* Header */}
-<header
-  className={`
-    fixed z-50
-    shadow-sm
-    backdrop-blur-md backdrop-saturate-150
-    transition-all duration-800
-
-    ${
-      scrolled
-        ? "top-0 left-0 right-0 rounded-none border-b border-gray-500 bg-gray-900/50 backdrop-blur-2xl"
-        : "top-1 left-1 right-1 mt-1 rounded-4xl border border-gray-500 bg-gray-900/20"
-    }
-  `}
->
-  <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <div className="flex items-center justify-between h-14 gap-2">
-      
-      {/* Logo + Title */}
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="w-14 h-14 flex items-center justify-center ">
-            <img
-              src="/logo2.gif"          // Place your logo in the public folder
-              alt="CrowdFund Logo"
-              className="w-full h-full object-contain"
-            />
-        </div>
-
-        <span
-          className={`font-bold text-white truncate
-          text-lg sm:text-xl
-          ${
-            scrolled
-              ? "transition-colors duration-[2000ms]"
-              : ""
-          }`}
-        >
-          CrowdFund
-        </span>
+    <div
+      onMouseMove={(e) => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      }}
+      className="relative min-h-screen overflow-x-hidden bg-black text-white"
+    >
+      {/* ===== Background layers (static, stays fixed while content scrolls) ===== */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        {/* Black base with a soft blue/indigo gradient */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#0b1030_0%,#05060f_40%,#000000_70%,#070c22_100%)]" />
+        {/* Soft indigo glow at the top */}
+        <div className="absolute -top-32 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-indigo-600/20 blur-[140px]" />
+        {/* Soft blue glow near the bottom */}
+        <div className="absolute bottom-[-10%] right-[-10%] h-[380px] w-[560px] rounded-full bg-blue-600/15 blur-[140px]" />
+        {/* Base dot grid */}
+        <div
+          className="absolute inset-0 [background-image:radial-gradient(rgba(255,255,255,0.05)_1px,transparent_1.2px)] [background-size:10px_10px]"
+        />
+        {/* Interactive dots that follow the cursor (desktop only) */}
+        <div
+          className="hidden md:block absolute inset-0 [background-image:radial-gradient(rgba(255,255,255,0.6)_0.8px,transparent_1px)] [background-size:10px_10px]"
+          style={{
+            maskImage: `radial-gradient(circle 160px at ${mousePosition.x}px ${mousePosition.y}px, white 0%, transparent 80%)`,
+            WebkitMaskImage: `radial-gradient(circle 160px at ${mousePosition.x}px ${mousePosition.y}px, white 0%, transparent 80%)`,
+          }}
+        />
       </div>
 
-      {/* Auth / Wallet Actions */}
-      <div
-        className={`
-          px-1 sm:px-4
-          py-1
-          rounded-3xl
-          shadow-lg
-          bg-white/0
-          flex-shrink-0
-          relative
-        `}
+      {/* ===== Header ===== */}
+      <header
+        className={`fixed z-50 transition-all duration-300 backdrop-blur-md ${
+          scrolled
+            ? "top-0 left-0 right-0 border-b border-white/10 bg-black/70"
+            : "top-2 left-2 right-2 rounded-4xl border border-white/10 bg-black/40"
+        }`}
       >
-        {hasValidClerkKey ? (
-          <>
-            <SignedOut>
-              <div className="flex items-center gap-2 text-white">
-                <SignInButton mode="modal">
-                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl  px-3 py-2">
-                    Login 
-                  </button>
-                </SignInButton> / 
-                <SignUpButton mode="modal">
-                  <button className="font-medium text-white text-sm whitespace-nowrap rounded-3xl  px-3 py-2">
-                    Sign Up
-                  </button>
-                </SignUpButton>
-              </div>
-            </SignedOut>
-
-            <SignedIn>
-              <div className="flex items-center gap-2">
-                <UserButton afterSignOutUrl="/" />
-                <ConnectButton.Custom>
-                  {({ openConnectModal, mounted, account }) => {
-                    if (!mounted) return null;
-
-                    return (
-                      <button
-                        onClick={openConnectModal}
-                        className="font-medium text-white text-sm whitespace-nowrap "
-                      >
-                        {account ? "Wallet Connected" : "Connect Wallet"}
-                      </button>
-                    );
-                  }}
-                </ConnectButton.Custom>
-              </div>
-            </SignedIn>
-          </>
-        ) : (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.open("https://dashboard.clerk.com/last-active?path=api-keys", "_blank", "noopener,noreferrer")}
-              className="font-medium text-black text-sm whitespace-nowrap rounded-3xl border border-gray-200 bg-white px-3 py-2 shadow-sm hover:bg-gray-50"
-            >
-              Configure Clerk
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-</header>
-
-      {/* Hero Section */}
-  <section className="relative overflow-hidden mt-[120px] mx-auto w-full max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
-  {/* Content */}
-  <div className="relative z-10 pt-[60px] mt-0 mb-12">
-    <div className="text-center mx-auto max-w-3xl">
-      {isLoaded && user && (
-        <div className="absolute -mt-[60px] ml-[250px] flex min-h-[2.8rem] items-center justify-center px-2 sm:min-h-[3.2rem]">
-          <p
-            className={`text-sm uppercase tracking-[0.35em] text-cyan-300 mb-3 mx-auto [text-shadow:0_0_10px_rgba(255,255,255,0.8)] max-w-[20rem] break-words text-center leading-tight  transition-all duration-500 ease-out sm:max-w-[32rem]  ${
-              isGreetingVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-            }`}
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
+          {/* Logo + Name */}
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="flex min-w-0 items-center gap-2"
           >
-            {displayGreeting}
-          </p>
-        </div>
-      )}
-      <h1 className="text-xl md:text-[40px] font-bold text-white mb-6">
-      Trusted Crowdfunding Platform!
-        <span className="mt-5 block text-3xl text-blue-200">Decentralized & Secure</span>
-      </h1>
-      <p className="text-lg -mt-2 text-blue-100 mb-8 max-w-2xl ">
-     Launch campaigns, support innovations, and empower projects with trusted support. Ensure every contribution is transparent, secure, and accountable through blockchain technology.
-      </p>
+            <div className="flex h-10 w-10 items-center justify-center">
+              <img src="/logo.png" alt="CrowdFund Logo" className="h-full w-full object-contain" />
+            </div>
+            <span className="truncate text-lg font-bold text-white">CrowdFund</span>
+          </button>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        {hasValidClerkKey ? (
-          <>
-            <SignedOut>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <SignInButton mode="modal">
-                  <button className="bg-white text-cyan-600 px-6 py-3 rounded-4xl font-medium hover:bg-cyan-50 transition-colors">
-                    Login
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="bg-cyan-600/40 text-white px-6 py-3 rounded-4xl font-medium hover:bg-cyan-700 transition-colors border border-cyan-400">
-                    Sign Up
-                  </button>
-                </SignUpButton>
-              </div>
-            </SignedOut>
+          {/* Actions */}
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {hasValidClerkKey ? (
+              <>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="rounded-full px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white">
+                      Login
+                    </button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <button className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-white/40">
+                      Sign Up
+                    </button>
+                  </SignUpButton>
+                </SignedOut>
 
-            <SignedIn>
-              {isConnected ? (
-                <button
-                  type="button"
-                  onClick={handleGoToCampaigns}
-                  className={`bg-white text-cyan-600 px-6 py-3 backdrop-blur-sm rounded-4xl font-medium hover:bg-cyan-500 hover:text-white transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
-                >
-                  Explore Campaigns
-                  <FiArrowRight className="ml-2 w-5 h-5" />
-                </button>
-              ) : (
-                <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-6 py-3 rounded-4xl hover:border-cyan-400">
+                <SignedIn>
+                  <UserButton afterSignOutUrl="/" />
                   <ConnectButton.Custom>
-                    {({ openConnectModal }) => (
-                      <button
-                        onClick={openConnectModal}
-                        className="text-white font-medium"
-                      >
-                        Connect Wallet to Start
-                      </button>
-                    )}
+                    {({ openConnectModal, mounted, account }) => {
+                      if (!mounted) return null;
+                      return (
+                        <button
+                          onClick={openConnectModal}
+                          className="rounded-full px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+                        >
+                          {account ? "Wallet Connected" : "Connect Wallet"}
+                        </button>
+                      );
+                    }}
                   </ConnectButton.Custom>
-                </div>
-              )}
-            </SignedIn>
-          </>
-        ) : (
-          <>
-            {isConnected ? (
-              <button
-                type="button"
-                onClick={handleGoToCampaigns}
-                className={`bg-white text-blue-600 px-6 py-3 rounded-4xl font-medium hover:bg-cyan-50 transition-colors inline-flex items-center ${shouldBlinkDashboard ? 'blink-twice' : ''}`}
-              >
-                Explore Campaigns
-                <FiArrowRight className="ml-2 w-5 h-5" />
-              </button>
+                </SignedIn>
+              </>
             ) : (
-              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 px-6 py-3 rounded-4xl hover:border-cyan-400">
-                <ConnectButton.Custom>
-                  {({ openConnectModal }) => (
+              <ConnectButton.Custom>
+                {({ openConnectModal, mounted, account }) => {
+                  if (!mounted) return null;
+                  return (
                     <button
                       onClick={openConnectModal}
-                      className="text-white font-medium"
+                      className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-white/40"
                     >
-                      Connect Wallet to Start
+                      {account ? "Wallet Connected" : "Connect Wallet"}
                     </button>
-                  )}
-                </ConnectButton.Custom>
-              </div>
-            )}
-          </>
-        )}
+                  );
+                }}
+              </ConnectButton.Custom>
+            )}          </div>
+        </div>
+      </header>
 
-        <SignedIn>
-          <button
-            onClick={handleGoToDashboard}
-            className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-6 py-3 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors"
-          >
-            Go to Dashboard
-          </button>
-        </SignedIn>
-        <SignedOut>
-          <SignInButton mode="modal">
-            <button className="bg-transparent backdrop-blur-sm border-2 border-white text-white px-6 py-3 rounded-4xl font-medium hover:bg-white hover:text-cyan-600 transition-colors">
-              Go to Dashboard
+      {/* ===== Hero ===== */}
+      <section className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-40 pb-20 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-white/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+            Decentralized crowdfunding on Ethereum
+          </div>
+
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Fund ideas that matter.
+            <span className="mt-3 block bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent">
+              Keep full control.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
+            CrowdFund lets you launch campaigns, raise funds, and back projects with complete
+            transparency. Every contribution is recorded on-chain, so you always know where the
+            money goes.
+          </p>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <button
+              onClick={() => router.push("/create-campaign")}
+              className="inline-flex w-full items-center justify-center rounded-full bg-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-indigo-400 sm:w-auto"
+            >
+              Start a Campaign
+              <FiArrowRight className="ml-2 h-4 w-4" />
             </button>
-          </SignInButton>
-        </SignedOut>
-      </div>
-    </div>
-</div>
- 
-</section>
-            <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-
-            {/* Recent Campaigns Section */}
-      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-px w-8 bg-cyan-400" />
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Recent Campaigns</span>
-              </div>
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">Discover the Latest Campaigns</h2>
-              <p className="text-base text-slate-400 max-w-lg leading-relaxed">
-                See what the community is backing right now. Transparent progress, real contributors, on-chain data.
-              </p>
-            </div>
+            <button
+              onClick={handleGoToCampaigns}
+              className={`inline-flex w-full items-center justify-center rounded-full border border-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-indigo-500 sm:w-auto ${
+                shouldBlinkDashboard ? "blink-twice" : ""
+              }`}
+            >
+              Explore Campaigns
+            </button>
             <SignedIn>
               <button
-                onClick={() => router.push("/all-campaigns")}
-                className="inline-flex items-center gap-2 rounded-[40px] border-2 border-white/40 backdrop-blur-sm bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.08] hover:border-white"
+                onClick={handleGoToDashboard}
+                className="inline-flex w-full items-center justify-center rounded-full backdrop-blur-sm px-6 py-3.5 border border-white/60 text-sm font-medium text-white/60 transition-colors hover:text-white sm:w-auto"
               >
-                View All Campaigns
-                <FiArrowRight className="w-4 h-4" />
+                Go to Dashboard
               </button>
             </SignedIn>
             <SignedOut>
-              <SignInButton mode="modal">
-                <button className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.08] hover:border-white">
-                  View All Campaigns
-                  <FiArrowRight className="w-4 h-4" />
-                </button>
-              </SignInButton>
+              {hasValidClerkKey && (
+                <SignInButton mode="modal">
+                  <button className="inline-flex w-full items-center justify-center rounded-full backdrop-blur-sm px-6 py-3.5 text-sm font-medium text-white/60 transition-colors hover:text-white sm:w-auto">
+                    Go to Dashboard
+                  </button>
+                </SignInButton>
+              )}
             </SignedOut>
           </div>
 
-          {recentCampaignsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02]  p-4 space-y-3 animate-pulse">
-                  <div className="h-36 rounded-lg bg-white/[0.04]" />
-                  <div className="h-4 w-3/4 rounded bg-white/[0.04]" />
-                  <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
-                  <div className="h-1.5 rounded-full bg-white/[0.04]" />
-                </div>
-              ))}
-            </div>
-          ) : visibleRecentCampaigns.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {visibleRecentCampaigns.map((campaign) => (
-                <CampaignCard
-                  key={campaign.id}
-                  campaign={campaign}
-                  creatorProfile={recentCreatorProfiles[campaign.creator?.toString?.()?.toLowerCase()]}
-                  currentUserAddress={address}
-                  currentUserName={currentUserName}
-                  isLandingCard
-                  className="border-white/[0.08] bg-navy-300/70 backdrop-blur-sm"
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center">
-              <p className="text-sm text-slate-400">No campaigns yet. Be the first to launch one.</p>
-            </div>
-          )}
-        </div>
-      </section>
- <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-{/* Stats Section */}
-      <section className="relative z-10 py-16 px-6 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-4 mb-12">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-8 bg-cyan-400" />
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Platform Metrics</span>
-            </div>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Real-Time Platform Momentum</h2>
-            <p className="text-base text-slate-400 max-w-lg leading-relaxed">
-              Live numbers from the blockchain. No inflated metrics — every stat is on-chain and verifiable.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                value: loading ? "..." : stats.campaignsLaunched,
-                label: "Campaigns Launched",
-                sub: "active on-chain",
-              },
-              {
-                value: loading ? "..." : `\u039E ${(Number(stats.fundsRaised) / 1e18).toFixed(2)}`,
-                label: "Total Raised",
-                sub: "ETH contributed",
-              },
-              {
-                value: loading ? "..." : stats.contributors,
-                label: "Contributors",
-                sub: "unique backers",
-              },
-            ].map((stat, i) => (
-              <div key={i} className="rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10 p-6">
-                <p className="text-3xl font-bold text-white tabular-nums">{stat.value}</p>
-                <p className="mt-2 text-sm font-medium text-slate-300">{stat.label}</p>
-                <p className="text-xs text-slate-600 mt-0.5">{stat.sub}</p>
+          {/* Live stats */}
+          <div className="mx-auto mt-16 grid max-w-xl grid-cols-3 divide-x divide-white/10 rounded-3xl backdrop-blur-sm border border-white/10 bg-white/[0.03] py-6">
+            {heroStats.map((stat, i) => (
+              <div key={i} className="px-2">
+                <p className="text-xl font-bold tabular-nums text-white sm:text-2xl">{stat.value}</p>
+                <p className="mt-1 text-xs text-white/50 sm:text-sm">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
- <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-{/* Explore Fundraising Categories Section */}
-      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-px w-8 bg-cyan-400" />
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Categories</span>
-              </div>
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">Browse by Category</h2>
-              <p className="text-base text-slate-400 max-w-lg leading-relaxed">
-                Find campaigns that match your interests. Each category is curated for transparency and impact.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categoryOverviewStats.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 rounded-[15px] border border-white/0 backdrop-blur-sm bg-cyan-800/30  px-4 py-2.5"
-                  >
-                    <Icon className="h-4 w-4 text-cyan-400" />
-                    <span className="text-sm text-slate-300">{stat.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {campaignCategories.map((category, index) => {
-              const Icon = category.icon;
+      {/* ===== Recent Campaigns ===== */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+              Live on the platform
+            </p>
+            <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+              Latest Campaigns
+            </h2>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/50">
+              See what the community is funding right now. Real campaigns, real backers, on-chain
+              data.
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/all-campaigns")}
+            className="inline-flex flex-shrink-0 items-center gap-2 self-start rounded-full border border-white/15 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-white transition-colors hover:border-white/40 md:self-auto"
+          >
+            View All
+            <FiArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        {recentCampaignsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse space-y-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4">
+                <div className="h-36 rounded-xl bg-white/[0.04]" />
+                <div className="h-4 w-3/4 rounded bg-white/[0.04]" />
+                <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                <div className="h-1.5 rounded-full bg-white/[0.04]" />
+              </div>
+            ))}
+          </div>
+        ) : visibleRecentCampaigns.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {visibleRecentCampaigns.map((campaign) => (
+              <CampaignCard
+                key={campaign.id}
+                campaign={campaign}
+                creatorProfile={recentCreatorProfiles[campaign.creator?.toString?.()?.toLowerCase()]}
+                currentUserAddress={address}
+                currentUserName={currentUserName}
+                isLandingCard
+                className="border-white/[0.08] bg-white/[0.03] backdrop-blur-sm"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-10 text-center">
+            <p className="text-sm text-white/50">
+              No campaigns yet. Be the first to launch one.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* ===== How It Works ===== */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-12 lg:flex-row lg:items-end lg:justify-between">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+            How It Works
+          </p>
+          <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+            Three steps to get funded
+          </h2>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {howItWorks.map((step, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm p-6 transition-colors hover:border-indigo-400/40"
+            >
+              <span className="text-sm font-semibold tabular-nums text-indigo-400">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 className="mt-3 text-lg font-semibold text-white">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/50">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== Categories ===== */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+              Categories
+            </p>
+            <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+              Find what you care about
+            </h2>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/50">
+              Browse campaigns by category. Counts update live as people fund projects.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categoryOverviewStats.map((stat, index) => {
+              const Icon = stat.icon;
               return (
                 <div
                   key={index}
-                  className={`group rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10 p-5 transition-all duration-200 hover:border-cyan-800 ${
-                    index === campaignCategories.length - 1 ? "lg:col-start-2" : ""
-                  }`}
+                  className="flex items-center gap-2 rounded-full border border-white/10 backdrop-blur-sm bg-white/[0.03] px-4 py-2"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[15px] bg-white/10 text-white">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-semibold text-white">{category.title}</h3>
-                      <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">{category.description}</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-semibold text-white">{category.campaigns}</span>
-                      <span className="text-xs text-slate-500">campaign{category.campaigns !== 1 ? 's' : ''}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-semibold text-cyan-300">{category.ethRaised.toFixed(1)}</span>
-                      <span className="text-xs text-slate-500">ETH raised</span>
-                    </div>
-                  </div>
+                  <Icon className="h-4 w-4 text-indigo-400" />
+                  <span className="text-sm text-white/70">{stat.label}</span>
                 </div>
               );
             })}
           </div>
         </div>
-      </section>
-       <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" /> 
-{/* Features Section */}
-      <section className="relative z-10 px-6 py-16 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-4 mb-12">
-            <div className="flex items-center gap-3">
-              <div className="h-px w-8 bg-cyan-400" />
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400">Why CrowdFund</span>
-            </div>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Built for Modern Crowdfunding</h2>
-            <p className="text-base text-slate-400 max-w-lg leading-relaxed">
-              Everything founders and backers need — transparent, secure, and built on-chain.
-            </p>
-          </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {campaignCategories.map((category, index) => {
+            const Icon = category.icon;
+            return (
               <div
                 key={index}
-                className="group rounded-3xl border border-white/10 backdrop-blur-sm bg-cyan-800/10  p-4 transition-all duration-200 hover:border-cyan-800"
+                className={`group rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm p-5 transition-colors hover:border-indigo-400/40 ${
+                  index === campaignCategories.length - 1 ? "lg:col-start-2" : ""
+                }`}
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[15px] bg-white/10 text-white">
-                    <feature.icon className="h-5 w-5" />
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-indigo-300">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600 tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-semibold text-white">{category.title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-white/50 line-clamp-2">
+                      {category.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base font-semibold text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-slate-400 leading-relaxed">{feature.description}</p>
+                <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold text-white">{category.campaigns}</span>
+                    <span className="text-xs text-white/40">
+                      campaign{category.campaigns !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold text-indigo-300">
+                      {category.ethRaised.toFixed(1)}
+                    </span>
+                    <span className="text-xs text-white/40">ETH raised</span>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Go to Top */}
-      <div className="relative z-10  -mt-[40px] mb-6 flex justify-center py-8">
+      {/* ===== Features ===== */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+            Why CrowdFund
+          </p>
+          <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+            Built for safe, open fundraising
+          </h2>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/50">
+            Everything founders and backers need, running on-chain.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm p-6 transition-colors hover:border-indigo-400/40"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06] text-indigo-300">
+                  <feature.icon className="h-5 w-5" />
+                </div>
+                <span className="text-xs font-medium tabular-nums text-white/25">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <h3 className="mt-4 text-base font-semibold text-white">{feature.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/50">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== Call to Action ===== */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-indigo-400/20 bg-indigo-500/[0.06] backdrop-blur-sm px-6 py-14 text-center">
+          <h2 className="text-2xl font-bold text-white sm:text-3xl">
+            Ready to start?
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60 sm:text-base">
+            Launch your campaign today and raise funds with full transparency, from the first
+            contribution to the last milestone.
+          </p>
+          <button
+            onClick={() => router.push("/create-campaign")}
+            className="mt-8 inline-flex items-center rounded-full bg-indigo-500 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-400"
+          >
+            Start a Campaign
+            <FiArrowRight className="ml-2 h-4 w-4" />
+          </button>
+        </div>
+      </section>
+
+      {/* ===== Go to Top ===== */}
+      <div className="relative z-10 flex justify-center pb-10">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.12] hover:border-white/40 backdrop-blur-sm"
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/40 hover:text-white"
+          aria-label="Go to top"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
-          Go to Top
+          Back to top
         </button>
       </div>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-cyan-700/50 bg-cyan-800/10 backdrop-blur-md text-slate-200">
-        <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-12 md:grid-cols-3">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center">
-                  <img
-                    src="/logo2.gif"
-                    alt="CrowdFund Logo"
-                    className="w-8 h-8 object-contain"
-                  />
-                </div>
-                <div>
-                  <p className="text-xl font-semibold text-white">CrowdFund</p>
-                  <p className="mt-1 text-sm text-slate-400">
-                    Decentralized crowdfunding for the future.
-                  </p>
-                </div>
+      {/* ===== Footer ===== */}
+      <footer className="relative z-10 border-t border-white/[0.08] backdrop-blur-sm bg-black/60">
+        <div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:gap-16">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="CrowdFund Logo" className="h-10 w-10 object-contain" />
+              <div>
+                <p className="text-lg font-semibold text-white">CrowdFund</p>
+                <p className="mt-0.5 text-sm text-white/40">
+                  Decentralized crowdfunding on Ethereum.
+                </p>
               </div>
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
                 Product
               </h3>
-              <ul className="mt-5 space-y-3 text-sm text-slate-300">
+              <ul className="mt-4 space-y-3 text-sm text-white/60">
                 <li>
-                  <a href="/all-campaigns" className="hover:text-white transition">
+                  <a href="/all-campaigns" className="transition hover:text-white">
                     Browse campaigns
                   </a>
                 </li>
                 <li>
-                  <a href="/create-campaign" className="hover:text-white transition">
+                  <a href="/create-campaign" className="transition hover:text-white">
                     Start a campaign
                   </a>
                 </li>
                 <li>
-                  <a href="/dashboard" className="hover:text-white transition">
+                  <a href="/dashboard" className="transition hover:text-white">
                     Your dashboard
                   </a>
                 </li>
               </ul>
             </div>
-
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Contact
-              </h3>
-              <p className="mt-5 text-sm text-slate-300">
-                support@crowdfund.in
-              </p>
-              <p className="mt-3 text-sm text-slate-400">
-                Follow us for the latest updates and launches.
-              </p>
-            </div>
           </div>
 
-          <div className="mt-10 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-            © {new Date().getFullYear()} CrowdFund. Built for modern on-chain funding.
+          <div className="mt-10 border-t border-white/[0.08] pt-6 text-xs text-white/30">
+            © {new Date().getFullYear()} CrowdFund. Built for open, on-chain funding.
           </div>
         </div>
       </footer>

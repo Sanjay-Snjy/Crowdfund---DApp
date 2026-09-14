@@ -140,7 +140,7 @@ export default function CampaignCard({
         {/* CTA */}
         <Link
           href={`/campaign/${id}`}
-          className="mt-auto bg-cyan-600/80  btn btn-sm w-full text-center"
+          className="mt-auto bg-indigo-500 hover:bg-indigo-400 btn btn-sm w-full text-center text-white"
         >
           View Campaign
         </Link>

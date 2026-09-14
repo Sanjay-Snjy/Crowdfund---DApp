@@ -16,7 +16,7 @@ export default function Document() {
         <meta property="og:title" content="CrowdFund" />
         <meta property="og:description" content="Decentralized crowdfunding on the blockchain." />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/logo2.gif" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </Head>
       <body>
         <Main />

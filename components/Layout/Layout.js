@@ -15,9 +15,8 @@ export default function Layout({ children }) {
     }
   });
 
-  // Ensure first paint is LIGHT theme for new visitors.
-  // The app currently only ever adds/removes "dark" — there is no separate light class —
-  // so making the default light is equivalent to starting without the "dark" class.
+  // Ensure theme is applied synchronously on mount to prevent flash.
+  // Read from localStorage and apply dark class before first paint.
   useEffect(() => {
     if (typeof document === "undefined") return;
 
@@ -28,12 +27,17 @@ export default function Layout({ children }) {
       savedTheme = null;
     }
 
+    // Respect existing dark class set by landing page — don't remove it
+    // if the user's saved preference is dark.
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
-    } else {
+    } else if (savedTheme === "light") {
       document.documentElement.classList.remove("dark");
     }
-    document.documentElement.style.colorScheme = savedTheme === "dark" ? "dark" : "light";
+    // If no saved theme, keep whatever class is already on <html>
+    // (e.g. dark set by landing page).
+    document.documentElement.style.colorScheme =
+      document.documentElement.classList.contains("dark") ? "dark" : "light";
   }, []);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
@@ -61,14 +65,13 @@ export default function Layout({ children }) {
     observer.observe(document.documentElement, { attributes: true });
 
     return () => observer.disconnect();
-  }, []);
-
-return (      <div
-        className="bg-gray-50 dark:bg-navy min-h-screen -mt-[20px] flex flex-col"
+  }, []);return (
+      <div
+        className="bg-gray-50 dark:bg-black min-h-screen -mt-[20px] flex flex-col"
         suppressHydrationWarning
       >
       {/* Fixed background for header area */}
-      <div className="fixed inset-0 bg-gray-50 dark:bg-navy z-0 pointer-events-none" />
+      <div className="fixed inset-0 bg-gray-50 dark:bg-black z-0 pointer-events-none" />
       
       <div
         className="relative flex-1 flex flex-col "
@@ -83,8 +86,8 @@ return (      <div
         <div
           className="hidden md:block fixed inset-0 pointer-events-none z-[1]"
           style={{
-            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.04)"} 1px,transparent 1.2px)`,
-            backgroundSize: "8px 8px",
+            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)"} 1px,transparent 1.2px)`,
+            backgroundSize: "10px 10px",
           }}
         />
 
@@ -92,17 +95,17 @@ return (      <div
         <div
           className="hidden md:block fixed inset-0 pointer-events-none z-[1]"
           style={{
-            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.71)" : "rgba(0, 0, 0, 0.4)"} 0.8px,transparent 1px)`,
-            backgroundSize: "8px 8px",
+            backgroundImage: `radial-gradient(${isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.4)"} 0.8px,transparent 1px)`,
+            backgroundSize: "10px 10px",
             maskImage: `radial-gradient(
               circle 160px at ${mousePosition.x}px ${mousePosition.y}px,
               white 0%,
-              transparent 85%
+              transparent 80%
             )`,
             WebkitMaskImage: `radial-gradient(
               circle 160px at ${mousePosition.x}px ${mousePosition.y}px,
               white 0%,
-              transparent 85%
+              transparent 80%
             )`,
           }}
         />
@@ -117,7 +120,7 @@ return (      <div
         key={sidebarCollapsed ? "collapsed" : "expanded"}
         className={`
           relative z-10 transition-all duration-300 ease-out flex-1 flex flex-col
-          ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[14.5rem]"}
+          ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"}
         `}
         >
           <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
@@ -131,15 +134,15 @@ return (      <div
       </div>
 
       {/* Footer - Solid background to hide the dotted pattern below */}
-      <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-navy-600 dark:bg-navy-200 border-t border-secondary dark:border-navy-200 text-slate-300 mt-auto">
+      <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-[rgba(255,255,255,0.1)] dark:bg-black border-t border-secondary dark:border-[rgba(255,255,255,0.1)] text-slate-300 mt-auto">
         <div
           className={`transition-all duration-300 ease-out ${
-            sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[14.5rem]"
+            sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"
           }`}
         >
           <div className="mx-auto flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
-              <p className="text-sm font-semibold text-black dark:text-[#F8FAFC]">CrowdFund DApp</p>
+              <p className="text-sm font-semibold text-black dark:text-white">CrowdFund DApp</p>
               <p className="mt-1 text-xs text-slate-400">
                 Built for secure, modern crowdfunding on-chain.
               </p>

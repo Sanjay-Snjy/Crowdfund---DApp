@@ -210,7 +210,7 @@ export default function AllCampaignsPage() {
         </div>
         
          {/* Hero Banner Slideshow */}
-        <section className="relative overflow-hidden h-[208px] rounded-[32px] border border-slate-200/70 dark:border-cyan-200/20 bg-slate-900 p-0 text-white">
+        <section className="relative overflow-hidden h-[208px] rounded-[32px] border border-slate-200/70 dark:border-[rgba(255,255,255,0.1)] bg-slate-900 p-0 text-white">
           <div className="absolute inset-0">
             {HERO_SLIDES.map((slide, index) => (
               <div
@@ -271,25 +271,25 @@ export default function AllCampaignsPage() {
                 placeholder="Search campaigns..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input pl-9 rounded-3xl"
+                className="input pl-9 rounded-full"
               />
             </div>
             <div className="flex gap-2">
-              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="select w-auto rounded-3xl">
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="select w-auto rounded-full">
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="funded">Funded</option>
               </select>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="select w-auto rounded-3xl">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="select w-auto rounded-full">
                 <option value="newest">Newest</option>
                 <option value="ending">Ending Soon</option>
                 <option value="funded">Most Funded</option>
                 <option value="popular">Most Popular</option>
               </select>
-              <div className="flex rounded-3xl border overflow-hidden " style={{ borderColor: "var(--color-border)" }}>
+              <div className="flex rounded-full border overflow-hidden " style={{ borderColor: "var(--color-border)" }}>
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 ${viewMode === "grid" ? "bg-cyan-50 dark:bg-cyan-500/10" : ""}`}
+                  className={`p-2 ${viewMode === "grid" ? "bg-indigo-50 dark:bg-indigo-500/10" : ""}`}
                   style={{ color: viewMode === "grid" ? "var(--color-accent)" : "var(--color-text-muted)" }}
                   aria-label="Grid view"
                 >
@@ -313,10 +313,10 @@ export default function AllCampaignsPage() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`shrink-0 px-4 py-1.5 rounded-3xl text-xs font-medium transition-colors ${
+                className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   activeCategory === cat
-                    ? "bg-cyan-600 text-white"
-                    : "hover:bg-slate-100 dark:hover:bg-slate-700/50"
+                    ? "bg-indigo-500 text-white"
+                    : "hover:bg-slate-100 dark:hover:bg-[rgba(255,255,255,0.06)]"
                 }`}
                 style={activeCategory === cat ? undefined : { color: "var(--color-text-secondary)" }}
               >

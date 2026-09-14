@@ -34,7 +34,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
     if (!savedTheme) {
       window.localStorage.setItem("theme", shouldUseDark ? "dark" : "light");
     }
-  }, [router.pathname]);
+  }, []);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) {
@@ -191,7 +191,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/40 dark:bg-navy-100 border-b md:border border-secondary dark:border-navy-600 
+       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/40 dark:bg-black/70 border-b md:border border-secondary dark:border-[rgba(255,255,255,0.1)] 
        transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
     >
@@ -201,9 +201,9 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuToggle}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-500 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.1)] transition-colors"
           >
-            <FiMenu className="w-5 h-5 text-gray-600 dark:text-[#94A3B8]" />
+            <FiMenu className="w-5 h-5 text-gray-600 dark:text-[rgba(255,255,255,0.6)]" />
           </button>
 
           {/* Logo + App Name (replaces search) */}
@@ -213,14 +213,14 @@ export default function Header({ onMenuToggle, isCollapsed }) {
             className="flex items-center gap-3 rounded-2xl transition hover:opacity-90 focus:outline-none"
           >
             <div className="w-10 h-10 rounded-4xl flex items-center justify-center">
-              <img src="/logo3.gif" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
+              <img src="/logo.png" alt="CrowdFund Logo" className="w-10 h-10 object-contain" />
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-[#F8FAFC] hidden sm:inline">CrowdFund</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-white hidden sm:inline">CrowdFund</span>
           </button>
         </div>
  {walletUserName && (
-            <div className="hidden lg:flex items-center rounded-4xl border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-navy-600 dark:bg-navy-300/70 dark:text-[#CBD5E1]">
-             <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-[#94A3B8]" /> &nbsp; {walletUserName}
+            <div className="hidden lg:flex items-center rounded-full border border-gray-300/0 bg-white/00 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-[rgba(255,255,255,0.1)] dark:bg-[rgba(255,255,255,0.06)] dark:text-[rgba(255,255,255,0.7)]">
+             <FiUserCheck className="w-[18px] h-[18px] text-gray-600 dark:text-[rgba(255,255,255,0.5)]" /> &nbsp; {walletUserName}
             </div>
           )}
         {/* Right Section */}
@@ -236,10 +236,10 @@ export default function Header({ onMenuToggle, isCollapsed }) {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-4xl hover:bg-white dark:hover:bg-navy-500 transition-colors"
+            className="p-2 rounded-full hover:bg-white dark:hover:bg-[rgba(255,255,255,0.1)] transition-colors"
           >
             {isDark ? (
-              <FiSun className="w-5 h-5 text-gray-500" />
+              <FiSun className="w-5 h-5 text-[rgba(255,255,255,0.5)]" />
             ) : (
               <FiMoon className="w-5 h-5 text-gray-600" />
             )}

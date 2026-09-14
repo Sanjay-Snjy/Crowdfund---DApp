@@ -23,14 +23,14 @@ function MyApp({ Component, pageProps }) {
     return (
       <div style={{
         position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-        background: "#f8fafc", color: "#0f172a", fontFamily: "system-ui, sans-serif", zIndex: 9999,
+        background: "#000000", color: "#f8fafc", fontFamily: "system-ui, sans-serif", zIndex: 9999,
       }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
           <div style={{
-            width: 32, height: 32, border: "3px solid #e2e8f0", borderTopColor: "#4f46e5",
+            width: 32, height: 32, border: "3px solid #1f2937", borderTopColor: "#6366f1",
             borderRadius: "50%", animation: "spin 0.8s linear infinite",
           }} />
-          <span style={{ fontSize: 14, color: "#64748b" }}>Loading…</span>
+          <span style={{ fontSize: 14, color: "#94a3b8" }}>Loading…</span>
         </div>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>

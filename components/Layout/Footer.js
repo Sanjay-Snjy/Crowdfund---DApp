@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2">
-              <img src="/logo3.gif" alt="CrowdFund" className="w-7 h-7 rounded" />
+              <img src="/logo.png" alt="CrowdFund" className="w-7 h-7 rounded" />
               <span className="text-base font-semibold" style={{ color: "var(--color-text)" }}>CrowdFund</span>
             </div>
             <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>

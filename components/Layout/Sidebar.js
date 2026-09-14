@@ -104,8 +104,8 @@ export default function Sidebar({
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
   const sidebarWidthClass = isOpen
-    ? `w-64 ${isCollapsed ? "md:w-14" : "md:w-56"}`
-    : `w-12 ${isCollapsed ? "md:w-14" : "md:w-56"}`;
+    ? `w-64 ${isCollapsed ? "md:w-14" : "md:w-48"}`
+    : `w-12 ${isCollapsed ? "md:w-14" : "md:w-48"}`;
 
   const handleCopyAddress = async () => {
     if (!address) return;
@@ -137,13 +137,13 @@ export default function Sidebar({
     "No email";
 
   const walletPanel = (
-    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
+    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-[rgba(255,255,255,0.1)] dark:bg-black/95 backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Wallet</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">Wallet</p>
         <button
           type="button"
           onClick={() => setIsWalletOpen(false)}
-          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
+          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[rgba(255,255,255,0.6)] dark:hover:bg-[rgba(255,255,255,0.1)] dark:hover:text-white"
         >
           ✕
         </button>
@@ -151,40 +151,40 @@ export default function Sidebar({
 
         {!isConnected ? (
           <div className="mt-4 space-y-3">
-            <p className="text-sm text-slate-500 dark:text-[#94A3B8]">Wallet not connected</p>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-navy-600 dark:bg-navy-500">
+            <p className="text-sm text-slate-500 dark:text-[rgba(255,255,255,0.5)]">Wallet not connected</p>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-[rgba(255,255,255,0.1)] dark:bg-[rgba(255,255,255,0.06)]">
               {openConnectModal ? (
                 <button
                   type="button"
                   onClick={() => openConnectModal()}
-                  className="w-full rounded-2xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600"
+                  className="w-full rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
                 >
                   Connect Wallet
                 </button>
               ) : (
-                <div className="text-sm text-slate-500 dark:text-[#94A3B8]">Connect wallet unavailable</div>
+                <div className="text-sm text-slate-500 dark:text-[rgba(255,255,255,0.5)]">Connect wallet unavailable</div>
               )}
             </div>
           </div>
         ) : (
           <div className="mt-4 space-y-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Balance</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-[#F8FAFC]">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[rgba(255,255,255,0.4)]">Balance</p>
+              <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
                 {formattedBalance || "0 ETH"}
               </p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Address</p>
-              <div className="mt-1 flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 dark:bg-navy-500">
-                <span className="truncate text-sm text-slate-700 dark:text-[#CBD5E1]">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[rgba(255,255,255,0.4)]">Address</p>
+              <div className="mt-1 flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 dark:bg-[rgba(255,255,255,0.06)]">
+                <span className="truncate text-sm text-slate-700 dark:text-[rgba(255,255,255,0.7)]">
                   {shortenedAddress || "No address"}
                 </span>
                 <button
                   type="button"
                   onClick={handleCopyAddress}
-                  className="ml-auto rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
+                  className="ml-auto rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[rgba(255,255,255,0.5)] dark:hover:bg-[rgba(255,255,255,0.1)] dark:hover:text-white"
                   title="Copy address"
                 >
                   {copied ? <FiCheck className="h-4 w-4" /> : <FiCopy className="h-4 w-4" />}
@@ -193,19 +193,19 @@ export default function Sidebar({
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[#94A3B8]">Network</p>
-              <p className="mt-1 text-sm font-medium text-slate-900 dark:text-[#F8FAFC]">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-[rgba(255,255,255,0.4)]">Network</p>
+              <p className="mt-1 text-sm font-medium text-slate-900 dark:text-white">
                 {networkLabel}
               </p>
               {networkDetail && (
-                <p className="text-xs text-slate-500 dark:text-[#94A3B8]">{networkDetail}</p>
+                <p className="text-xs text-slate-500 dark:text-[rgba(255,255,255,0.4)]">{networkDetail}</p>
               )}
             </div>
 
             <button
               type="button"
               onClick={() => disconnect()}
-              className="w-full rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-[rgba(239,68,68,0.10)] dark:text-[#EF4444]"
+              className="w-full rounded-full border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-[rgba(239,68,68,0.10)] dark:text-[#EF4444]"
             >
               Disconnect Wallet
             </button>
@@ -215,19 +215,19 @@ export default function Sidebar({
   );
 
   const profilePanel = (
-    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-navy-600 dark:bg-navy-400/95">
+    <div className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-20 md:right-auto z-[90] w-full md:max-w-sm rounded-t-3xl md:rounded-[24px] border border-slate-200/70 bg-white p-4 shadow-2xl dark:border-[rgba(255,255,255,0.1)] dark:bg-black/95 backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">Profile</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">Profile</p>
         <button
           type="button"
           onClick={() => setIsProfileOpen(false)}
-          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[#CBD5E1] dark:hover:bg-navy-500 dark:hover:text-[#F8FAFC]"
+          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 dark:text-[rgba(255,255,255,0.6)] dark:hover:bg-[rgba(255,255,255,0.1)] dark:hover:text-white"
         >
           ✕
         </button>
       </div>
       <div className="mt-4 space-y-4">
-        <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-3 dark:bg-navy-500">
+        <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-[rgba(255,255,255,0.06)]">
           {user?.imageUrl ? (
             <img
               src={user.imageUrl}
@@ -235,19 +235,19 @@ export default function Sidebar({
               className="h-12 w-12 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-navy-600 dark:text-[#CBD5E1]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-[rgba(255,255,255,0.1)] dark:text-[rgba(255,255,255,0.6)]">
               <FiUser className="h-6 w-6" />
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-slate-900 dark:text-[#F8FAFC]">{userFullName}</p>
-            <p className="text-xs text-slate-500 dark:text-[#94A3B8]">{userEmail}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{userFullName}</p>
+            <p className="text-xs text-slate-500 dark:text-[rgba(255,255,255,0.5)]">{userEmail}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => openUserProfile?.()}
-          className="w-full rounded-2xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600"
+          className="w-full rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
         >
           Manage profile
         </button>
@@ -268,7 +268,7 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[#e6e6e6]/40 backdrop-blur-md dark:bg-navy-100 border-0 md:border border-secondary dark:border-navy-600 z-40 transition-all duration-300 ease-out
+        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[#e6e6e6]/40 backdrop-blur-md dark:bg-black/80 border-0 md:border border-secondary dark:border-[rgba(255,255,255,0.1)] z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
         rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
@@ -289,19 +289,19 @@ export default function Sidebar({
                 <Link
                   href={item.path}
                 className={`
-                  flex items-center px-3 py-2 rounded-4xl transition-all duration-300 w-full
+                  flex items-center px-3 py-2 rounded-2xl transition-all duration-300 w-full 
                   ${isCollapsed ? "justify-center" : "justify-start gap-5"}
                   ${
                     isActive
-                      ? "bg-cyan-400/5 dark:bg-[rgba(99, 182, 241, 0.14)] text-cyan-800 dark:text-cyan-500 border border-cyan-500 dark:border-cyan-500"
-                      : "text-gray-700 dark:text-[#CBD5E1] hover:bg-gray-50 dark:hover:bg-cyan-500/50"
+                      ? "bg-[rgba(99,102,241,0.15)] dark:bg-[rgba(99,102,241,0.2)] text-indigo-700 dark:text-[#A5B4FC] border border-indigo-400 dark:border-[rgba(99,102,241,0.4)]"
+                      : "text-gray-700 dark:text-[rgba(255,255,255,0.7)] hover:bg-gray-50 dark:hover:bg-[rgba(255,255,255,0.06)]"
                   }
                 `}
                 title={item.label}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 {!isCollapsed && (
-                  <span className="font-medium text-sm">{item.label}</span>
+                  <span className="font-medium text-[13px]">{item.label}</span>
                 )}
               </Link>
                 <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1 dark:bg-slate-200 dark:text-slate-950">
@@ -317,7 +317,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100 dark:text-[#94A3B8] dark:hover:bg-navy-500 ${isCollapsed ? "justify-center" : "justify-start"}`}
+            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-[13px] font-medium text-gray-500 transition hover:bg-gray-100 dark:text-[rgba(255,255,255,0.5)] dark:hover:bg-[rgba(255,255,255,0.06)] ${isCollapsed ? "justify-center" : "justify-start"}`}
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <FiChevronLeft className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
@@ -325,19 +325,19 @@ export default function Sidebar({
           </button>
         </div>
 
-        <div className="mt-auto border-t border-gray-200/80 p-2 dark:border-navy-600/80">
+        <div className="mt-auto border-t border-gray-200/80 p-2 dark:border-[rgba(255,255,255,0.08)]">
           <div className="flex flex-col gap-1">
             {/* Wallet button */}
             <div className="relative overflow-visible">
               <button
                 type="button"
                 onClick={openWalletPanel}
-                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-[13px] font-medium transition ${
                   isCollapsed ? "justify-center" : "justify-start ml-2"
                 } ${
                   isWalletOpen
-                    ? "bg-indigo-500/10 text-indigo-500 dark:bg-[rgba(99,102,241,0.14)] dark:text-[#A5B4FC]"
-                    : "text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500 "
+                    ? "bg-[rgba(99,102,241,0.15)] text-[#A5B4FC] dark:bg-[rgba(99,102,241,0.2)] dark:text-[#A5B4FC]"
+                    : "text-gray-700 hover:bg-gray-50 dark:text-[rgba(255,255,255,0.7)] dark:hover:bg-[rgba(255,255,255,0.06)] "
                 }`}
                 title="Your Wallet"
               >
@@ -358,9 +358,9 @@ export default function Sidebar({
                 <button
                   type="button"
                   onClick={openProfilePanel}
-                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-[13px] font-medium transition ${
                     isCollapsed ? "justify-center" : "justify-start"
-                  } text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500`}
+                  } text-gray-700 hover:bg-gray-50 dark:text-[rgba(255,255,255,0.7)] dark:hover:bg-[rgba(255,255,255,0.06)]`}
                   title={userFullName || "User Profile"}
                 >
                   <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
@@ -378,7 +378,7 @@ export default function Sidebar({
                   onClick={() => window.location.assign("/sign-in")}
                   className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
                     isCollapsed ? "justify-center" : "justify-start"
-                  } text-gray-700 hover:bg-gray-50 dark:text-[#CBD5E1] dark:hover:bg-navy-500`}
+                  } text-gray-700 hover:bg-gray-50 dark:text-[rgba(255,255,255,0.7)] dark:hover:bg-[rgba(255,255,255,0.06)]`}
                   title="User Profile"
                 >
                   <FiUser className="h-5 w-5 flex-shrink-0" />

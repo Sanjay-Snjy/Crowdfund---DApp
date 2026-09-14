@@ -124,21 +124,21 @@ export default function CreateCampaignForm() {
     <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
       {/* ─── Left: Campaign Form ─── */}
       <div className="space-y-5">
-        <div className="card p-6 rounded-3xl ">
+        <div className="card p-6 rounded-2xl">
           {/* Header */}
           <div className="mb-6">
-            <h3 className="text-[14px] font-bold uppercase tracking-[0.2em] text-cyan-700">New Campaign</h3>
+            <h3 className="text-[14px] font-bold uppercase tracking-[0.2em] text-indigo-600">New Campaign</h3>
             <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
               Complete the form below to launch campaign.
             </p>
           </div>
 
           {/* Creation Fee Notice */}
-          <div className="flex items-start gap-3 px-4 py-2 rounded-2xl bg-cyan-600/10 dark:bg-cyan-900/20 border border-cyan-800/20 dark:border-cyan-800/40 mb-6">
-            <FiInfo className="w-5 h-5 text-cyan-800 mt-0.5 shrink-0" />
+          <div className="flex items-start gap-3 px-4 py-2 rounded-2xl bg-indigo-500/10 dark:bg-indigo-900/20 border border-indigo-800/20 dark:border-indigo-800/40 mb-6">
+            <FiInfo className="w-5 h-5 text-indigo-700 mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">Creation fee notice</p>
-              <p className="text-xs text-cyan-600/80 dark:text-cyan-400/70 mt-0.5">
+              <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-300">Creation fee notice</p>
+              <p className="text-xs text-indigo-500/80 dark:text-indigo-400/70 mt-0.5">
                 A fee of {formatEther(CAMPAIGN_CREATION_FEE)} ETH is required to create your campaign.
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function CreateCampaignForm() {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="Enter a compelling title"
-                  className="w-full rounded-3xl border px-4 py-2.5 text-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  className="w-full rounded-full border px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                 />
               </div>
@@ -168,7 +168,7 @@ export default function CreateCampaignForm() {
                   onChange={handleInputChange}
                   rows={4}
                   placeholder="Describe your campaign, goals, and how funds will be used"
-                  className="w-full rounded-3xl border px-4 py-2.5 text-sm outline-none resize-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  className="w-full rounded-[20px] border px-4 py-2.5 text-sm outline-none resize-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                 />
               </div>
@@ -180,7 +180,7 @@ export default function CreateCampaignForm() {
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full rounded-3xl border px-4 py-2.5 text-sm outline-none transition focus:border-cyan-500"
+                    className="w-full rounded-full border px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                   >
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
@@ -196,7 +196,7 @@ export default function CreateCampaignForm() {
                     min="1"
                     max="365"
                     placeholder="30"
-                    className="w-full rounded-3xl border px-4 py-2.5 text-sm outline-none transition focus:border-cyan-500"
+                    className="w-full rounded-full border px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                   />
                 </div>
@@ -213,16 +213,16 @@ export default function CreateCampaignForm() {
                     step="0.01"
                     min="0.01"
                     placeholder="0.00"
-                    className="flex-1 rounded-3xl border px-4 py-2.5 w-[50px] text-sm outline-none transition focus:border-cyan-500"
+                    className="flex-1 rounded-full border px-4 py-2.5 w-[50px] text-sm outline-none transition focus:border-indigo-500"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                   />
                   {rates && formData.targetAmount > 0 && (
                     <>
-                      <div className="flex flex-col items-center px-3 py-1 rounded-3xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+                      <div className="flex flex-col items-center px-3 py-1 rounded-xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
                         <span className="text-[10px] uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>USD</span>
                         <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>${(parseFloat(formData.targetAmount) * rates.usd).toFixed(2)}</span>
                       </div>
-                      <div className="flex flex-col items-center px-3 py-1 rounded-3xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+                      <div className="flex flex-col items-center px-3 py-1 rounded-xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
                         <span className="text-[10px] uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>INR</span>
                         <span className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>₹{(parseFloat(formData.targetAmount) * rates.inr).toFixed(2)}</span>
                       </div>
@@ -242,13 +242,13 @@ export default function CreateCampaignForm() {
                     <button
                       type="button"
                       onClick={() => { setImageFile(null); setImagePreview(null); }}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-3xl bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
                     >
                       <FiX className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center h-48 rounded-3xl border-2 border-dashed cursor-pointer transition-colors hover:border-cyan-400" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+                  <label className="flex flex-col items-center justify-center h-48 rounded-2xl border-2 border-dashed cursor-pointer transition-colors hover:border-indigo-400" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
                     <FiUpload className="w-10 h-10 mb-2" style={{ color: "var(--color-text-muted)" }} />
                     <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Upload a campaign image</span>
                     <span className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>PNG, JPG, GIF up to 10MB.</span>
@@ -265,7 +265,7 @@ export default function CreateCampaignForm() {
                   onChange={handleInputChange}
                   rows={4}
                   placeholder="Share extra context, milestones, or team details"
-                  className="w-full rounded-3xl border px-4 py-2.5 text-sm outline-none resize-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  className="w-full rounded-[20px]  border px-4 py-2.5 text-sm outline-none resize-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }}
                 />
               </div>
@@ -280,7 +280,7 @@ export default function CreateCampaignForm() {
           <button
             type="submit"
             disabled={isLoading || uploading}
-            className="w-full mt-5 py-3 rounded-3xl bg-cyan-600 text-white font-semibold text-sm transition hover:bg-cyan-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-5 py-3 rounded-full bg-indigo-500 text-white font-semibold text-sm transition hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? "Uploading..." : isLoading ? "Creating..." : "Create Campaign"}
           </button>
@@ -289,22 +289,22 @@ export default function CreateCampaignForm() {
 
       {/* ─── Right: Milestone Planner ─── */}
       <div className="space-y-4">
-        <div className="p-6 rounded-3xl bg-[#111827] text-white sticky top-20">
+        <div className="p-6 rounded-2xl bg-[#111827] text-white sticky top-20">
           {/* Header */}
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Milestone Planner</h3>
           <p className="text-xs text-slate-400 mt-1">Define project milestones and allocate fund percentages.</p>
 
           {/* Total Allocation */}
-          <div className="mt-5 p-4 rounded-3xl bg-white/5 border border-white/10">
+          <div className="mt-5 p-4 rounded-xl bg-white/5 border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-slate-300">Total Allocation</span>
-              <span className={`text-sm font-bold ${isAllocationValid ? "text-cyan-400" : totalAllocation > 100 ? "text-red-400" : "text-white"}`}>
+              <span className={`text-sm font-bold ${isAllocationValid ? "text-indigo-400" : totalAllocation > 100 ? "text-red-400" : "text-white"}`}>
                 {totalAllocation}%
               </span>
             </div>
-            <div className="h-2 rounded-3xl bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
               <div
-                className={`h-full rounded-3xl transition-all duration-300 ${isAllocationValid ? "bg-cyan-600" : totalAllocation > 100 ? "bg-red-500" : "bg-cyan-500"}`}
+                className={`h-full rounded-full transition-all duration-300 ${isAllocationValid ? "bg-indigo-500" : totalAllocation > 100 ? "bg-red-500" : "bg-indigo-500"}`}
                 style={{ width: `${Math.min(totalAllocation, 100)}%` }}
               />
             </div>
@@ -313,8 +313,8 @@ export default function CreateCampaignForm() {
             <div className="flex items-center gap-2 mt-3">
               {isAllocationValid ? (
                 <>
-                  <FiCheckCircle className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xs text-cyan-400">Milestones are valid</span>
+                  <FiCheckCircle className="w-4 h-4 text-indigo-400" />
+                  <span className="text-xs text-indigo-400">Milestones are valid</span>
                 </>
               ) : (
                 <>
@@ -328,7 +328,7 @@ export default function CreateCampaignForm() {
           {/* Milestone List */}
           <div ref={milestoneListRef} className="mt-4 space-y-3 max-h-[280px] overflow-y-auto pr-1 scrollbar-hide">
             {milestones.map((m, i) => (
-              <div key={i} className="p-3 rounded-3xl bg-white/5 border border-white/10">
+              <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-slate-400">Milestone {i + 1}</span>
                   {milestones.length > 1 && (
@@ -341,7 +341,7 @@ export default function CreateCampaignForm() {
                   value={m.title}
                   onChange={(e) => updateMilestone(i, "title", e.target.value)}
                   placeholder="Milestone title"
-                  className="w-full rounded-3xl px-3 py-2 text-sm bg-white/5 border border-white/10 text-white placeholder-slate-500 outline-none focus:border-cyan-500 mb-2"
+                  className="w-full rounded-full px-3 py-2 text-sm bg-white/5 border border-white/10 text-white placeholder-slate-500 outline-none focus:border-indigo-500 mb-2"
                 />
                 <div className="flex items-center gap-2">
                   <input
@@ -350,7 +350,7 @@ export default function CreateCampaignForm() {
                     max="100"
                     value={m.percentage}
                     onChange={(e) => updateMilestone(i, "percentage", e.target.value)}
-                    className="flex-1 rounded-3xl px-3 py-2 text-sm bg-white/5 border border-white/10 text-white outline-none focus:border-cyan-500"
+                    className="flex-1 rounded-full px-3 py-2 text-sm bg-white/5 border border-white/10 text-white outline-none focus:border-indigo-500"
                   />
                   <span className="text-xs text-slate-400 font-medium">%</span>
                 </div>
@@ -363,7 +363,7 @@ export default function CreateCampaignForm() {
             type="button"
             onClick={addMilestone}
             disabled={milestones.length >= 3}
-            className="w-full mt-4 py-2.5 rounded-3xl border-2 border-cyan-500/50 bg-cyan-500/10 text-cyan-400 font-medium text-sm transition hover:bg-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full mt-4 py-2.5 rounded-full border-2 border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-medium text-sm transition hover:bg-indigo-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <FiPlus className="w-4 h-4" /> Add Milestone
           </button>
