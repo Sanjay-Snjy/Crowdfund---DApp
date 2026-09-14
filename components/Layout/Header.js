@@ -227,12 +227,6 @@ export default function Header({ onMenuToggle, isCollapsed }) {
         <div className="flex items-center space-x-3">
          
 
-        {/*  {isConnected && address && (
-            <div className="hidden md:flex items-center rounded-4xl border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
-              {address.slice(0, 6)}...{address.slice(-4)}
-            </div>
-          )}*/}
-
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
@@ -244,22 +238,6 @@ export default function Header({ onMenuToggle, isCollapsed }) {
               <FiMoon className="w-5 h-5 text-gray-600" />
             )}
           </button>
-
-          {/* Notifications 
-          {isConnected && (
-            <buttona className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-500 transition-colors">
-              <FiBell className="w-5 h-5 text-gray-600 dark:text-[#94A3B8]" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-            </buttona>
-          )}*/}
-
-          {/* Network Status 
-          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-100 border border-gray-400 dark:bg-navy-300 rounded-4xl">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600 dark:text-[#94A3B8] capitalize">
-              {process.env.NEXT_PUBLIC_NETWORK || "Unknown"}
-            </span>
-          </div>*/}
 
           {/* Connect Wallet Button */}
             <ConnectButton 

@@ -56,10 +56,10 @@ export default function CampaignCard({
 
   return (
     <div
-      className={`card card-hover overflow-hidden ${isListView ? "flex flex-col sm:flex-row" : "flex flex-col"} ${className}`}
+      className={`card card-hover overflow-hidden ${isListView ? "flex flex-col sm:flex-row max-w-3xl" : "flex flex-col"} ${className}`}
     >
       {/* Image */}
-      <div className={`relative shrink-0 ${isListView ? "sm:w-48 h-36 sm:h-auto" : "h-44"}`}>
+      <div className={`relative shrink-0 ${isListView ? "sm:w-40 h-32 sm:h-auto" : "h-44"}`}>
         {metadata?.image && !imgError ? (
           <img
             src={metadata.image}

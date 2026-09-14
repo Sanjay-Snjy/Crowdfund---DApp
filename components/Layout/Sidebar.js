@@ -104,8 +104,8 @@ export default function Sidebar({
   const networkDetail = chain?.id ? `Chain ID ${chain.id}` : null;
 
   const sidebarWidthClass = isOpen
-    ? `w-64 ${isCollapsed ? "md:w-14" : "md:w-48"}`
-    : `w-12 ${isCollapsed ? "md:w-14" : "md:w-48"}`;
+    ? `w-64 ${isCollapsed ? "md:w-12" : "md:w-48"}`
+    : `w-12 ${isCollapsed ? "md:w-12" : "md:w-48"}`;
 
   const handleCopyAddress = async () => {
     if (!address) return;
