@@ -3,7 +3,9 @@ import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import DemoHeader from "./DemoHeader";
 import ErrorBoundary from "./ErrorBoundary";
+import { useDemoMode } from "../../lib/demoMode";
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +16,8 @@ export default function Layout({ children }) {
       return false;
     }
   });
+
+  const demoMode = useDemoMode();
 
   // Ensure theme is applied synchronously on mount to prevent flash.
   // Read from localStorage and apply dark class before first paint.
@@ -67,7 +71,7 @@ export default function Layout({ children }) {
     return () => observer.disconnect();
   }, []);return (
       <div
-        className="bg-[var(--bg)]  min-h-screen -mt-[20px] flex flex-col"
+        className="bg-[var(--bg)] min-h-screen flex flex-col"
         suppressHydrationWarning
       >
       {/* Fixed background for header area */}
@@ -111,20 +115,26 @@ export default function Layout({ children }) {
         />
 
 
+        {/* Sidebar: show in both modes (admin panel hidden for demo via SIDEBAR_ITEMS filter) */}
         <Sidebar
           isOpen={sidebarOpen}
           onToggle={toggleSidebar}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleSidebarCollapse}
-        />      <div
-        key={sidebarCollapsed ? "collapsed" : "expanded"}
-        className={`
-          relative z-10 transition-all duration-300 ease-out flex-1 flex flex-col
-          ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"}
-        `}
+          demoMode={demoMode}
+        />
+        <div
+          key={sidebarCollapsed ? "collapsed" : "expanded"}
+          className={`
+            relative z-10 transition-all duration-300 ease-out flex-1 flex flex-col
+            ${sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"}
+          `}
         >
-          <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
-
+          {demoMode ? (
+            <DemoHeader />
+          ) : (
+            <Header onMenuToggle={toggleSidebar} isCollapsed={sidebarCollapsed} />
+          )}
           <main className="flex-1 pt-24 px-3 pb-4 md:pt-20 md:px-6 md:pb-6">
             <ErrorBoundary key={router.asPath}>
               <div>{children}</div>

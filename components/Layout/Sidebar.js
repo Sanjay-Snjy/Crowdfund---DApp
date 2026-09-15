@@ -50,6 +50,7 @@ export default function Sidebar({
   onToggle,
   isCollapsed,
   onToggleCollapse,
+  demoMode = false,
 }) {
   const router = useRouter();
   const { address, isConnected } = useAccount();
@@ -108,6 +109,9 @@ export default function Sidebar({
 
   const filteredItems = SIDEBAR_ITEMS.filter(
     (item) => !item.adminOnly || (item.adminOnly && isAdmin)
+  ).filter(
+    // In demo mode, hide admin panel entirely
+    (item) => !(demoMode && item.adminOnly)
   );
 
   useEffect(() => {
@@ -159,7 +163,7 @@ export default function Sidebar({
     setIsProfileOpen((prev) => !prev);
   };
 
-  const userFullName = user?.fullName || user?.firstName || "Profile";
+  const userFullName = demoMode ? "Demo" : (user?.fullName || user?.firstName || "Profile");
   const userEmail =
     user?.primaryEmailAddress?.emailAddress ||
     user?.emailAddresses?.[0]?.emailAddress ||
@@ -179,7 +183,14 @@ export default function Sidebar({
         </button>
       </div>
 
-        {!isConnected ? (
+        {demoMode ? (
+          <div className="mt-4 space-y-3">
+            <p className="text-sm font-medium text-indigo-400">Demo Account</p>
+            <p className="text-xs text-slate-500 dark:text-[rgba(255,255,255,0.5)]">
+              Connect a real wallet to use full features.
+            </p>
+          </div>
+        ) : !isConnected ? (
           <div className="mt-4 space-y-3">
             <p className="text-sm text-slate-500 dark:text-[rgba(255,255,255,0.5)]">Wallet not connected</p>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-[rgba(255,255,255,0.1)] dark:bg-[rgba(255,255,255,0.06)]">
@@ -258,29 +269,23 @@ export default function Sidebar({
       </div>
       <div className="mt-4 space-y-4">
         <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-[rgba(255,255,255,0.06)]">
-          {user?.imageUrl ? (
-            <img
-              src={user.imageUrl}
-              alt="Profile"
-              className="h-12 w-12 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-600 dark:bg-[rgba(255,255,255,0.1)] dark:text-[rgba(255,255,255,0.6)]">
-              <FiUser className="h-6 w-6" />
-            </div>
-          )}
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+            <FiUser className="h-6 w-6" />
+          </div>
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{userFullName}</p>
-            <p className="text-xs text-slate-500 dark:text-[rgba(255,255,255,0.5)]">{userEmail}</p>
+            <p className="text-xs text-slate-500 dark:text-[rgba(255,255,255,0.5)]">{demoMode ? "Demo account" : userEmail}</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => openUserProfile?.()}
-          className="w-full rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
-        >
-          Manage profile
-        </button>
+        {!demoMode && (
+          <button
+            type="button"
+            onClick={() => openUserProfile?.()}
+            className="w-full rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+          >
+            Manage profile
+          </button>
+        )}
       </div>
     </div>
   );

@@ -23,6 +23,7 @@ import {
 } from "react-icons/fi";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
+import { setDemoMode } from "../lib/demoMode";
 import { useContract } from "../hooks/useContract";
 import CampaignCard from "../components/Campaign/CampaignCard";
 import { getFromIPFS } from "../utils/ipfs";
@@ -43,6 +44,13 @@ export default function Home() {
     typeof process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "string" &&
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.trim().length > 0 &&
     !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("your_clerk_publishable_key_here");
+
+  // If the user signed in through real Clerk auth, auto-clear demo mode.
+  useEffect(() => {
+    if (hasValidClerkKey && isLoaded && user) {
+      setDemoMode(false);
+    }
+  }, [hasValidClerkKey, isLoaded, user]);
 
   // Force dark mode on landing page for correct CSS variable resolution.
   useEffect(() => {
@@ -555,6 +563,15 @@ export default function Home() {
                     <FiArrowRight className="ml-2 h-4 w-4" />
                   </button>
                 </SignUpButton>
+                <button
+                  onClick={() => {
+                    setDemoMode(true);
+                    router.push("/all-campaigns");
+                  }}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-white/15 backdrop-blur-sm px-8 py-3.5 text-sm font-medium text-white/70 transition-colors hover:border-white/40 hover:text-white sm:w-auto"
+                >
+                  Demo Login
+                </button>
               </>
             )}
 

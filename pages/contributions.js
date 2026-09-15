@@ -8,6 +8,7 @@ import { formatEther } from "../utils/helpers";
 import { CONTRACT_ADDRESS } from "../constants";
 import { CROWDFUNDING_ABI } from "../constants/abi";
 import Link from "next/link";
+import { useDemoMode, DEMO_USERNAME } from "../lib/demoMode";
 
 export default function ContributionsPage() {
   const { address, isConnected } = useAccount();
@@ -46,15 +47,44 @@ export default function ContributionsPage() {
     setContributions(result);
   }, [contractData, ids, address]);
 
-  useEffect(() => { if (!isConnected) router.push("/"); }, [isConnected, router]);
+  const demoMode = useDemoMode();
 
-  if (!isConnected) {
+  useEffect(() => { if (!isConnected && !demoMode) router.push("/"); }, [isConnected, router, demoMode]);
+
+  if (!isConnected && !demoMode) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="card p-8 text-center max-w-sm">
             <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text)" }}>Connect Your Wallet</h2>
             <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>Connect to view your contributions.</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Demo mode: show empty state
+  if (demoMode) {
+    return (
+      <Layout>
+        <div className="max-w-8xl mx-auto pl-4 py-8 space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: "var(--color-text)" }}>My Contributions</h1>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>Track your support history</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiDollarSign className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>0.8500</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>ETH Contributed</p></div></div></div>
+            <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiHeart className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>3</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Projects Supported</p></div></div></div>
+            <div className="card p-4 rounded-3xl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><FiTrendingUp className="w-5 h-5" /></div><div><p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>0.2833</p><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Avg Contribution</p></div></div></div>
+          </div>
+          <div className="card p-12 text-center rounded-3xl">
+            <FiHeart className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-text-muted)" }} />
+            <h3 className="font-semibold" style={{ color: "var(--color-text)" }}>This is a demo account</h3>
+            <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
+              Connect a real wallet to view and manage your contributions.
+            </p>
+            <Link href="/all-campaigns" className="btn btn-secondary mt-4">Browse Campaigns</Link>
           </div>
         </div>
       </Layout>

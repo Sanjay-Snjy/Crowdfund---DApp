@@ -9,6 +9,7 @@ import { useContract } from "../../hooks/useContract";
 import { uploadCampaignMetadata } from "../../utils/ipfs";
 import { CAMPAIGN_CREATION_FEE } from "../../constants";
 import { formatEther } from "../../utils/helpers";
+import { useDemoMode } from "../../lib/demoMode";
 
 const CATEGORIES = [
   "Student Projects", "Medical", "Startup", "Education", "Research and Innovation",
@@ -18,6 +19,7 @@ const CATEGORIES = [
 export default function CreateCampaignForm() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const demoMode = useDemoMode();
   const { user } = useUser();
   const { chain } = useNetwork();
   const { data: balanceData } = useBalance({ address, enabled: Boolean(address) });
@@ -279,10 +281,11 @@ export default function CreateCampaignForm() {
           {/* Create Button */}
           <button
             type="submit"
-            disabled={isLoading || uploading}
+            disabled={isLoading || uploading || demoMode}
+            title={demoMode ? "Demo account - connect a wallet to create campaigns" : ""}
             className="w-full mt-5 py-3 rounded-full bg-indigo-500 text-white font-semibold text-sm transition hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {uploading ? "Uploading..." : isLoading ? "Creating..." : "Create Campaign"}
+            {demoMode ? "Demo Account — Create Disabled" : uploading ? "Uploading..." : isLoading ? "Creating..." : "Create Campaign"}
           </button>
         </div>
       </div>
