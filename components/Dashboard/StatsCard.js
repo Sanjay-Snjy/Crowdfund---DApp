@@ -2,7 +2,7 @@ import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 
 export function StatsCard({ title, value, icon: Icon, trend, trendValue }) {
   return (
-    <div className="card p-4 rounded-3xl">
+    <div className="card p-4 rounded-2xl">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>{title}</p>

@@ -133,33 +133,25 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* Footer - Solid background to hide the dotted pattern below */}
-      <footer className="relative  z-10 rounded-t-[30px] bg-[var(--bg-secondary)] backdrop-blur-md dark:border-[rgba(255,255,255,0.1)] border-t border-secondary dark:border-[rgba(255,255,255,0.1)] text-slate-300 mt-auto">
-        <div
-          className={`transition-all duration-300 ease-out ${
-            sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"
-          }`}
-        >
-          <div className="mx-auto flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div>
-              <p className="text-sm font-semibold text-black dark:text-white">CrowdFund DApp</p>
-              <p className="mt-1 text-xs text-slate-400">
-                Built for secure, modern crowdfunding on-chain.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
-             
-              <a className="transition hover:text-indigo-400 text-slate-400">
-                Create 
-              </a>/
-              <a className="transition hover:text-indigo-400 text-slate-400">
-                Contribute
-              </a>
-            </div>
-            <p className="text-xs text-slate-500 sm:text-right">
-              © {new Date().getFullYear()} CrowdFund. All rights reserved.
+      {/* Footer - Solid background to hide the dotted pattern below.
+          No sidebar margin: the sidebar shrinks above the footer, so the
+          content can span the full width with the brand at the far left. */}
+      <footer className="relative z-10 rounded-t-[20px] bg-[var(--bg-secondary)] mx-[8px] backdrop-blur-md border border-secondary dark:border-[rgba(255,255,255,0.1)] text-slate-300 mt-auto">
+        <div className="mx-auto flex flex-col items-center gap-2 px-4 py-4 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
+            <p className="text-sm font-semibold text-black dark:text-white">CrowdFund DApp</p>
+            <p className="text-xs text-slate-400">
+              Built for secure, modern crowdfunding on-chain.
             </p>
           </div>
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <a className="transition hover:text-indigo-400">Create</a>
+            <span className="text-slate-300 dark:text-[rgba(255,255,255,0.2)]">/</span>
+            <a className="transition hover:text-indigo-400">Contribute</a>
+          </div>
+          <p className="text-xs text-slate-500">
+            © {new Date().getFullYear()} CrowdFund. All rights reserved.
+          </p>
         </div>
       </footer>
 

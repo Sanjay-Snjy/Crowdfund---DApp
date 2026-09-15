@@ -15,14 +15,14 @@
   --text-muted: #9ca3af;
   /* Color aliases for redesigned components */
   --color-bg: #f8fafc;
-  --color-surface: #ffffff;
+  --color-surface: #f2f2f22a;
   --color-surface-raised: #f1f5f9;
   --color-border: #d9dadd;
   --color-border-strong: #cbd5e1;
   --color-text: #111827;
   --color-text-secondary: #4b5563;
   --color-text-muted: #9ca3af;
-  --color-accent: #509dbc;
+  --color-accent: #4578dd;
   --color-accent-hover: #03a3d9;
   --color-accent-light: #eef2ff;
   --color-success: #16a34a;
@@ -331,7 +331,7 @@ html {
     @apply rounded-2xl border;
     background: var(--color-surface);
     border-color: var(--color-border);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(10px);
   }
 
   .badge {
@@ -574,4 +574,15 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 1;
+}
+
+/* ===== Clerk: hide "Secured by Clerk" branding badge =====
+   The badge container has no stable class (emotion hash), but its branding
+   link is unique (clerk.com?utm_source=clerk&utm_medium=components).
+   :has() is supported in all modern browsers; the link-only rule is a
+   fallback. The svg rule catches Clerk's branding illustration. */
+a[href*="clerk.com?utm_source=clerk"],
+div:has(> a[href*="utm_medium=components"]),
+svg[viewBox="569.4 86.3 83.6 48.2"] {
+  display: none !important;
 }

@@ -113,12 +113,12 @@ function Dashboard() {
             { label: "Contributions", value: userContributions?.length || 0 },
             { label: "Active Campaigns", value: liveActive.length },
           ].map((s) => (
-            <div key={s.label} className="card p-4 rounded-3xl">
+            <div key={s.label} className="card p-4 rounded-2xl">
               <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{s.label}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: "var(--color-text)" }}>{s.value}</p>
             </div>
           ))}
-          <div className="card p-4 rounded-3xl">
+          <div className="card p-4 rounded-2xl">
             <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>Connected</p>
             <p className="text-sm font-medium mt-1" style={{ color: "var(--color-success)" }}>{address?.slice(0, 6)}...{address?.slice(-4)}</p>
           </div>
@@ -126,7 +126,7 @@ function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent transactions */}
-          <div className="lg:col-span-2 card p-5 rounded-3xl">
+          <div className="lg:col-span-2 card p-5 rounded-2xl">
             <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Recent Transactions</h3>
             {loadingTx ? (
               <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-14" />)}</div>
@@ -148,7 +148,7 @@ function Dashboard() {
           </div>
 
           {/* Created campaigns with progress bars and countdown */}
-          <div className="card p-5 rounded-3xl">
+          <div className="card p-5 rounded-2xl">
             <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Your Campaigns</h3>
             {loadingUserCampaigns ? (
               <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-10" />)}</div>
@@ -181,7 +181,7 @@ function Dashboard() {
 
         {/* Feature #14: Milestone Progress Tracker */}
         {userCampaigns?.length > 0 && (
-          <div className="card p-5 rounded-3xl">
+          <div className="card p-5 rounded-2xl">
             <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>
               Milestone Progress
             </h3>
@@ -203,7 +203,7 @@ function Dashboard() {
         {/* Feature #18: Bookmarked Campaigns + Platform Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className="card p-5 rounded-3xl">
+            <div className="card p-5 rounded-2xl">
               <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--color-text)" }}>Platform Statistics</h3>
               <DashboardStats />
             </div>

@@ -64,9 +64,39 @@ export default function Sidebar({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // Pixels of the footer currently visible in the viewport. The sidebar's
+  // bottom offset grows by this amount so it never overlaps the footer.
+  const [footerOverlap, setFooterOverlap] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const updateFooterOverlap = () => {
+      const footer = document.querySelector("footer");
+      if (!footer) {
+        setFooterOverlap(0);
+        return;
+      }
+      const rect = footer.getBoundingClientRect();
+      const overlap = window.innerHeight - rect.top;
+      // Clamp: never exceed the footer height, and keep a sliver of sidebar
+      // visible on very short viewports.
+      const clamped = Math.max(
+        0,
+        Math.min(Math.ceil(overlap), rect.height, window.innerHeight - 80)
+      );
+      setFooterOverlap(overlap > 0 ? clamped : 0);
+    };
+
+    updateFooterOverlap();
+    window.addEventListener("scroll", updateFooterOverlap, { passive: true });
+    window.addEventListener("resize", updateFooterOverlap);
+    return () => {
+      window.removeEventListener("scroll", updateFooterOverlap);
+      window.removeEventListener("resize", updateFooterOverlap);
+    };
   }, []);
 
   useEffect(() => {
@@ -267,11 +297,12 @@ export default function Sidebar({
 
       {/* Sidebar */}
       <div
+        style={{ "--sb-inset": `${12 + footerOverlap}px` }}
         className={`
-        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[var(--bg-secondary)] backdrop-blur-md  border-0 md:border border-secondary dark:border-[rgba(255,255,255,0.1)] z-40 transition-all duration-300 ease-out
+        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-[var(--sb-inset,1.5rem)] md:left-3 bg-[var(--bg-secondary)] backdrop-blur-md  border-0 md:border border-secondary dark:border-[rgba(255,255,255,0.1)] z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
-        rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
+        rounded-2xl overflow-y-auto overflow-x-hidden flex flex-col
       `}
       >
         {/* Header */}

@@ -210,7 +210,7 @@ export default function AllCampaignsPage() {
         </div>
         
          {/* Hero Banner Slideshow */}
-        <section className="relative overflow-hidden h-[208px] rounded-[32px] border border-slate-200/70 dark:border-[rgba(255,255,255,0.1)] bg-slate-900 p-0 text-white">
+        <section className="relative overflow-hidden h-[208px] rounded-3xl border border-slate-200/70 dark:border-[rgba(255,255,255,0.1)] bg-slate-900 p-0 text-white">
           <div className="absolute inset-0">
             {HERO_SLIDES.map((slide, index) => (
               <div

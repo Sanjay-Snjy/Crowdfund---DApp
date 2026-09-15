@@ -14,7 +14,9 @@ const clerkAppearance = {
     colorInputText: "#FFFFFF",
     colorDanger: "#EF4444",
     colorSuccess: "#22C55E",
-    borderRadius: "9999px",            // Rounded-full
+    // Base (md) radius. Clerk SCALES this per element (lg x1.35, xl x2.7, 2xl x3.35),
+    // so a huge value like 999px turns large panels into giant circles.
+    borderRadius: "0.75rem",
     fontFamily: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
     fontSize: "0.9375rem",
     spacingUnit: "1rem",
@@ -28,6 +30,9 @@ const clerkAppearance = {
       borderRadius: "1.5rem",
       boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
       backdropFilter: "blur(40px)",
+      // Clips the absolutely-positioned "Secured by Clerk" badge that
+      // Clerk hangs off the card edge (it has no styleable class).
+      overflow: "hidden",
     },
     rootBox: {
       backgroundColor: "transparent",
@@ -40,6 +45,7 @@ const clerkAppearance = {
     page: {
       backgroundColor: "rgba(0,0,0,0.8)",
       minHeight: "100vh",
+      borderRadius: "1.5rem",
     },
 
     // ─── Form Fields ───
@@ -47,7 +53,7 @@ const clerkAppearance = {
       backgroundColor: "rgba(255,255,255,0.06)",
       border: "1px solid rgba(255,255,255,0.1)",
       color: "#FFFFFF",
-      borderRadius: "9999px",
+      borderRadius: "0.75rem",
       padding: "0.75rem 1rem",
       fontSize: "0.9375rem",
       transition: "border-color 150ms ease, box-shadow 150ms ease",
@@ -167,7 +173,9 @@ const clerkAppearance = {
     navbar: {
       backgroundColor: "rgba(255,255,255,0.03)",
       borderBottom: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: "9999px",
+      // Override Clerk's border-radius inheritance so the nav rail stays rectangular.
+      borderRadius: "0",
+      overflow: "hidden",
     },
     navbarButton: {
       color: "rgba(255,255,255,0.6)",
@@ -186,7 +194,7 @@ const clerkAppearance = {
       backgroundColor: "rgba(255,255,255,0.06)",
       border: "1px solid rgba(255,255,255,0.1)",
       color: "#FFFFFF",
-      borderRadius: "9999px",
+      borderRadius: "0.75rem",
       fontSize: "1.25rem",
       fontWeight: 600,
       "&:focus": {
@@ -236,14 +244,10 @@ const clerkAppearance = {
       },
     },
 
-    // ─── Badges (hidden) ───
+    // ─── Badges ───
+    // NOTE: the "Secured by Clerk" branding badge has NO element class; it is
+    // hidden via globals.css (attribute selector on its inner clerk.com link).
     badge: {
-      display: "none",
-    },
-    clerkBadge: {
-      display: "none",
-    },
-    poweredByClerk: {
       display: "none",
     },
 

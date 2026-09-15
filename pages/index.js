@@ -400,6 +400,17 @@ export default function Home() {
     user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
     "";
 
+  const authEnabled = hasValidClerkKey;
+  const signedIn = authEnabled && isLoaded && Boolean(user);
+  // Progressive hero CTA: 1) sign in/up, 2) connect wallet, 3) explore + dashboard.
+  // Render nothing until Clerk resolves so signed-in users don't see a sign-in flash.
+  const heroStep = authEnabled && !isLoaded ? 0 : authEnabled && !signedIn ? 1 : !isConnected ? 2 : 3;
+
+  const heroPrimaryButtonClass =
+    "inline-flex w-full items-center justify-center rounded-full bg-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-indigo-400 sm:w-auto";
+  const heroSecondaryButtonClass =
+    "inline-flex w-full items-center justify-center rounded-full border border-white/15 backdrop-blur-sm px-8 py-3.5 text-sm font-medium text-white transition-colors hover:border-white/40 sm:w-auto";
+
   const heroStats = [
     { value: loading ? "—" : String(stats.campaignsLaunched), label: "Campaigns" },
     {
@@ -440,10 +451,10 @@ export default function Home() {
 
       {/* ===== Header ===== */}
       <header
-        className={`fixed z-50 transition-all duration-300 backdrop-blur-md ${
+        className={`fixed z-50 transition-all duration-300 backdrop-blur-lg ${
           scrolled
-            ? "top-0 left-0 right-0 border-b border-white/10 bg-black/70"
-            : "top-2 left-2 right-2 rounded-4xl border border-white/10 bg-black/40"
+            ? "top-0 left-0 right-0 border-b border-white/15 bg-white/08"
+            : "top-2 left-2 right-2 rounded-4xl border border-white/15 bg-white/05"
         }`}
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
@@ -512,9 +523,9 @@ export default function Home() {
       </header>
 
       {/* ===== Hero ===== */}
-      <section className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-40 pb-20 text-center sm:px-6 lg:px-8">
+      <section className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-32 pb-20 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-white/70">
+          <div className="mb-6 inline-flex items-center gap-2 backdrop-blur-sm rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-white/70">
             <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
             Decentralized crowdfunding on Ethereum
           </div>
@@ -533,38 +544,52 @@ export default function Home() {
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
-              onClick={() => router.push("/create-campaign")}
-              className="inline-flex w-full items-center justify-center rounded-full bg-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-indigo-400 sm:w-auto"
-            >
-              Start a Campaign
-              <FiArrowRight className="ml-2 h-4 w-4" />
-            </button>
-            <button
-              onClick={handleGoToCampaigns}
-              className={`inline-flex w-full items-center justify-center rounded-full border border-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-indigo-500 sm:w-auto ${
-                shouldBlinkDashboard ? "blink-twice" : ""
-              }`}
-            >
-              Explore Campaigns
-            </button>
-            <SignedIn>
-              <button
-                onClick={handleGoToDashboard}
-                className="inline-flex w-full items-center justify-center rounded-full backdrop-blur-sm px-6 py-3.5 border border-white/60 text-sm font-medium text-white/60 transition-colors hover:text-white sm:w-auto"
-              >
-                Go to Dashboard
-              </button>
-            </SignedIn>
-            <SignedOut>
-              {hasValidClerkKey && (
+            {heroStep === 1 && (
+              <>
                 <SignInButton mode="modal">
-                  <button className="inline-flex w-full items-center justify-center rounded-full backdrop-blur-sm px-6 py-3.5 text-sm font-medium text-white/60 transition-colors hover:text-white sm:w-auto">
-                    Go to Dashboard
-                  </button>
+                  <button className={heroSecondaryButtonClass}>Sign In</button>
                 </SignInButton>
-              )}
-            </SignedOut>
+                <SignUpButton mode="modal">
+                  <button className={heroPrimaryButtonClass}>
+                    Sign Up
+                    <FiArrowRight className="ml-2 h-4 w-4" />
+                  </button>
+                </SignUpButton>
+              </>
+            )}
+
+            {heroStep === 2 && (
+              <ConnectButton.Custom>
+                {({ openConnectModal, mounted }) => {
+                  if (!mounted) return null;
+                  return (
+                    <button onClick={openConnectModal} className={heroPrimaryButtonClass}>
+                      Connect Wallet
+                      <FiArrowRight className="ml-2 h-4 w-4" />
+                    </button>
+                  );
+                }}
+              </ConnectButton.Custom>
+            )}
+
+            {heroStep === 3 && (
+              <>
+                <button
+                  onClick={handleGoToCampaigns}
+                  className={`inline-flex w-full items-center justify-center rounded-full border border-indigo-500 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:border-white/40 hover:bg-indigo-500 sm:w-auto ${
+                    shouldBlinkDashboard ? "blink-twice" : ""
+                  }`}
+                >
+                  Explore Campaigns
+                </button>
+                <button
+                  onClick={handleGoToDashboard}
+                  className="inline-flex w-full items-center justify-center rounded-full backdrop-blur-sm px-6 py-3.5 border border-white/60 text-sm font-medium text-white/60 transition-colors hover:text-white sm:w-auto"
+                >
+                  Go to Dashboard
+                </button>
+              </>
+            )}
           </div>
 
           {/* Live stats */}
