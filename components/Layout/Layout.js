@@ -67,11 +67,11 @@ export default function Layout({ children }) {
     return () => observer.disconnect();
   }, []);return (
       <div
-        className="bg-gray-50 dark:bg-black min-h-screen -mt-[20px] flex flex-col"
+        className="bg-[var(--bg)]  min-h-screen -mt-[20px] flex flex-col"
         suppressHydrationWarning
       >
       {/* Fixed background for header area */}
-      <div className="fixed inset-0 bg-gray-50 dark:bg-black z-0 pointer-events-none" />
+      <div className="fixed inset-0 bg-[var(--bg)] z-0 pointer-events-none" />
       
       <div
         className="relative flex-1 flex flex-col "
@@ -134,7 +134,7 @@ export default function Layout({ children }) {
       </div>
 
       {/* Footer - Solid background to hide the dotted pattern below */}
-      <footer className="relative z-10 bg-gray-50 backdrop-blur-md dark:border-[rgba(255,255,255,0.1)] dark:bg-black border-t border-secondary dark:border-[rgba(255,255,255,0.1)] text-slate-300 mt-auto">
+      <footer className="relative  z-10 rounded-t-[30px] bg-[var(--bg-secondary)] backdrop-blur-md dark:border-[rgba(255,255,255,0.1)] border-t border-secondary dark:border-[rgba(255,255,255,0.1)] text-slate-300 mt-auto">
         <div
           className={`transition-all duration-300 ease-out ${
             sidebarCollapsed ? "md:ml-[3rem]" : "md:ml-[12.5rem]"

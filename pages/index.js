@@ -596,7 +596,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => router.push("/all-campaigns")}
-            className="inline-flex flex-shrink-0 items-center gap-2 self-start rounded-full border border-white/15 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-white transition-colors hover:border-white/40 md:self-auto"
+            className="inline-flex flex-shrink-0 items-center gap-2 self-start rounded-full border border-white/35 backdrop-blur-sm px-5 py-2.5 text-sm font-medium text-white transition-colors hover:border-white/40 md:self-auto"
           >
             View All
             <FiArrowRight className="h-4 w-4" />

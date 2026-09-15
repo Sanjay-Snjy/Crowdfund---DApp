@@ -191,7 +191,7 @@ export default function Header({ onMenuToggle, isCollapsed }) {
   return (
     <header
       className={`
-       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[#e6e6e6]/40 dark:bg-black/70 border-b md:border border-secondary dark:border-[rgba(255,255,255,0.1)] 
+       fixed top-0 left-0 right-0 md:top-2 md:left-2 md:right-2 z-50 bg-[var(--bg-secondary)] border-b md:border border-secondary dark:border-[rgba(255,255,255,0.1)] 
        transition-all duration-300 rounded-3xl backdrop-blur-md backdrop-saturate-150
     `}
     >

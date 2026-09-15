@@ -7,7 +7,7 @@
 :root {
   /* Light mode tokens (unchanged) */
   --bg: #ffffff;
-  --bg-secondary: #f9fafb;
+  --bg-secondary: #dcdcdc3c;
   --card: #ffffff;
   --border: #e5e7eb;
   --text-primary: #111827;
@@ -35,8 +35,8 @@
 
 .dark {
   /* Black base - matches landing page */
-  --bg: #000000;
-  --bg-secondary: #050505;
+  --bg: #04011d;
+  --bg-secondary: #000b1b;
   --card: rgba(255, 255, 255, 0.03);
   --card-elevated: rgba(255, 255, 255, 0.06);
   --surface-hover: rgba(255, 255, 255, 0.08);
@@ -60,8 +60,8 @@
   --error-bg: rgba(239, 68, 68, 0.12);
   --info: #38BDF8;
   /* Color aliases for redesigned components (dark mode) */
-  --color-bg: #000000;
-  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-bg: #010f38;
+  --color-surface: rgba(0, 3, 19, 0.421);
   --color-surface-raised: rgba(255, 255, 255, 0.06);
   --color-border: rgba(255, 255, 255, 0.1);
   --color-border-strong: rgba(255, 255, 255, 0.15);
@@ -331,6 +331,7 @@ html {
     @apply rounded-2xl border;
     background: var(--color-surface);
     border-color: var(--color-border);
+    backdrop-filter: blur(4px);
   }
 
   .badge {

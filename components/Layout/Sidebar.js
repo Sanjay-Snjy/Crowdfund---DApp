@@ -268,7 +268,7 @@ export default function Sidebar({
       {/* Sidebar */}
       <div
         className={`
-        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[#e6e6e6]/40 backdrop-blur-md dark:bg-black/80 border-0 md:border border-secondary dark:border-[rgba(255,255,255,0.1)] z-40 transition-all duration-300 ease-out
+        fixed top-0 bottom-0 left-0 md:top-[72px] md:bottom-6 md:left-3 bg-[var(--bg-secondary)] backdrop-blur-md  border-0 md:border border-secondary dark:border-[rgba(255,255,255,0.1)] z-40 transition-all duration-300 ease-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${sidebarWidthClass}
         rounded-3xl overflow-y-auto overflow-x-hidden flex flex-col
